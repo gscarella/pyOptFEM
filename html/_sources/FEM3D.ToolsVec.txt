@@ -1,0 +1,62 @@
+
+Vectorized computation of basis functions gradients
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By construction, the gradients of basis functions are constants on each element :math:`T_k.` 
+So, we denote, :math:`\forall \il\in\ENS{1}{4},` by :math:`\vecb{G}^\il` the :math:`3 \times \nme` array defined,
+:math:`\forall k\in\ENS{1}{\nme},` by
+
+.. math::
+
+   \vecb{G}^\il(:,k)= \GRAD\BasisFunc_{\me(\il,k)}(\q),\ \forall \q\in T_k.
+
+On :math:`T_k` tetrahedra
+we set
+
+.. math::
+  \begin{array}{lcllcl}
+  \vecb{D}^{12}&=&\q^{\me(1,k)}-\q^{\me(2,k)},\ & \vecb{D}^{23}&=&\q^{\me(2,k)}-\q^{\me(3,k)}\\
+  \vecb{D}^{13}&=&\q^{\me(1,k)}-\q^{\me(3,k)},\ & \vecb{D}^{24}&=&\q^{\me(2,k)}-\q^{\me(4,k)}\\
+  \vecb{D}^{14}&=&\q^{\me(1,k)}-\q^{\me(4,k)},\ & \vecb{D}^{34}&=&\q^{\me(3,k)}-\q^{\me(4,k)}
+  \end{array}
+
+Then, we have
+
+.. math::
+  \begin{array}{ll}
+    \GRAD\BasisFunc_{1}^k(\q)=\frac{1}{6|T_k|}
+    \begin{pmatrix}
+    -\vecb{D}^{23}_y \vecb{D}^{24}_z + \vecb{D}^{23}_z \vecb{D}^{24}_y\\
+          \vecb{D}^{23}_x \vecb{D}^{24}_z - \vecb{D}^{23}_z \vecb{D}^{24}_x\\
+          -\vecb{D}^{23}_x \vecb{D}^{24}_y + \vecb{D}^{23}_y \vecb{D}^{24}_x
+    \end{pmatrix},&\GRAD\BasisFunc_{2}^k(\q)=\frac{1}{6|T_k|}
+    \begin{pmatrix} \vecb{D}^{13}_y \vecb{D}^{14}_z - \vecb{D}^{13}_z \vecb{D}^{14}_y\\
+          -\vecb{D}^{13}_x \vecb{D}^{14}_z + \vecb{D}^{13}_z \vecb{D}^{14}_x\\
+          \vecb{D}^{13}_x \vecb{D}^{14}_y - \vecb{D}^{13}_y \vecb{D}^{14}_x
+    \end{pmatrix}\\
+    \GRAD\BasisFunc_{3}^k(\q)=\frac{1}{6|T_k|}
+    \begin{pmatrix} -\vecb{D}^{12}_y \vecb{D}^{14}_z + \vecb{D}^{12}_z \vecb{D}^{14}_y\\
+          \vecb{D}^{12}_x \vecb{D}^{14}_z - \vecb{D}^{12}_z \vecb{D}^{14}_x\\
+          -\vecb{D}^{12}_x \vecb{D}^{14}_y + \vecb{D}^{12}_y \vecb{D}^{14}_x
+    \end{pmatrix},& 
+    \GRAD\BasisFunc_{4}^k(\q)=\frac{1}{6|T_k|}
+    \begin{pmatrix}     
+    \vecb{D}^{12}_y \vecb{D}^{13}_z - \vecb{D}^{12}_z \vecb{D}^{13}_y\\
+          -\vecb{D}^{12}_x \vecb{D}^{13}_z + \vecb{D}^{12}_z \vecb{D}^{13}_x\\
+          \vecb{D}^{12}_x \vecb{D}^{13}_y - \vecb{D}^{12}_y \vecb{D}^{13}_x
+    \end{pmatrix}
+    \end{array}
+
+    
+With these formulas, we obtain the vectorized algorithm given in Algorithm :num:`gradientvec3dalgo`.
+
+.. admonition:: Algorithm :num:`gradientvec3dalgo`
+
+    .. _GradientVec3Dalgo:  
+          
+    .. figure::  images/GradientVec3D_algo.png
+          :width: 600px
+          :scale: 100%
+          :align:   center
+        
+          Vectorized algorithm for computation of basis functions gradients in 3d

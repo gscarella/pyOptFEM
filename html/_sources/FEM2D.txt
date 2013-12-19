@@ -1,0 +1,45 @@
+.. _FEM2D-label:
+
+FEM2D module
+++++++++++++
+:Author: Francois Cuvelier <cuvelier@math.univ-paris13.fr>
+:Date: 15/09/2013
+
+Contains functions to build some finite element matrices using :math:`P_1`-Lagrange finite elements on a 2D mesh.
+Each assembly matrix is computed by three different versions called ``base``,
+``OptV1`` and  ``OptV2`` (see `here <http://hal.inria.fr/docs/00/82/19/42/PDF/RR-8305.pdf>`_)
+
+.. contents:: Contents
+   :local:
+
+.. _FEM2D-assembly-label:   
+
+Assembly matrices (``base``, ``OptV1`` and  ``OptV2`` versions)
+---------------------------------------------------------------
+
+   
+.. include:: FEM2D.assembly.rst
+
+
+Element matrices (used by ``base`` and ``OptV1`` versions)
+-------------------------------------------------------------
+
+.. include:: FEM2D.elemMatrix.rst
+
+Vectorized tools (used by ``OptV2`` version)
+--------------------------------------------
+
+.. include:: FEM2D.ToolsVec.rst
+
+
+Vectorized element matrices (used by ``OptV2`` version)
+-------------------------------------------------------------
+
+.. include:: FEM2D.elemMatrixVec.rst
+
+Mesh
+-------------------------------------------------------------
+.. automodule:: pyOptFEM.FEM2D.mesh
+	:members:
+
+

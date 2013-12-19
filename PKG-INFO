@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: pyOptFEM
+Version: 0.0.7
+Summary: Python library for assembling finite element matrices in 2D and 3D
+Home-page: http://www.math.univ-paris13.fr/~cuvelier
+Author: F. Cuvelier
+Author-email: cuvelier@math.univ-paris13.fr
+License: GNU GPL
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Topic :: Scientific/Engineering :: Mathematics

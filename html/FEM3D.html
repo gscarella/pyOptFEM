@@ -1,0 +1,1209 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FEM3D module &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="index.html" />
+    <link rel="next" title="valid2D module" href="valid2D.html" />
+    <link rel="prev" title="FEM2D module" href="FEM2D.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="valid2D.html" title="valid2D module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="FEM2D.html" title="FEM2D module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="fem3d-module">
+<span id="fem3d-label"></span><h1>FEM3D module<a class="headerlink" href="#fem3d-module" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Francois Cuvelier &lt;<a class="reference external" href="mailto:cuvelier&#37;&#52;&#48;math&#46;univ-paris13&#46;fr">cuvelier<span>&#64;</span>math<span>&#46;</span>univ-paris13<span>&#46;</span>fr</a>&gt;</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">15/09/2013</td>
+</tr>
+</tbody>
+</table>
+<p>Contains functions to build some finite element matrices using <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements on a 3D mesh.
+Each assembly matrix is computed by three differents versions called <tt class="docutils literal"><span class="pre">base</span></tt>,
+<tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> (see <a class="reference external" href="http://hal.inria.fr/docs/00/82/19/42/PDF/RR-8305.pdf">here</a>)</p>
+<div class="contents local topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#assembly-matrix-base-optv1-and-optv2-versions" id="id4">Assembly matrix (<tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions)</a><ul>
+<li><a class="reference internal" href="#mass-matrix" id="id5">Mass Matrix</a></li>
+<li><a class="reference internal" href="#stiffness-matrix" id="id6">Stiffness Matrix</a></li>
+<li><a class="reference internal" href="#elastic-stiffness-matrix" id="id7">Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#element-matrix-used-by-base-and-optv1-versions" id="id8">Element matrix (used by <tt class="docutils literal"><span class="pre">base</span></tt> and <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions)</a><ul>
+<li><a class="reference internal" href="#element-mass-matrix" id="id9">Element Mass Matrix</a></li>
+<li><a class="reference internal" href="#element-stiffness-matrix" id="id10">Element Stiffness Matrix</a></li>
+<li><a class="reference internal" href="#element-elastic-stiffness-matrix" id="id11">Element Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vectorized-tools-used-by-optv2-version" id="id12">Vectorized tools (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a><ul>
+<li><a class="reference internal" href="#vectorized-computation-of-basis-functions-gradients" id="id13">Vectorized computation of basis functions gradients</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vectorized-element-matrix-used-by-optv2-version" id="id14">Vectorized element matrix (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a><ul>
+<li><a class="reference internal" href="#id1" id="id15">Element Mass Matrix</a></li>
+<li><a class="reference internal" href="#id2" id="id16">Element Stiffness Matrix</a></li>
+<li><a class="reference internal" href="#id3" id="id17">Element Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pyOptFEM.FEM3D.mesh" id="id18">Mesh</a></li>
+</ul>
+</div>
+<div class="section" id="assembly-matrix-base-optv1-and-optv2-versions">
+<h2><a class="toc-backref" href="#id4">Assembly matrix (<tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions)</a><a class="headerlink" href="#assembly-matrix-base-optv1-and-optv2-versions" title="Permalink to this headline">¶</a></h2>
+<p>Let <img class="math" src="_images/math/a6f6a1ca959a10c8ccd5149338d04ebe08987dd1.png" alt="\Omega_h"/> be a tetrahedral mesh of <img class="math" src="_images/math/9e2b196e9b7e57d1ec99f6534c581ea9759d2170.png" alt="\Omega"/> corresponding
+to the following structure data:</p>
+<div class="math">
+<p><img src="_images/math/cc16cf40bee8d694e1d96b522c2dff9e8317f5d2.png" alt="\mbox{\begin{tabular}{lccll}
+\hline
+\textbf{name} &amp; \textbf{type} &amp; \textbf{dimension} &amp; \textbf{description} &amp; \textbf{Python}\\
+\hline
+$\nq$ &amp; integer &amp; 1 &amp; number of vertices &amp; \texttt{nq}\\
+$\nme$ &amp; integer &amp; 1 &amp; number of elements &amp; \texttt{nme}\\
+$\q$   &amp; double  &amp; $3 \times {\nq}$ &amp;
+\begin{minipage}[t]{7.9cm}
+array of vertices coordinates. $\q(\al,j)$ is the $\nu$-th coordinate of the $j$-th vertex,
+$\al\in\{1,2,3\}$, $j\in\{1,\hdots,\nq\}.$
+The $j$-th vertex will be also denoted by $\q^j$
+\end{minipage}&amp;
+\begin{minipage}[t]{3cm}
+\texttt{q} (transposed)\\
+\texttt{q[j-1]} = $\q^j$
+\end{minipage}\\
+$\me$  &amp; integer &amp; $4 \times \nme$ &amp;
+\begin{minipage}[t]{7.9cm}
+connectivity array. ${\me}(\jl,k)$ is the storage index of the $\beta$-th vertex
+of the $k$-th element, in the array~$q$, for $\jl\in\{1,\hdots,4\}$ and $k\in\{1,\hdots,{\nme}\}$
+\end{minipage}&amp;\texttt{me} (transposed)\\
+$\rm volumes$  &amp; double &amp; $1\times {\nme}$ &amp;
+\begin{minipage}[t]{7.9cm}
+array of volumes. ${\rm volumes}(k)$ is the $k$-th tetrahedron volume,
+$k\in\{1,\hdots,\nme\}$
+\end{minipage}&amp;\texttt{volumes}\\
+\hline
+\end{tabular}}"/></p>
+</div><p>The <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange basis functions associated to <img class="math" src="_images/math/a6f6a1ca959a10c8ccd5149338d04ebe08987dd1.png" alt="\Omega_h"/> are denoted by <img class="math" src="_images/math/87686aa0f5136421c8415c7169adcb308e36c7a8.png" alt="\varphi_i"/>
+for all <img class="math" src="_images/math/7cb4737f941d4bce5dff305820cfd44076a67e0c.png" alt="i\in\{1,\hdots,\rm{n_q}\}"/> and are defined by</p>
+<div class="math">
+<p><img src="_images/math/192a2c08013fd81a36a82c3f17fd67dc50a184e1.png" alt="\varphi_i(\rm{q}^j)=\delta_{i,j},\ \ \forall (i,j)\in\{1,\hdots,\rm{n_q}\}^2"/></p>
+</div><p>We also define the global <em>alternate</em> basis <img class="math" src="_images/math/d6ec75eaa4b0a8b5675477e7c0d4723eceacebba.png" alt="\mathcal{B}_a"/>  by</p>
+<div class="math">
+<p><img src="_images/math/32b4f81159ffee67ed369b1a522e2f7689bf671a.png" alt="\mathcal{B}_a=\{\FoncBaseDeuxD_1,\hdots,\FoncBaseDeuxD_{3\nq}\}=\left\{
+\begin{pmatrix}  \varphi_1 \\ 0 \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_1 \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ 0 \\ \varphi_1 \end{pmatrix}, \hdots,
+\begin{pmatrix}  \varphi_\nq \\ 0 \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_\nq \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ 0 \\ \varphi_\nq \end{pmatrix}
+\right\}"/></p>
+</div><p>and the global <em>block</em> basis <img class="math" src="_images/math/6b5488ebd4c806ed88554d44f2589ea787771b60.png" alt="\mathcal{B}_b"/> by</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/9c2b39f0be748e0b44d1d78babba7bf7a0d3212c.png" alt="\mathcal{B}_b=\{\FoncBaseDeuxDB_1,\hdots,\FoncBaseDeuxDB_{3\nq}\}=\left\{
+\begin{pmatrix}  \varphi_1 \\ 0 \\ 0\end{pmatrix},\hdots,
+\begin{pmatrix}  \varphi_\nq \\ 0 \\0\end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_1 \\ 0\end{pmatrix},\hdots,
+\begin{pmatrix} 0  \\ \varphi_\nq \\0 \end{pmatrix},
+\begin{pmatrix}  0  \\ 0\\ \varphi_1 \end{pmatrix},\hdots,
+\begin{pmatrix} 0  \\ 0\\ \varphi_\nq \end{pmatrix}
+\right\}."/></p>
+</div></div></blockquote>
+<div class="section" id="mass-matrix">
+<span id="fem3d-massassembling-label"></span><h3><a class="toc-backref" href="#id5">Mass Matrix</a><a class="headerlink" href="#mass-matrix" title="Permalink to this headline">¶</a></h3>
+<p>Assembly of the Mass Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements
+using  <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions respectively (see report).
+The Mass Matrix <img class="math" src="_images/math/a86bef475b8bcf8376aab847967c0b507650d684.png" alt="\mathbb{M}"/> is given by</p>
+<div class="math" id="massmatrix-label">
+<p><img src="_images/math/7648f6b1ee22510339fdf05bb261300c5665b08a.png" alt="\mathbb{M}_{i,j}=\int_{\Omega_h} \varphi_j(q)\ \varphi_i(q)dq,\ \ \forall (i,j) \in \{1,...,\rm{n_q}\}^2."/></p>
+</div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>generic syntax:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">M</span> <span class="o">=</span> <span class="n">MassAssembling3DP1</span><span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nq</span><span class="p">,</span><span class="n">nme</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">volumes</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">nq</span></tt>: total number of nodes of the mesh, also denoted by <img class="math" src="_images/math/d74b57421efe61b98415dd13c897885a98023c8f.png" alt="\nq"/>,</li>
+<li><tt class="docutils literal"><span class="pre">nme</span></tt>: total number of tetrahedra, also denoted by <img class="math" src="_images/math/1b2ddc9345548a0e09b20ac6851e89cc2d81df8e.png" alt="\nme"/>,</li>
+<li><tt class="docutils literal"><span class="pre">me</span></tt>: Connectivity array, <tt class="docutils literal"><span class="pre">(nme,4)</span></tt> array,</li>
+<li><tt class="docutils literal"><span class="pre">volumes</span></tt>: Array of tetrahedra volumes, <tt class="docutils literal"><span class="pre">(nme,)</span></tt>  array,</li>
+<li><strong>returns</strong> a <em>Scipy</em> CSC sparse matrix of size <img class="math" src="_images/math/c20d70584cfa7adc7b861f63f29d3ad78576d535.png" alt="\nq \times \nq"/></li>
+</ul>
+<p class="last">where <tt class="docutils literal"><span class="pre">&lt;version&gt;</span></tt> is <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> or  <tt class="docutils literal"><span class="pre">OptV2</span></tt></p>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM3D</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Th</span><span class="o">=</span><span class="n">CubeMesh</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mbase</span> <span class="o">=</span>  <span class="n">MassAssembling3DP1base</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MOptV1</span><span class="o">=</span> <span class="n">MassAssembling3DP1OptV1</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&quot; NormInf(Mbase-MOptV1)=</span><span class="si">%e</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">NormInf</span><span class="p">(</span><span class="n">Mbase</span><span class="o">-</span><span class="n">MOptV1</span><span class="p">))</span>
+<span class="go">NormInf(Mbase-MOptV1)=1.734723e-18</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MOptV2</span><span class="o">=</span> <span class="n">MassAssembling3DP1OptV2</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&quot; NormInf(Mbase-MOptV2)=</span><span class="si">%e</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">NormInf</span><span class="p">(</span><span class="n">Mbase</span><span class="o">-</span><span class="n">MOptV2</span><span class="p">))</span>
+<span class="go">NormInf(Mbase-MOptV2)=1.734723e-18</span>
+</pre></div>
+</div>
+<p>We can show sparsity of the Mass matrix :</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM3D</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Th</span><span class="o">=</span><span class="n">CubeMesh</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span><span class="o">=</span><span class="n">MassAssembling3DP1OptV2</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">areas</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">showSparsity</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/Mass3DP1sparsity.png"><img alt="_images/Mass3DP1sparsity.png" src="_images/Mass3DP1sparsity.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 18: Sparsity of Mass Matrix generated with command <em>showSparsity(M)</em></p>
+</div>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>source code</p>
+<dl class="function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.assembly.</tt><tt class="descname">MassAssembling3DP1base</tt><big>(</big><em>nq</em>, <em>nme</em>, <em>me</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/assembly.html#MassAssembling3DP1base"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Assembly of the Mass Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">base</span></tt> version (see report).</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.assembly.</tt><tt class="descname">MassAssembling3DP1OptV1</tt><big>(</big><em>nq</em>, <em>nme</em>, <em>me</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/assembly.html#MassAssembling3DP1OptV1"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Assembly of the Mass Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">OptV1</span></tt> version (see report).</p>
+</dd></dl>
+
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.assembly.</tt><tt class="descname">MassAssembling3DP1OptV2</tt><big>(</big><em>nq</em>, <em>nme</em>, <em>me</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/assembly.html#MassAssembling3DP1OptV2"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Assembly of the Mass Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">OptV2</span></tt> version (see report).</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="stiffness-matrix">
+<span id="fem3d-stiffassembling-label"></span><h3><a class="toc-backref" href="#id6">Stiffness Matrix</a><a class="headerlink" href="#stiffness-matrix" title="Permalink to this headline">¶</a></h3>
+<p>Assembly of the Stiffness Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">base</span></tt>,
+<tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions respectively (see report).
+The Stiffness Matrix <img class="math" src="_images/math/833117207ad5712c11418dd7a78028b8261b628c.png" alt="\mathbb{S}"/> is given by</p>
+<div class="math">
+<p><img src="_images/math/709421224967aff653d4436a0bb46b8f285a1a14.png" alt="\mathbb{S}_{i,j}=\int_{\Omega_h} \nabla\varphi_j(q).\nabla \varphi_i(q)dq,\ \ \forall (i,j) \in \{1,...,\rm{n_q}\}^2."/></p>
+</div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>generic syntax</p>
+<dl class="last function">
+<dt>
+<tt class="descname">M=StiffAssembling3DP1&lt;version&gt;(nq,nme,q,me,volumes)</tt></dt>
+<dd><p>Compute the <strong>stiffness</strong> sparse matrix  where <tt class="docutils literal"><span class="pre">&lt;version&gt;</span></tt> is <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> or  <tt class="docutils literal"><span class="pre">OptV2</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nq</strong> &#8211; total number of nodes of the mesh, also denoted by <img class="math" src="_images/math/d74b57421efe61b98415dd13c897885a98023c8f.png" alt="\nq"/>,</li>
+<li><strong>nme</strong> &#8211; total number of tetrahedra, also denoted by <img class="math" src="_images/math/1b2ddc9345548a0e09b20ac6851e89cc2d81df8e.png" alt="\nme"/>,</li>
+<li><strong>q</strong> (<em>numpy</em> array of float) &#8211; <dl class="docutils">
+<dt>array of vertices coordinates,</dt>
+<dd><ul class="first last">
+<li><tt class="docutils literal"><span class="pre">(nq,3)</span></tt> array for <tt class="docutils literal"><span class="pre">base</span></tt> and <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions,</li>
+<li><tt class="docutils literal"><span class="pre">(3,nq)</span></tt> array for  <tt class="docutils literal"><span class="pre">OptV2</span></tt> version,</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>me</strong> (<em>numpy</em> array of int) &#8211; <dl class="docutils">
+<dt>Connectivity array,</dt>
+<dd><ul class="first last">
+<li><tt class="docutils literal"><span class="pre">(nme,4)</span></tt> array for <tt class="docutils literal"><span class="pre">base</span></tt> and <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions,</li>
+<li><tt class="docutils literal"><span class="pre">(4,nme)</span></tt> array for  <tt class="docutils literal"><span class="pre">OptV2</span></tt> version,</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>volumes</strong> (<em>numpy</em> array of floats,) &#8211; <tt class="docutils literal"><span class="pre">(nme,)</span></tt> array of tetrahedra volumes,</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <em>Scipy</em> CSC sparse matrix of size <img class="math" src="_images/math/969af0b58a18f3fd443d1a02aa140d2de843fd84.png" alt="2\nq \times 2\nq"/></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<p>Benchmarks of theses functions are presented in <a class="reference internal" href="benchmarks3D.html#bench3d-stiff-label"><em>Stiffness Matrix</em></a>.
+We give a simple usage :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM3D</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Th</span><span class="o">=</span><span class="n">CubeMesh</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Sbase</span> <span class="o">=</span>  <span class="n">StiffAssembling3DP1base</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SOptV1</span><span class="o">=</span> <span class="n">StiffAssembling3DP1OptV1</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&quot; NormInf(Sbase-SOptV1)=</span><span class="si">%e</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">NormInf</span><span class="p">(</span><span class="n">Sbase</span><span class="o">-</span><span class="n">SOptV1</span><span class="p">))</span>
+<span class="go">NormInf(Sbase-SOptV1)=2.220446e-15</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SOptV2</span><span class="o">=</span> <span class="n">StiffAssembling3DP1OptV2</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&quot; NormInf(Sbase-SOptV2)=</span><span class="si">%e</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">NormInf</span><span class="p">(</span><span class="n">Sbase</span><span class="o">-</span><span class="n">SOptV2</span><span class="p">))</span>
+<span class="go">NormInf(Sbase-SOptV2)=2.220446e-15</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>source code</p>
+<dl class="function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.assembly.</tt><tt class="descname">StiffAssembling3DP1base</tt><big>(</big><em>nq</em>, <em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/assembly.html#StiffAssembling3DP1base"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Assembly of the Stiffness Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">base</span></tt> version (see report).</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.assembly.</tt><tt class="descname">StiffAssembling3DP1OptV1</tt><big>(</big><em>nq</em>, <em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/assembly.html#StiffAssembling3DP1OptV1"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Assembly of the Stiffness Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">OptV1</span></tt> version (see report).</p>
+</dd></dl>
+
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.assembly.</tt><tt class="descname">StiffAssembling3DP1OptV2</tt><big>(</big><em>nq</em>, <em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/assembly.html#StiffAssembling3DP1OptV2"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Assembly of the Stiffness Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">OptV2</span></tt> version (see report).</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="elastic-stiffness-matrix">
+<span id="fem3d-stiffelasassembling-label"></span><h3><a class="toc-backref" href="#id7">Elastic Stiffness Matrix</a><a class="headerlink" href="#elastic-stiffness-matrix" title="Permalink to this headline">¶</a></h3>
+<p>Assembly of the Elastic Stiffness Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">base</span></tt>,
+<tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions respectively (see report).
+The Elastic Stiffness Matrix <img class="math" src="_images/math/fe3564f325e203a3aa3d067ae85114a8877129f3.png" alt="\mathbb{K}"/> is given by</p>
+<div class="math">
+<p><img src="_images/math/b2ec900df94c71bb640d1bdf1b6f0acc8d652706.png" alt="\mathbb{K}_{m,l}=\int_{\Omega_h} \Odv^t(\psi_l(q))
+\Ocv(\psi_m(q)),
+\ \ \forall (m,l) \in \{1,...,3\nq\}^2."/></p>
+</div><p>where   <img class="math" src="_images/math/f7b10731d4beb1e065510f20620ca21c24bdba32.png" alt="\Ocv=(\Occ_{xx},\Occ_{yy},\Occ_{zz},\Occ_{xy},\Occ_{yz},\Occ_{xz})^t"/> and
+<img class="math" src="_images/math/c6f7a499ff8a87156cf75460b6346f6f8f59c195.png" alt="\Odv=(\Odc_{xx},\Odc_{yy},\Odc_{zz},2\Odc_{xy},2\Odc_{yz},2\Odc_{xz})^t"/>
+are the elastic stress and strain tensors respectively.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>generic syntax</p>
+<dl class="last function">
+<dt>
+<tt class="descname">M=StiffElasAssembling3DP1&lt;version&gt;(nq,nme,q,me,volumes,la,mu,Num)</tt></dt>
+<dd><p>Compute the <strong>elastic stiffness</strong> sparse matrix where <tt class="docutils literal"><span class="pre">&lt;version&gt;</span></tt> is <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> or  <tt class="docutils literal"><span class="pre">OptV2</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nq</strong> &#8211; total number of nodes of the mesh,</li>
+<li><strong>nme</strong> &#8211; total number of tetrahedrons,</li>
+<li><strong>q</strong> (<em>numpy</em> array of float) &#8211; <dl class="docutils">
+<dt>vertices coordinates,</dt>
+<dd><ul class="first last">
+<li><tt class="docutils literal"><span class="pre">(nq,3)</span></tt> array for <tt class="docutils literal"><span class="pre">base</span></tt> and <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions,</li>
+<li><tt class="docutils literal"><span class="pre">(3,nq)</span></tt> array for  <tt class="docutils literal"><span class="pre">OptV2</span></tt> version,</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>me</strong> (<em>numpy</em> array of int) &#8211; <dl class="docutils">
+<dt>connectivity array,</dt>
+<dd><ul class="first last">
+<li><tt class="docutils literal"><span class="pre">(nme,4)</span></tt> array for <tt class="docutils literal"><span class="pre">base</span></tt> and <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions,</li>
+<li><tt class="docutils literal"><span class="pre">(4,nme)</span></tt> array for  <tt class="docutils literal"><span class="pre">OptV2</span></tt> version,</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>volumes</strong> (<em>numpy</em> array of floats,) &#8211; <tt class="docutils literal"><span class="pre">(nme,)</span></tt> array of tetrahedra volumes,</li>
+<li><strong>la</strong> &#8211; the first Lame coefficient in Hooke&#8217;s law, denoted by <img class="math" src="_images/math/ce4588fd900d02afcbd260bc07f54cce49a7dc4a.png" alt="\lambda"/>,</li>
+<li><strong>mu</strong> &#8211; the second Lame coefficient in Hooke&#8217;s law, denoted by <img class="math" src="_images/math/2d8c833ed800824727cd7bd2fb9de1a12ad7e674.png" alt="\mu"/>,</li>
+<li><strong>Num</strong> &#8211; <ul>
+<li>0 global alternate numbering with local alternate numbering (classical method),</li>
+<li>1 global block numbering with local alternate numbering,</li>
+<li>2 global alternate numbering with local block numbering,</li>
+<li>3 global block numbering with local block numbering.</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <em>Scipy</em> CSC sparse matrix of size <img class="math" src="_images/math/79e53c5106383aa51dff1cd7af136a84fe8fef17.png" alt="3nq\times 3nq"/></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM3D</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Th</span><span class="o">=</span><span class="n">CubeMesh</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Kbase</span> <span class="o">=</span>  <span class="n">StiffElasAssembling3DP1base</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">KOptV1</span><span class="o">=</span> <span class="n">StiffElasAssembling3DP1OptV1</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&quot; NormInf(Kbase-KOptV1)=</span><span class="si">%e</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">NormInf</span><span class="p">(</span><span class="n">Kbase</span><span class="o">-</span><span class="n">KOptV1</span><span class="p">))</span>
+<span class="go">NormInf(Kbase-KOptV1)=1.332268e-15</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">KOptV2</span><span class="o">=</span> <span class="n">StiffElasAssembling3DP1OptV2</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s">&quot; NormInf(Kbase-KOptV2)=</span><span class="si">%e</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">NormInf</span><span class="p">(</span><span class="n">Kbase</span><span class="o">-</span><span class="n">KOptV2</span><span class="p">))</span>
+<span class="go">NormInf(Kbase-KOptV2)=1.332268e-15</span>
+</pre></div>
+</div>
+<p>We now illustrate the consequences of the choice of the global basis on matrix sparsity</p>
+<ul>
+<li><p class="first">global <em>alternate</em> basis <img class="math" src="_images/math/d6ec75eaa4b0a8b5675477e7c0d4723eceacebba.png" alt="\mathcal{B}_a"/> (<tt class="docutils literal"><span class="pre">Num=0</span></tt> or <tt class="docutils literal"><span class="pre">Num=2</span></tt>)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM3D</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Th</span><span class="o">=</span><span class="n">CubeMesh</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">K0</span><span class="o">=</span><span class="n">StiffElasAssembling3DP1OptV1</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">showSparsity</span><span class="p">(</span><span class="n">K0</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><div class="figure align-center">
+<a class="reference internal image-reference" href="_images/StiffElas3DP1_Num0_sparsity.png"><img alt="_images/StiffElas3DP1_Num0_sparsity.png" src="_images/StiffElas3DP1_Num0_sparsity.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 19: Sparsity of the Elastic Stiffness Matrix generated with global alternate numbering (Num=0 or 2)</p>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">global <em>block</em> basis <img class="math" src="_images/math/d6ec75eaa4b0a8b5675477e7c0d4723eceacebba.png" alt="\mathcal{B}_a"/> (<tt class="docutils literal"><span class="pre">Num=1</span></tt> or <tt class="docutils literal"><span class="pre">Num=3</span></tt>)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">K3</span><span class="o">=</span><span class="n">StiffElasAssembling3DP1OptV1</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">showSparsity</span><span class="p">(</span><span class="n">K3</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><div class="figure align-center">
+<a class="reference internal image-reference" href="_images/StiffElas3DP1_Num3_sparsity.png"><img alt="_images/StiffElas3DP1_Num3_sparsity.png" src="_images/StiffElas3DP1_Num3_sparsity.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 20: Sparsity of the Elastic Stiffness Matrix generated with global block numbering (Num=1 or 3)</p>
+</div>
+</div></blockquote>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>source code</p>
+<dl class="function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.assembly.</tt><tt class="descname">StiffElasAssembling3DP1base</tt><big>(</big><em>nq</em>, <em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em>, <em>la</em>, <em>mu</em>, <em>Num</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/assembly.html#StiffElasAssembling3DP1base"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Assembly of the Elasticity Stiffness Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">base</span></tt> version (see report).</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.assembly.</tt><tt class="descname">StiffElasAssembling3DP1OptV1</tt><big>(</big><em>nq</em>, <em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em>, <em>la</em>, <em>mu</em>, <em>Num</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/assembly.html#StiffElasAssembling3DP1OptV1"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Assembly of the Elasticity Stiffness Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">OptV1</span></tt> version (see report).</p>
+</dd></dl>
+
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.assembly.</tt><tt class="descname">StiffElasAssembling3DP1OptV2</tt><big>(</big><em>nq</em>, <em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em>, <em>la</em>, <em>mu</em>, <em>Num</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/assembly.html#StiffElasAssembling3DP1OptV2"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Assembly of the Elasticity Stiffness Matrix by <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite elements using <tt class="docutils literal"><span class="pre">OptV2</span></tt> version (see report).</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+<div class="section" id="element-matrix-used-by-base-and-optv1-versions">
+<h2><a class="toc-backref" href="#id8">Element matrix (used by <tt class="docutils literal"><span class="pre">base</span></tt> and <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions)</a><a class="headerlink" href="#element-matrix-used-by-base-and-optv1-versions" title="Permalink to this headline">¶</a></h2>
+<p>Let <img class="math" src="_images/math/2554b6496c3b678897e9b060ef00aa9f0a7d7ece.png" alt="T"/> be a tetrahedron of volume <img class="math" src="_images/math/fc73f3216cbfb7ceb707c9c143823d7e5e49f659.png" alt="|T|"/> and with <img class="math" src="_images/math/b8b351ed71528630187ee6527a283ac1c1f6ea7b.png" alt="\tilde{\q}^1"/>, <img class="math" src="_images/math/9b7f338cbc557237f1f68205611c9b7e135defbf.png" alt="\tilde{\q}^2"/>,
+<img class="math" src="_images/math/7d857c5d56e93a68668fd0a4644abd9cc46d29ba.png" alt="\tilde{\q}^3"/>
+and  <img class="math" src="_images/math/0112d98dcefcea7e644b9a8004822d6435f1020d.png" alt="\tilde{\q}^4"/> its four vertices. We denote by
+<img class="math" src="_images/math/38dde6ef15d8e6b8d2780d41d8204620c509614b.png" alt="\tilde{\varphi}_1"/>, <img class="math" src="_images/math/a41594f94e8895c039826182868676670e726f25.png" alt="\tilde{\varphi}_2"/>, <img class="math" src="_images/math/5fa9a8331519aa051eb284c66eafd59fcb0f8570.png" alt="\tilde{\varphi}_3"/> and
+<img class="math" src="_images/math/3eabb6d3ab26de6e05d37cd2843d50b15d011359.png" alt="\tilde{\varphi}_4"/>
+the <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange local basis functions such that <img class="math" src="_images/math/12f59f56565991a7add1366d634f6f339f740263.png" alt="\tilde{\varphi}_i(\pmb{q}^j)=\delta_{i,j},\ \forall(i,j)\in\{1,\hdots,4\}^2"/> .</p>
+<p>We also define the local <em>alternate</em> basis <img class="math" src="_images/math/64c145d17ae4ed9dacdad661f54e7618f50353f4.png" alt="\tilde{\mathcal{B}}_a"/>  by</p>
+<div class="math">
+<p><img src="_images/math/021f9c192c36a2721484554cf3241e74a52e472b.png" alt="\tilde{\mathcal{B}}_a=\{\pmb{\tilde{\psi}}_1,\hdots,\pmb{\tilde{\psi}}_{12}\}=\left\{
+\begin{pmatrix}  \tilde{\varphi}_1 \\ 0 \\ 0\end{pmatrix},
+\begin{pmatrix}  0  \\ \tilde{\varphi}_1 \\ 0\end{pmatrix},
+\begin{pmatrix}  0  \\ 0 \\ \tilde{\varphi}_1 \end{pmatrix}, \hdots,
+\begin{pmatrix}  \tilde{\varphi}_4 \\ 0 \\ 0\end{pmatrix},
+\begin{pmatrix}  0  \\ \tilde{\varphi}_4 \\ 0\end{pmatrix},
+\begin{pmatrix}  0  \\ 0 \\ \tilde{\varphi}_4 \end{pmatrix},
+\right\}"/></p>
+</div><p>and the local <em>block</em> basis <img class="math" src="_images/math/c72bb7cedf6bf22c03ab199444670268bba504a2.png" alt="\tilde{\mathcal{B}}_b"/> by</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/6598af8127bbdfc818123c5c5df57f2eda5c360c.png" alt="\tilde{\mathcal{B}}_b=\{\pmb{\tilde{\phi}}_1,\hdots,\pmb{\tilde{\phi}}_{12}\}=\left\{
+\begin{pmatrix}  \tilde{\varphi}_1 \\ 0 \\ 0\end{pmatrix},
+\begin{pmatrix}  \tilde{\varphi}_2 \\ 0 \\ 0\end{pmatrix},
+\begin{pmatrix}  \tilde{\varphi}_3 \\ 0 \\ 0 \end{pmatrix},
+\begin{pmatrix}  \tilde{\varphi}_4 \\ 0 \\ 0\end{pmatrix},\hdots,
+\begin{pmatrix}  0 \\ 0  \\ \tilde{\varphi}_1 \end{pmatrix},
+\begin{pmatrix}  0 \\ 0  \\ \tilde{\varphi}_2\end{pmatrix},
+\begin{pmatrix}  0 \\ 0  \\ \tilde{\varphi}_3 \end{pmatrix}
+\begin{pmatrix}  0 \\ 0  \\ \tilde{\varphi}_4 \end{pmatrix}
+\right\}."/></p>
+</div></div></blockquote>
+<p>The <strong>elasticity tensor</strong>, <img class="math" src="_images/math/fb04136b051734a1f90ee00b1e0e6d96b932b2e4.png" alt="\mathbb{H}"/>,  obtained from Hooke&#8217;s law with an isotropic material,
+defined with the Lamé parameters <img class="math" src="_images/math/ce4588fd900d02afcbd260bc07f54cce49a7dc4a.png" alt="\lambda"/> and <img class="math" src="_images/math/2d8c833ed800824727cd7bd2fb9de1a12ad7e674.png" alt="\mu"/> is given by</p>
+<div class="math">
+<p><img src="_images/math/238b8ab4b49f83f9c62569fe72f3ccd297ca2333.png" alt="\mathbb{H} =\begin{pmatrix}
+               \lambda+2\mu &amp; \lambda &amp; \lambda &amp; 0 &amp; 0 &amp; 0\\
+               \lambda &amp; \lambda+2\mu &amp; \lambda &amp; 0 &amp; 0 &amp; 0\\
+               \lambda &amp; \lambda &amp; \lambda+2\mu &amp; 0 &amp; 0 &amp; 0\\
+               0 &amp; 0 &amp; 0 &amp; \mu &amp; 0 &amp; 0\\
+               0 &amp; 0 &amp; 0 &amp; 0 &amp; \mu &amp; 0\\
+               0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; \mu
+             \end{pmatrix}"/></p>
+</div><p>and, for a function <img class="math" src="_images/math/717473a419d2fc1565d808c505f01b6a2f758629.png" alt="\vecb{u}=(u_1,u_2,u_3)"/> the strain tensors is given by</p>
+<div class="math">
+<p><img src="_images/math/0e86bca141cba339cf53bd549a4e751eed2a1e7c.png" alt="\Odv(\vecb{u})=\begin{pmatrix}\displaystyle\DP{u_1}{x}, &amp; \displaystyle\DP{u_2}{y},&amp; \displaystyle\DP{u_3}{z}, &amp;
+                              \displaystyle\DP{u_2}{x}+\displaystyle\DP{u_1}{y},&amp;
+                              \displaystyle\DP{u_2}{z}+\displaystyle\DP{u_3}{y},&amp;
+                              \displaystyle\DP{u_1}{z}+\displaystyle\DP{u_3}{x}\end{pmatrix}^t"/></p>
+</div><div class="section" id="element-mass-matrix">
+<h3><a class="toc-backref" href="#id9">Element Mass Matrix</a><a class="headerlink" href="#element-mass-matrix" title="Permalink to this headline">¶</a></h3>
+<p>The element Mass matrix <img class="math" src="_images/math/516041c6edc9ea1eb545fb1c5412979ad2dc2685.png" alt="\mathbb{M}^e(T)"/> for the tetrahedron <img class="math" src="_images/math/2554b6496c3b678897e9b060ef00aa9f0a7d7ece.png" alt="T"/>,
+is defined by</p>
+<div class="math">
+<p><img src="_images/math/1fa5f6701616d7b5bc1f11d27b26580ff9bc9c17.png" alt="\MAT{M}^e_{i,j}(T)=\int_T \tilde{\varphi}_i(\q) \tilde{\varphi}_j(\q)\ dq,\ \ \forall(i,j)\in\{1,2,3,4\}^2"/></p>
+</div><p>We obtain :</p>
+<div class="math">
+<p><img src="_images/math/cafcb6077ca161f28a01827deff42c3fa8ded434.png" alt="\mathbb{M}^e(T) =\frac{|T|}{20}\begin{pmatrix}
+                                  2 &amp; 1 &amp; 1 &amp; 1\\
+                                  1 &amp; 2 &amp; 1 &amp; 1\\
+                                  1 &amp; 1 &amp; 2 &amp; 1\\
+                                  1 &amp; 1 &amp; 1 &amp; 2
+                                \end{pmatrix}"/></p>
+</div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>source code</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrix.</tt><tt class="descname">ElemMassMat3DP1</tt><big>(</big><em>V</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrix.html#ElemMassMat3DP1"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes  the element mass matrix <img class="math" src="_images/math/516041c6edc9ea1eb545fb1c5412979ad2dc2685.png" alt="\mathbb{M}^e(T)"/> for a given tetrahedron <img class="math" src="_images/math/2554b6496c3b678897e9b060ef00aa9f0a7d7ece.png" alt="T"/> of volume <img class="math" src="_images/math/fc73f3216cbfb7ceb707c9c143823d7e5e49f659.png" alt="|T|"/></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>V</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; volume of the tetrahedron.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><img class="math" src="_images/math/62d4eeb6a966219df4ac79cfc9981ec095e6be0b.png" alt="4 \times 4"/> <em>numpy</em> array of floats.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="element-stiffness-matrix">
+<h3><a class="toc-backref" href="#id10">Element Stiffness Matrix</a><a class="headerlink" href="#element-stiffness-matrix" title="Permalink to this headline">¶</a></h3>
+<p>The element stiffness matrix, <img class="math" src="_images/math/0135c045dc7b60b2d446b80aadd981d2c3d9edb0.png" alt="\mathbb{S}^e(T)"/>,
+for the <img class="math" src="_images/math/2554b6496c3b678897e9b060ef00aa9f0a7d7ece.png" alt="T"/> is defined by</p>
+<div class="math">
+<p><img src="_images/math/ca5a292aa0f219ca84f687f9b3e5daba8edde507.png" alt="\mathbb{S}^e_{i,j}(T)=\int_T &lt;\nabla \tilde{\varphi}_i(\pmb{q}),\nabla \tilde{\varphi}_j(\pmb{q})&gt;\ d\pmb{q},\ \ (i,j)\in\{1,2,3,4\}^2"/></p>
+</div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>source code</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrix.</tt><tt class="descname">ElemStiffMat3DP1</tt><big>(</big><em>ql</em>, <em>volume</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrix.html#ElemStiffMat3DP1"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes the element stiffness matrix <img class="math" src="_images/math/0135c045dc7b60b2d446b80aadd981d2c3d9edb0.png" alt="\mathbb{S}^e(T)"/> for a given tetrahedron <img class="math" src="_images/math/2554b6496c3b678897e9b060ef00aa9f0a7d7ece.png" alt="T"/></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ql</strong> (<img class="math" src="_images/math/3c357e004b6a219b581c96a89fe448077ca1cdb2.png" alt="2 \times 4"/> <em>numpy</em> array) &#8211; the four vertices of the tetrahedron,</li>
+<li><strong>volume</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; volume of the tetrahedron.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body"><p class="first last"><img class="math" src="_images/math/62d4eeb6a966219df4ac79cfc9981ec095e6be0b.png" alt="4 \times 4"/> <em>numpy</em> array of floats.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="element-elastic-stiffness-matrix">
+<h3><a class="toc-backref" href="#id11">Element Elastic Stiffness Matrix</a><a class="headerlink" href="#element-elastic-stiffness-matrix" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">The element elastic stiffness matrix, <img class="math" src="_images/math/9c6cf28206ae28e8b500ca036321ed2ababc10ed.png" alt="\mathbb{K}^e(T)"/>,
+for a given tetrahedron <img class="math" src="_images/math/2554b6496c3b678897e9b060ef00aa9f0a7d7ece.png" alt="T"/> in the local <em>alternate</em> basis <img class="math" src="_images/math/64c145d17ae4ed9dacdad661f54e7618f50353f4.png" alt="\tilde{\mathcal{B}}_a"/> is defined by</p>
+<div class="math">
+<p><img src="_images/math/2c8e59bcd0edbecfdc077522b28b9e39e7aff76e.png" alt="\mathbb{K}^e_{i,j}(T) = \int_T \underline{\pmb{\epsilon}}(\tilde{\pmb{\psi}}_j)^t(\pmb{q})
+                              \mathbb{H} \underline{\pmb{\epsilon}}(\tilde{\pmb{\psi}}_i)(\pmb{q})\, d\pmb{q},
+\ \ \ \forall (i,j)\in\{1,\hdots,12\}^2."/></p>
+</div><p>We also have</p>
+<div class="math">
+<p><img src="_images/math/9a5d5acc405ba11d9f5320b4d9ad286bc337fc16.png" alt="\mathbb{K}^e(T)=\frac{1}{4|T|} \mathbb{B}^t\mathbb{H}\mathbb{B}"/></p>
+</div><p>where <img class="math" src="_images/math/fb04136b051734a1f90ee00b1e0e6d96b932b2e4.png" alt="\mathbb{H}"/> is the elasticity tensor and <img class="math" src="_images/math/8d530dd8bca015775a0efaada7bd6557bb9c073b.png" alt="\mathbb{B}"/> is a <img class="math" src="_images/math/594b2b2c7ea3e7303b045b746ce5dac2bd9fdf8f.png" alt="6 \times 12"/> matrix defined by</p>
+<div class="math">
+<p><img src="_images/math/a2732f394be2f82e19fee7fc4636e78739e249a3.png" alt="\mathbb{B}=\begin{pmatrix}
+            \Odv(\tilde{\pmb{\psi}}_1)&amp;| &amp; \Odv(\tilde{\pmb{\psi}}_2)&amp; \hdots &amp;
+            \Odv(\tilde{\pmb{\psi}}_{11})&amp;| &amp; \Odv(\tilde{\pmb{\psi}}_{12})
+          \end{pmatrix}"/></p>
+</div><p>So in <img class="math" src="_images/math/64c145d17ae4ed9dacdad661f54e7618f50353f4.png" alt="\tilde{\mathcal{B}}_a"/> basis we obtain</p>
+<div class="math">
+<p><img src="_images/math/452a7325867f2f795f6be260ee6c0f436820213c.png" alt="\mathbb{B}=\begin{pmatrix}
+  \DP{\tilde{\varphi}_1}{x}&amp; 0 &amp;0 &amp; &amp; \DP{\tilde{\varphi}_4}{x}&amp; 0 &amp;0 \\
+  0&amp; \DP{\tilde{\varphi}_1}{y} &amp; 0&amp; &amp; 0&amp; \DP{\tilde{\varphi}_4}{y} &amp; 0\\
+  0&amp; 0 &amp; \DP{\tilde{\varphi}_1}{z} &amp; &amp; 0&amp; 0 &amp; \DP{\tilde{\varphi}_4}{z}\\
+  \DP{\tilde{\varphi}_1}{y}&amp; \DP{\tilde{\varphi}_1}{x} &amp; 0 &amp; \hdots\hdots&amp;  \DP{\tilde{\varphi}_4}{y}&amp; \DP{\tilde{\varphi}_4}{x} &amp; 0\\
+  0&amp;\DP{\tilde{\varphi}_1}{z}&amp; \DP{\tilde{\varphi}_1}{y}  &amp; &amp; 0&amp;\DP{\tilde{\varphi}_4}{z}&amp; \DP{\tilde{\varphi}_4}{y}\\
+  \DP{\tilde{\varphi}_1}{z}&amp; 0 &amp;  \DP{\tilde{\varphi}_1}{x} &amp; &amp; \DP{\tilde{\varphi}_4}{z}&amp; 0 &amp;  \DP{\tilde{\varphi}_4}{x}
+\end{pmatrix}"/></p>
+</div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>source code</p>
+<span class="target" id="module-pyOptFEM.FEM3D.elemMatrix"></span><dl class="last function">
+<dt id="pyOptFEM.FEM3D.elemMatrix.ElemStiffElasMatBa3DP1">
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrix.</tt><tt class="descname">ElemStiffElasMatBa3DP1</tt><big>(</big><em>ql</em>, <em>V</em>, <em>C</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrix.html#ElemStiffElasMatBa3DP1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyOptFEM.FEM3D.elemMatrix.ElemStiffElasMatBa3DP1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the element elastic stiffness matrix <img class="math" src="_images/math/9c6cf28206ae28e8b500ca036321ed2ababc10ed.png" alt="\mathbb{K}^e(T)"/> 
+for a given tetrahedron <img class="math" src="_images/math/2554b6496c3b678897e9b060ef00aa9f0a7d7ece.png" alt="T"/>  in the local <em>alternate</em> basis <img class="math" src="_images/math/d6ec75eaa4b0a8b5675477e7c0d4723eceacebba.png" alt="\mathcal{B}_a"/></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ql</strong> (<img class="math" src="_images/math/495c45dde59928de3e09d9f0cccd8f2a8af8bee9.png" alt="4 \times 2"/> <em>numpy</em> array) &#8211; contains the four vertices of the tetrahedron,</li>
+<li><strong>V</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; volume of the tetrahedron</li>
+<li><strong>H</strong> (<img class="math" src="_images/math/3df735414ed74b5fb2bd45fea452f9907f34bee3.png" alt="6 \times 6"/> <em>numpy</em> array) &#8211; Elasticity tensor, <img class="math" src="_images/math/fb04136b051734a1f90ee00b1e0e6d96b932b2e4.png" alt="\mathbb{H}"/>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><img class="math" src="_images/math/9c6cf28206ae28e8b500ca036321ed2ababc10ed.png" alt="\mathbb{K}^e(T)"/> in <img class="math" src="_images/math/d6ec75eaa4b0a8b5675477e7c0d4723eceacebba.png" alt="\mathcal{B}_a"/> basis.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body"><p class="first last"><img class="math" src="_images/math/7b1e5dbf697b6e66c3bbcea5ceab1c63b3e0fbf1.png" alt="12 \times 12"/> <em>numpy</em> array of floats.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</li>
+<li><p class="first">The element elastic stiffness matrix, <img class="math" src="_images/math/9c6cf28206ae28e8b500ca036321ed2ababc10ed.png" alt="\mathbb{K}^e(T)"/>,
+for a given triangle <img class="math" src="_images/math/2554b6496c3b678897e9b060ef00aa9f0a7d7ece.png" alt="T"/> in the local <em>block</em> basis <img class="math" src="_images/math/c72bb7cedf6bf22c03ab199444670268bba504a2.png" alt="\tilde{\mathcal{B}}_b"/> is defined by</p>
+<div class="math">
+<p><img src="_images/math/6ec9669e46c163d43410f666f720132a8bfb6d6a.png" alt="\mathbb{K}^e_{i,j}(T) = \int_T \underline{\pmb{\epsilon}}(\tilde{\pmb{\phi}}_j)^t(\pmb{q})
+                              \mathbb{H} \underline{\pmb{\epsilon}}(\tilde{\pmb{\phi}}_i)(\pmb{q})\, d\pmb{q},
+\ \ \ \forall (i,j)\in\{1,\hdots,6\}^2."/></p>
+</div><p>We also have</p>
+<div class="math">
+<p><img src="_images/math/9a5d5acc405ba11d9f5320b4d9ad286bc337fc16.png" alt="\mathbb{K}^e(T)=\frac{1}{4|T|} \mathbb{B}^t\mathbb{H}\mathbb{B}"/></p>
+</div><p>where <img class="math" src="_images/math/fb04136b051734a1f90ee00b1e0e6d96b932b2e4.png" alt="\mathbb{H}"/> is the elasticity tensor and <img class="math" src="_images/math/8d530dd8bca015775a0efaada7bd6557bb9c073b.png" alt="\mathbb{B}"/> is a <img class="math" src="_images/math/594b2b2c7ea3e7303b045b746ce5dac2bd9fdf8f.png" alt="6 \times 12"/> matrix defined by</p>
+<div class="math">
+<p><img src="_images/math/1928d59cc2e7ffea749e3ff1a472593dc8f3cfc0.png" alt="\mathbb{B}=\begin{pmatrix}
+            \Odv(\tilde{\pmb{\phi}}_1)&amp;\vdots &amp; \Odv(\tilde{\pmb{\phi}}_2)&amp; \hdots &amp;
+            \Odv(\tilde{\pmb{\phi}}_{11})&amp;\vdots &amp; \Odv(\tilde{\pmb{\phi}}_{12})
+          \end{pmatrix}"/></p>
+</div><p>So in <img class="math" src="_images/math/c72bb7cedf6bf22c03ab199444670268bba504a2.png" alt="\tilde{\mathcal{B}}_b"/> basis we obtain</p>
+<div class="math">
+<p><img src="_images/math/fb9a10eb42a4ea438177d81ace01ac2d8d44fcf2.png" alt="\mathbb{B}=\begin{pmatrix}
+  \DP{\tilde{\varphi}_1}{x}&amp; \hdots &amp;\DP{\tilde{\varphi}_4}{x} &amp; 0&amp; \hdots &amp; 0 &amp;0&amp; \hdots &amp; 0 \\
+  0&amp;  \hdots &amp; 0 &amp; \DP{\tilde{\varphi}_1}{y}&amp; \hdots &amp; \DP{\tilde{\varphi}_4}{y}&amp; 0 &amp; \hdots &amp; 0\\
+  0&amp;  \hdots &amp; 0 &amp;0 &amp; \hdots &amp; 0 &amp; \DP{\tilde{\varphi}_1}{z}  &amp; \hdots &amp;\DP{\tilde{\varphi}_4}{z}\\
+  \DP{\tilde{\varphi}_1}{y}&amp; \hdots &amp; \DP{\tilde{\varphi}_4}{y}&amp; \DP{\tilde{\varphi}_1}{x}&amp; \hdots &amp; \DP{\tilde{\varphi}_4}{x}&amp; 0&amp; \hdots &amp; 0\\
+  0&amp; \hdots &amp;  0 &amp; \DP{\tilde{\varphi}_1}{z}&amp; \hdots &amp; \DP{\tilde{\varphi}_4}{z}&amp; \DP{\tilde{\varphi}_1}{y}&amp; \hdots &amp;\DP{\tilde{\varphi}_4}{y}\\
+  \DP{\tilde{\varphi}_1}{z}&amp; \hdots &amp; \DP{\tilde{\varphi}_4}{z} &amp; 0&amp; \hdots &amp; 0 &amp; \DP{\tilde{\varphi}_1}{x}&amp; \hdots &amp; \DP{\tilde{\varphi}_4}{x}
+\end{pmatrix}"/></p>
+</div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>source code</p>
+<span class="target" id="module-pyOptFEM.FEM3D.elemMatrix"></span><dl class="last function">
+<dt id="pyOptFEM.FEM3D.elemMatrix.ElemStiffElasMatBb3DP1">
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrix.</tt><tt class="descname">ElemStiffElasMatBb3DP1</tt><big>(</big><em>ql</em>, <em>V</em>, <em>C</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrix.html#ElemStiffElasMatBb3DP1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyOptFEM.FEM3D.elemMatrix.ElemStiffElasMatBb3DP1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the element elastic stiffness matrix <img class="math" src="_images/math/9c6cf28206ae28e8b500ca036321ed2ababc10ed.png" alt="\mathbb{K}^e(T)"/> 
+for a given tetrahedron <img class="math" src="_images/math/2554b6496c3b678897e9b060ef00aa9f0a7d7ece.png" alt="T"/>  in the local <em>block</em> basis <img class="math" src="_images/math/6b5488ebd4c806ed88554d44f2589ea787771b60.png" alt="\mathcal{B}_b"/></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ql</strong> (<img class="math" src="_images/math/495c45dde59928de3e09d9f0cccd8f2a8af8bee9.png" alt="4 \times 2"/> <em>numpy</em> array) &#8211; contains the four vertices of the tetrahedron,</li>
+<li><strong>V</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; volume of the tetrahedron</li>
+<li><strong>H</strong> (<img class="math" src="_images/math/3df735414ed74b5fb2bd45fea452f9907f34bee3.png" alt="6 \times 6"/> <em>numpy</em> array) &#8211; Elasticity tensor, <img class="math" src="_images/math/fb04136b051734a1f90ee00b1e0e6d96b932b2e4.png" alt="\mathbb{H}"/>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><img class="math" src="_images/math/9c6cf28206ae28e8b500ca036321ed2ababc10ed.png" alt="\mathbb{K}^e(T)"/> in <img class="math" src="_images/math/6b5488ebd4c806ed88554d44f2589ea787771b60.png" alt="\mathcal{B}_b"/> basis.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body"><p class="first last"><img class="math" src="_images/math/7b1e5dbf697b6e66c3bbcea5ceab1c63b3e0fbf1.png" alt="12 \times 12"/> <em>numpy</em> array of floats.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="vectorized-tools-used-by-optv2-version">
+<h2><a class="toc-backref" href="#id12">Vectorized tools (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a><a class="headerlink" href="#vectorized-tools-used-by-optv2-version" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="vectorized-computation-of-basis-functions-gradients">
+<h3><a class="toc-backref" href="#id13">Vectorized computation of basis functions gradients</a><a class="headerlink" href="#vectorized-computation-of-basis-functions-gradients" title="Permalink to this headline">¶</a></h3>
+<p>By construction, the gradients of basis functions are constants on each element <img class="math" src="_images/math/5c06711a6aa08073fa2f134868e97e430894a2e9.png" alt="T_k."/>
+So, we denote, <img class="math" src="_images/math/805ffbfefbe65b78f2574566009699904f3706e6.png" alt="\forall \il\in\ENS{1}{4},"/> by <img class="math" src="_images/math/4abc95a20741ad1165e9871fb64cc6c4a09098a7.png" alt="\vecb{G}^\il"/> the <img class="math" src="_images/math/8d11e47d4d50282de8475ec8afe1e2e2be991bd4.png" alt="3 \times \nme"/> array defined,
+<img class="math" src="_images/math/c29242d77866f3e5c5dbb67028c7e41f1cef8cb7.png" alt="\forall k\in\ENS{1}{\nme},"/> by</p>
+<div class="math">
+<p><img src="_images/math/1c72e95858e542147eb168a3b7d3de550da3a264.png" alt="\vecb{G}^\il(:,k)= \GRAD\BasisFunc_{\me(\il,k)}(\q),\ \forall \q\in T_k."/></p>
+</div><p>On <img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/> tetrahedra
+we set</p>
+<div class="math">
+<p><img src="_images/math/8f75b5902db2273f9eb1196e53014b40c7e852ff.png" alt="\begin{array}{lcllcl}
+\vecb{D}^{12}&amp;=&amp;\q^{\me(1,k)}-\q^{\me(2,k)},\ &amp; \vecb{D}^{23}&amp;=&amp;\q^{\me(2,k)}-\q^{\me(3,k)}\\
+\vecb{D}^{13}&amp;=&amp;\q^{\me(1,k)}-\q^{\me(3,k)},\ &amp; \vecb{D}^{24}&amp;=&amp;\q^{\me(2,k)}-\q^{\me(4,k)}\\
+\vecb{D}^{14}&amp;=&amp;\q^{\me(1,k)}-\q^{\me(4,k)},\ &amp; \vecb{D}^{34}&amp;=&amp;\q^{\me(3,k)}-\q^{\me(4,k)}
+\end{array}"/></p>
+</div><p>Then, we have</p>
+<div class="math">
+<p><img src="_images/math/0083b6dabae51d34578014f115625570f818c6d3.png" alt="\begin{array}{ll}
+  \GRAD\BasisFunc_{1}^k(\q)=\frac{1}{6|T_k|}
+  \begin{pmatrix}
+  -\vecb{D}^{23}_y \vecb{D}^{24}_z + \vecb{D}^{23}_z \vecb{D}^{24}_y\\
+        \vecb{D}^{23}_x \vecb{D}^{24}_z - \vecb{D}^{23}_z \vecb{D}^{24}_x\\
+        -\vecb{D}^{23}_x \vecb{D}^{24}_y + \vecb{D}^{23}_y \vecb{D}^{24}_x
+  \end{pmatrix},&amp;\GRAD\BasisFunc_{2}^k(\q)=\frac{1}{6|T_k|}
+  \begin{pmatrix} \vecb{D}^{13}_y \vecb{D}^{14}_z - \vecb{D}^{13}_z \vecb{D}^{14}_y\\
+        -\vecb{D}^{13}_x \vecb{D}^{14}_z + \vecb{D}^{13}_z \vecb{D}^{14}_x\\
+        \vecb{D}^{13}_x \vecb{D}^{14}_y - \vecb{D}^{13}_y \vecb{D}^{14}_x
+  \end{pmatrix}\\
+  \GRAD\BasisFunc_{3}^k(\q)=\frac{1}{6|T_k|}
+  \begin{pmatrix} -\vecb{D}^{12}_y \vecb{D}^{14}_z + \vecb{D}^{12}_z \vecb{D}^{14}_y\\
+        \vecb{D}^{12}_x \vecb{D}^{14}_z - \vecb{D}^{12}_z \vecb{D}^{14}_x\\
+        -\vecb{D}^{12}_x \vecb{D}^{14}_y + \vecb{D}^{12}_y \vecb{D}^{14}_x
+  \end{pmatrix},&amp;
+  \GRAD\BasisFunc_{4}^k(\q)=\frac{1}{6|T_k|}
+  \begin{pmatrix}
+  \vecb{D}^{12}_y \vecb{D}^{13}_z - \vecb{D}^{12}_z \vecb{D}^{13}_y\\
+        -\vecb{D}^{12}_x \vecb{D}^{13}_z + \vecb{D}^{12}_z \vecb{D}^{13}_x\\
+        \vecb{D}^{12}_x \vecb{D}^{13}_y - \vecb{D}^{12}_y \vecb{D}^{13}_x
+  \end{pmatrix}
+  \end{array}"/></p>
+</div><p>With these formulas, we obtain the vectorized algorithm given in Algorithm <a href="FEM3D.ToolsVec.html#gradientvec3dalgo">26</a>.</p>
+<div class="admonition-algorithm-num-gradientvec3dalgo admonition">
+<p class="first admonition-title">Algorithm <a href="FEM3D.ToolsVec.html#gradientvec3dalgo">26</a></p>
+<div class="last figure align-center" id="gradientvec3dalgo">
+<a class="reference internal image-reference" href="_images/GradientVec3D_algo.png"><img alt="_images/GradientVec3D_algo.png" src="_images/GradientVec3D_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 21: Vectorized algorithm for computation of basis functions gradients in 3d</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="vectorized-element-matrix-used-by-optv2-version">
+<h2><a class="toc-backref" href="#id14">Vectorized element matrix (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a><a class="headerlink" href="#vectorized-element-matrix-used-by-optv2-version" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3><a class="toc-backref" href="#id15">Element Mass Matrix</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>We have</p>
+<div class="math">
+<p><img src="_images/math/cafcb6077ca161f28a01827deff42c3fa8ded434.png" alt="\mathbb{M}^e(T) =\frac{|T|}{20}\begin{pmatrix}
+                                  2 &amp; 1 &amp; 1 &amp; 1\\
+                                  1 &amp; 2 &amp; 1 &amp; 1\\
+                                  1 &amp; 1 &amp; 2 &amp; 1\\
+                                  1 &amp; 1 &amp; 1 &amp; 2
+                                \end{pmatrix}"/></p>
+</div><p>Then with <img class="math" src="_images/math/55ad9149a912591433016952afe50e9bd1da9d98.png" alt="\MAT{K}_g"/> definition (see Section <a class="reference internal" href="presentation.html#presentationoptv2-label"><em>New Optimized assembly algorithm (OptV2 version)</em></a>) , we obtain</p>
+<div class="math">
+<p><img src="_images/math/5417b60b0ee4b80eba4a279904f2bb57dbcf32de.png" alt="\MAT{K}_g(4(i-1)+j,k)=|T_k|\frac{1+\delta_{i,j}}{20}  \quad 1\le i,j \le 4,"/></p>
+</div><p>So the vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> computation is simple and given in Algorithm <a href="FEM3D.elemMatrixVec.html#elemmassmat3dp1vectoralgo">27</a>.</p>
+<div class="admonition-algorithm-num-elemmassmat3dp1vectoralgo admonition">
+<p class="first admonition-title">Algorithm <a href="FEM3D.elemMatrixVec.html#elemmassmat3dp1vectoralgo">27</a></p>
+<div class="last figure align-center" id="elemmassmat3dp1vectoralgo">
+<a class="reference internal image-reference" href="_images/ElemMassMat3DP1_algo.png"><img alt="_images/ElemMassMat3DP1_algo.png" src="_images/ElemMassMat3DP1_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 22: Vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> associated to 3d <strong>Mass</strong> matrix</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrixVec.</tt><tt class="descname">ElemMassMat3DP1Vec</tt><big>(</big><em>nme</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrixVec.html#ElemMassMat3DP1Vec"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes all the element Mass matrices <img class="math" src="_images/math/364f23dff042c528ff9499ae4785fc1b440eeddd.png" alt="\mathbb{M}^e(T_k)"/> for <img class="math" src="_images/math/0c1a5b812f7df75f27ae30d57d614b305c4c4203.png" alt="k\in\{0,\hdots,\nme-1\}"/></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>volumes</strong> (<img class="math" src="_images/math/1b2ddc9345548a0e09b20ac6851e89cc2d81df8e.png" alt="\nme"/> <em>numpy</em> array of floats) &#8211; volumes of all the mesh elements.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a one dimensional <em>numpy</em> array of size <img class="math" src="_images/math/c1bccae0437745ece7b45872924f5be5a9147dd0.png" alt="16 \nme"/></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="id2">
+<h3><a class="toc-backref" href="#id16">Element Stiffness Matrix</a><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>We have <img class="math" src="_images/math/5b647f67d2060d11529ee9d47a32708f7533bb58.png" alt="\forall (\il,\jl)\in\ENS{1}{4}^2"/></p>
+<div class="math">
+<p><img src="_images/math/f6cc8620320fd293358b2dc2cce8b859d05a55d4.png" alt="\mathbb{S}_{\il,\jl}^e(T_k)= |T_k| \DOT{\GRAD\BasisFunc_{\jl}^k}{\GRAD\BasisFunc_{\il}^k}."/></p>
+</div><p>Using vectorized algorithm function <img class="math" src="_images/math/81070b3b885b402e04faae49543d43a7c5b18cec.png" alt="\FNametxt{GradientVec3D}"/>  given in Algorithm <a href="FEM3D.ToolsVec.html#gradientvec3dalgo">26</a>, we obtain
+the vectorized algorithm <a href="FEM3D.elemMatrixVec.html#elemstiffmat3dp1vectoralgo">28</a> for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> computation for the <strong>Stiffness</strong> matrix in 3d.</p>
+<div class="admonition-algorithm-num-elemstiffmat3dp1vectoralgo admonition">
+<p class="first admonition-title">Algorithm <a href="FEM3D.elemMatrixVec.html#elemstiffmat3dp1vectoralgo">28</a></p>
+<div class="last figure align-center" id="elemstiffmat3dp1vectoralgo">
+<a class="reference internal image-reference" href="_images/ElemStiffMat3DP1_algo.png"><img alt="_images/ElemStiffMat3DP1_algo.png" src="_images/ElemStiffMat3DP1_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 23: Vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> associated to 3d <strong>Stiffness</strong> matrix</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrixVec.</tt><tt class="descname">ElemStiffMat3DP1Vec</tt><big>(</big><em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrixVec.html#ElemStiffMat3DP1Vec"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes all the element stiffness matrices <img class="math" src="_images/math/41390009c72e75f920919740275248250c403309.png" alt="\mathbb{S}^e(T_k)"/> for <img class="math" src="_images/math/0c1a5b812f7df75f27ae30d57d614b305c4c4203.png" alt="k\in\{0,\hdots,\nme-1\}"/></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nme</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of mesh elements,</li>
+<li><strong>q</strong> (<img class="math" src="_images/math/58e37a7cde3188c5e13e79c903bf976b080450f1.png" alt="3\times \nq"/> <em>numpy</em> array of floats) &#8211; mesh vertices,</li>
+<li><strong>me</strong> (<img class="math" src="_images/math/dcf0df73a85b8f7bde061a112b9191a101389806.png" alt="4 \times\nme"/> <em>numpy</em> array of integers) &#8211; mesh connectivity,</li>
+<li><strong>areas</strong> (<img class="math" src="_images/math/1b2ddc9345548a0e09b20ac6851e89cc2d81df8e.png" alt="\nme"/> <em>numpy</em> array of floats) &#8211; areas of all the mesh elements.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a one dimensional <em>numpy</em> array of size <img class="math" src="_images/math/b091aced11cff2cca8a1057d148eaf6174158fbf.png" alt="9 \nme"/></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="id3">
+<h3><a class="toc-backref" href="#id17">Element Elastic Stiffness Matrix</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">We define on the tetrahedron <img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/> the local <em>alternate</em> basis <img class="math" src="_images/math/d6a84d09f60683a514d7dffd09af5b6f6e54fe40.png" alt="\mathcal{B}_a^k"/>  by</p>
+<div class="math">
+<p><img src="_images/math/2060c318244a1a093ab4a7a603d13de6e186b4b9.png" alt="\begin{array}{c}
+  \mathcal{B}_a^k=\{\BasisFuncTwoD_1^k,\hdots,\BasisFuncTwoD_{12}^k\}\\=\\
+  \left\{\tiny
+  \begin{pmatrix}  \BasisFunc_1^k \\ 0 \\ 0\end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_1^k \\0  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_1^k  \end{pmatrix},
+  \begin{pmatrix}  \BasisFunc_2^k \\ 0 \\ 0\end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_2^k \\0  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_2^k  \end{pmatrix},
+  \begin{pmatrix}  \BasisFunc_3^k \\ 0 \\ 0\end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_3^k \\0  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_3^k   \end{pmatrix},
+  \begin{pmatrix}  \BasisFunc_4^k \\ 0 \\ 0\end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_4^k \\0  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_4^k  \end{pmatrix}
+  \right\}
+\end{array}"/></p>
+</div><p>where <img class="math" src="_images/math/84859d3a0a3f19f132eb85cf3228e6e7a11983d0.png" alt="\BasisFunc_\il^k=\BasisFunc_{\me(\il,k)}."/> With notations of <a class="reference internal" href="presentation.html#presentation-label"><em>Presentation</em></a>,
+we have <img class="math" src="_images/math/02126df37d248aa7db6571801b991a7dcf4201db.png" alt="\forall (\il,\jl) \in \ENS{1}{12}^2"/></p>
+<div class="math">
+<p><img src="_images/math/2b7a1d1c0db4052ea6c273bcb059afdde8bf734c.png" alt="\StiffElasElem_{\il,\jl}(T_k)=
+\int_{T_k} \Odv^t(\BasisFuncTwoD^k_\jl) \mathbb{C}\Odv(\BasisFuncTwoD^k_\il)d\q=
+\int_{T_k} \mathcal{H}(\BasisFuncTwoD^k_\jl,\BasisFuncTwoD^k_\il)(\q)d\q"/></p>
+</div><p>with, <img class="math" src="_images/math/de8cfc52fc871fe7f23697590b1ebf732dc121e1.png" alt="\forall \vecb{u}=(u_1,u_2,u_3)\in\HUnD{\DOM}^3,"/> <img class="math" src="_images/math/b50312da6d79f69e3c790fb0c2b5c21cea39e3dc.png" alt="\forall \vecb{v}=(v_1,v_2,v_3)\in\HUnD{\DOM}^3,"/> by</p>
+<div class="math">
+<p><img src="_images/math/966dac90c9bb68859a3b173ab0ab2ef0b3d43379.png" alt="\begin{array}{c}
+\mathcal{H}(\vecb{u},\vecb{v})\\=\\
+\tiny{
+\DOT{\begin{pmatrix} \gamma &amp; 0 &amp;0\\ 0 &amp; \mu &amp;0\\ 0 &amp; 0 &amp;\mu\end{pmatrix}\GRAD u_1 }{\GRAD v_1}
++\DOT{\begin{pmatrix} 0 &amp; \lambda &amp; 0\\ \mu &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 \end{pmatrix}\GRAD u_2 }{\GRAD v_1}
++\DOT{\begin{pmatrix} 0 &amp; 0 &amp; \lambda\\ 0 &amp; 0 &amp; 0 \\ \mu &amp; 0 &amp; 0 \end{pmatrix}\GRAD u_3 }{\GRAD v_1}
+}\\
+%&amp;+&amp;
+\tiny{+
+\DOT{\begin{pmatrix} 0 &amp; \mu &amp;0\\ \lambda &amp; 0 &amp;0\\ 0 &amp; 0 &amp;0\end{pmatrix}\GRAD u_1 }{\GRAD v_2}
++\DOT{\begin{pmatrix} \mu &amp; 0 &amp; 0\\ 0 &amp; \gamma &amp; 0 \\ 0 &amp; 0 &amp; \mu \end{pmatrix}\GRAD u_2 }{\GRAD v_2}
++\DOT{\begin{pmatrix} 0 &amp; 0 &amp; 0\\ 0 &amp; 0 &amp; \lambda \\ 0 &amp; \mu &amp; 0 \end{pmatrix}\GRAD u_3 }{\GRAD v_2}
+}\\
+%&amp;+&amp;
+\tiny{+
+\DOT{\begin{pmatrix} 0 &amp; 0 &amp;\mu\\ 0 &amp; 0 &amp;0\\ \lambda &amp; 0 &amp; 0\end{pmatrix}\GRAD u_1 }{\GRAD v_3}
++\DOT{\begin{pmatrix} 0 &amp; 0 &amp; 0\\ 0 &amp; 0 &amp; \mu \\ 0 &amp; \lambda &amp; 0 \end{pmatrix}\GRAD u_2 }{\GRAD v_3}
++\DOT{\begin{pmatrix} \mu &amp; 0 &amp; 0\\ 0 &amp; \mu &amp; 0 \\ 0 &amp; 0 &amp; \gamma \end{pmatrix}\GRAD u_3 }{\GRAD v_3}
+}
+\end{array}"/></p>
+</div><p>where <img class="math" src="_images/math/ce4588fd900d02afcbd260bc07f54cce49a7dc4a.png" alt="\lambda"/> and <img class="math" src="_images/math/2d8c833ed800824727cd7bd2fb9de1a12ad7e674.png" alt="\mu"/> are the Lame coefficients and <img class="math" src="_images/math/80ae9900d18b7bb7e7c51e2f397713ebbc73f1db.png" alt="\gamma=\lambda+2\mu."/></p>
+<p>For example, we can explicitly compute the first two terms in the first column of <img class="math" src="_images/math/0b4446e4b61aedda7d45af09681a69a6817d570d.png" alt="\StiffElasElem(T_k)"/> which are given by</p>
+<div class="math">
+<p><img src="_images/math/f31f782483fbaab8941ce8f3c00e6367807572bc.png" alt="\begin{array}{lcl}
+\StiffElasElem_{1,1}(T_k)&amp;=&amp;\int_{T_k} \mathcal{H}(\BasisFuncTwoD^k_{1},\BasisFuncTwoD^k_{1})(\q)d\q\\
+&amp;=&amp;\int_{T_k} \mathcal{H}\left(
+\tiny\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\
+0
+\end{pmatrix},
+\tiny\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\ 0
+\end{pmatrix}
+\right)(\q)d\q\\
+&amp;=&amp;|T_k|
+\DOT{\tiny\begin{pmatrix} \gamma &amp; 0 &amp;0\\ 0 &amp; \mu &amp;0\\ 0 &amp; 0 &amp;\mu\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{1}}
+=|T_k|\left(\gamma\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{1}}{x}+\mu(\DP{\BasisFunc^k_{1}}{y}\DP{\BasisFunc^k_{1}}{y}+\DP{\BasisFunc^k_{1}}{z}\DP{\BasisFunc^k_{1}}{z}) \right).
+\end{array}"/></p>
+</div><p>and</p>
+<div class="math">
+<p><img src="_images/math/3225a4c4059f6c6445664bcd509f69ab55badf13.png" alt="\begin{array}{lcl}
+\StiffElasElem_{2,1}(T_k)&amp;=&amp;\int_{T_k} \mathcal{H}(\BasisFuncTwoD^k_{1},\BasisFuncTwoD^k_{2})(\q)d\q\\
+&amp;=&amp;\int_{T_k} \mathcal{H}\left(
+\tiny\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\0
+\end{pmatrix},
+\begin{pmatrix}
+0\\
+\BasisFunc^k_{1}\\ 0
+\end{pmatrix}
+\right)(\q)d\q\\
+&amp;=&amp;|T_k|
+\DOT{\tiny\begin{pmatrix} 0 &amp; \mu &amp;0\\ \lambda &amp; 0 &amp;0\\ 0 &amp; 0 &amp;0\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{1}}
+=|T_k|(\lambda+\mu)\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{1}}{y}.
+\end{array}"/></p>
+</div><p>Using vectorized algorithm function <img class="math" src="_images/math/81070b3b885b402e04faae49543d43a7c5b18cec.png" alt="\FNametxt{GradientVec3D}"/>  given in Algorithm <a href="FEM3D.ToolsVec.html#gradientvec3dalgo">26</a>, we obtain
+the vectorized algorithm <a href="FEM3D.elemMatrixVec.html#elemstiffelasmatba3dp1vectoralgo">29</a> for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> computation for the <strong>Elastic Stiffness</strong> matrix in 3d.</p>
+<div class="admonition-algorithm-num-elemstiffelasmatba3dp1vectoralgo admonition">
+<p class="first admonition-title">Algorithm <a href="FEM3D.elemMatrixVec.html#elemstiffelasmatba3dp1vectoralgo">29</a></p>
+<div class="last figure align-center" id="elemstiffelasmatba3dp1vectoralgo">
+<a class="reference internal image-reference" href="_images/ElemStiffElasMatBa3DP1_algo.png"><img alt="_images/ElemStiffElasMatBa3DP1_algo.png" src="_images/ElemStiffElasMatBa3DP1_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 24: Vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> associated to 3d <strong>Elastic Stiffness</strong> matrix</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrixVec.</tt><tt class="descname">ElemStiffElasMatBa3DP1Vec</tt><big>(</big><em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em>, <em>la</em>, <em>mu</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrixVec.html#ElemStiffElasMatBa3DP1Vec"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes all the element elastic stiffness  matrices <img class="math" src="_images/math/05b5b58654cbedf6c936e3c93a7e60b02d0140be.png" alt="\mathbb{K}^e(T_k)"/> for <img class="math" src="_images/math/0c1a5b812f7df75f27ae30d57d614b305c4c4203.png" alt="k\in\{0,\hdots,\nme-1\}"/> 
+in local <em>alternate</em> basis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nme</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of mesh elements,</li>
+<li><strong>q</strong> (<tt class="docutils literal"><span class="pre">(3,nq)</span></tt> <em>numpy</em> array of floats) &#8211; mesh vertices,</li>
+<li><strong>me</strong> (<tt class="docutils literal"><span class="pre">(4,nme)</span></tt> <em>numpy</em> array of integers) &#8211; mesh connectivity,</li>
+<li><strong>volumes</strong> (<tt class="docutils literal"><span class="pre">(nme,)</span></tt> <em>numpy</em> array of floats) &#8211; volumes of all the mesh elements.</li>
+<li><strong>la</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the  <img class="math" src="_images/math/bc2f669949a98b6b06d4d2e23c06f0a81d6df0bf.png" alt="\\lambda"/> Lame parameter,</li>
+<li><strong>mu</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the  <img class="math" src="_images/math/2ea6c91b54aae2758daf2eb0e7ff97dc394dbd39.png" alt="\\mu"/> Lame parameter.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <tt class="docutils literal"><span class="pre">(144*nme,)</span></tt> <em>numpy</em> array of floats.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</li>
+<li><p class="first">We define on <img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/> the local <em>block</em> basis <img class="math" src="_images/math/5aa57a93d78d68a92c864829cc1fd8bdce43fa4d.png" alt="\mathcal{B}_b^k"/>  by</p>
+<div class="math">
+<p><img src="_images/math/7c4bf83fbf2fdf41f5cb21583408a47f29c82237.png" alt="\begin{array}{c}
+  \mathcal{B}_b^k=\{\BasisFuncTwoDB_1^k,\hdots,\BasisFuncTwoDB_{12}^k\} \\ = \\
+  \left\{\tiny
+  \begin{pmatrix} \BasisFunc_1^k \\ 0 \\ 0 \end{pmatrix},
+  \begin{pmatrix} \BasisFunc_2^k \\ 0 \\ 0 \end{pmatrix},
+  \begin{pmatrix} \BasisFunc_3^k \\ 0 \\ 0 \end{pmatrix},
+  \begin{pmatrix} \BasisFunc_4^k \\ 0 \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_1^k \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_2^k \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_3^k \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_4^k \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_1^k  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_2^k  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_3^k  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_4^k  \end{pmatrix}
+  \right\}
+\end{array}"/></p>
+</div><p>where <img class="math" src="_images/math/84859d3a0a3f19f132eb85cf3228e6e7a11983d0.png" alt="\BasisFunc_\il^k=\BasisFunc_{\me(\il,k)}."/></p>
+<p>For example, using formula <a href="#equation-eq_StiffElasHop">(?)</a>, we can  explicitly compute the first two terms in the first column of <img class="math" src="_images/math/0b4446e4b61aedda7d45af09681a69a6817d570d.png" alt="\StiffElasElem(T_k)"/> which are given by</p>
+<div class="math">
+<p><img src="_images/math/c4aef18f1397200b418955ce636071bc976bd58e.png" alt="\begin{array}{lcl}
+\StiffElasElem_{1,1}(T_k)&amp;=&amp;\int_{T_k} \mathcal{H}(\BasisFuncTwoDB^k_{1},\BasisFuncTwoDB^k_{1})(\q)d\q\\
+&amp;=&amp;\int_{T_k} \mathcal{H}\left(
+\tiny\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\0
+\end{pmatrix},
+\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\0
+\end{pmatrix}
+\right)(\q)d\q\\
+&amp;=&amp;|T_k|
+\DOT{\tiny\begin{pmatrix} \gamma &amp; 0 &amp;0\\ 0 &amp; \mu &amp;0\\ 0 &amp; 0 &amp;\mu\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{1}}
+=|T_k|\left(\gamma\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{1}}{x}+\mu(\DP{\BasisFunc^k_{1}}{y}\DP{\BasisFunc^k_{1}}{y} +\DP{\BasisFunc^k_{1}}{z}\DP{\BasisFunc^k_{1}}{z})\right).
+\end{array}"/></p>
+</div><p>and</p>
+<div class="math">
+<p><img src="_images/math/c7bc5b702294ebee564e5c3c2e19643d6cea022a.png" alt="\begin{array}{lcl}
+\StiffElasElem_{2,1}(T_k)&amp;=&amp;\int_{T_k} \mathcal{H}(\BasisFuncTwoDB^k_{1},\BasisFuncTwoDB^k_{2})(\q)d\q\\
+&amp;=&amp;\int_{T_k} \mathcal{H}\left(
+\tiny \begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\ 0
+\end{pmatrix},
+\begin{pmatrix}
+\BasisFunc^k_{2}\\
+0\\ 0
+\end{pmatrix}
+\right)(\q)d\q\\
+&amp;=&amp;|T_k|
+\DOT{\tiny\begin{pmatrix} \gamma &amp; 0 &amp;0\\ 0 &amp; \mu &amp;0\\ 0 &amp; 0 &amp;\mu\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{2}}
+=|T_k|\left(\gamma\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{2}}{x}+\mu(\DP{\BasisFunc^k_{1}}{y}\DP{\BasisFunc^k_{2}}{y}+\DP{\BasisFunc^k_{1}}{z}\DP{\BasisFunc^k_{2}}{z}) \right).
+\end{array}"/></p>
+</div><p>Using vectorized algorithm function <img class="math" src="_images/math/81070b3b885b402e04faae49543d43a7c5b18cec.png" alt="\FNametxt{GradientVec3D}"/>  given in Algorithm <a href="FEM3D.ToolsVec.html#gradientvec3dalgo">26</a>, we obtain
+the vectorized algorithm <a href="FEM3D.elemMatrixVec.html#elemstiffelasmatbb3dp1vectoralgo">30</a> for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> computation for the <strong>Elastic Stiffness</strong> matrix in 3d.</p>
+<div class="admonition-algorithm-num-elemstiffelasmatbb3dp1vectoralgo admonition">
+<p class="first admonition-title">Algorithm <a href="FEM3D.elemMatrixVec.html#elemstiffelasmatbb3dp1vectoralgo">30</a></p>
+<div class="last figure align-center" id="elemstiffelasmatbb3dp1vectoralgo">
+<a class="reference internal image-reference" href="_images/ElemStiffElasMatBb3DP1_algo.png"><img alt="_images/ElemStiffElasMatBb3DP1_algo.png" src="_images/ElemStiffElasMatBb3DP1_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 25: Vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> associated to 3d <strong>Elastic Stiffness</strong> matrix</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrixVec.</tt><tt class="descname">ElemStiffElasMatBb3DP1Vec</tt><big>(</big><em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em>, <em>L</em>, <em>M</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrixVec.html#ElemStiffElasMatBb3DP1Vec"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Compute all the element elastic stiffness matrices, <img class="math" src="_images/math/05b5b58654cbedf6c936e3c93a7e60b02d0140be.png" alt="\mathbb{K}^e(T_k)"/> for <img class="math" src="_images/math/0c1a5b812f7df75f27ae30d57d614b305c4c4203.png" alt="k\in\{0,\hdots,\nme-1\}"/> 
+in local <em>block</em> basis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nme</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of mesh elements,</li>
+<li><strong>q</strong> (<tt class="docutils literal"><span class="pre">(3,nq)</span></tt> <em>numpy</em> array of floats) &#8211; mesh vertices,</li>
+<li><strong>me</strong> (<tt class="docutils literal"><span class="pre">(4,nme)</span></tt> <em>numpy</em> array of integers) &#8211; mesh connectivity,</li>
+<li><strong>volumes</strong> (<tt class="docutils literal"><span class="pre">(nme,)</span></tt> <em>numpy</em> array of floats) &#8211; volumes of all the mesh elements.</li>
+<li><strong>la</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the  <img class="math" src="_images/math/bc2f669949a98b6b06d4d2e23c06f0a81d6df0bf.png" alt="\\lambda"/> Lame parameter,</li>
+<li><strong>mu</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the  <img class="math" src="_images/math/2ea6c91b54aae2758daf2eb0e7ff97dc394dbd39.png" alt="\\mu"/> Lame parameter.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <tt class="docutils literal"><span class="pre">(144*nme,)</span></tt> <em>numpy</em> array of floats.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-pyOptFEM.FEM3D.mesh">
+<span id="mesh"></span><h2><a class="toc-backref" href="#id18">Mesh</a><a class="headerlink" href="#module-pyOptFEM.FEM3D.mesh" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyOptFEM.FEM3D.mesh.CubeMesh">
+<em class="property">class </em><tt class="descclassname">pyOptFEM.FEM3D.mesh.</tt><tt class="descname">CubeMesh</tt><big>(</big><em>N</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/mesh.html#CubeMesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyOptFEM.FEM3D.mesh.CubeMesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates meshes of the unit cube <img class="math" src="_images/math/84d989f1815cde65061abef404e8efdf2a02a3c1.png" alt="[0,1]^3"/>. Class attributes are :</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><strong>nq</strong>, total number of mesh vertices (points), also denoted <img class="math" src="_images/math/d74b57421efe61b98415dd13c897885a98023c8f.png" alt="\nq"/>.</p>
+</li>
+<li><p class="first"><strong>nme</strong>, total number of mesh elements (tetrahedra in 3d),</p>
+</li>
+<li><p class="first"><strong>version</strong>, mesh structure version,</p>
+</li>
+<li><p class="first"><strong>q</strong>, <em>Numpy</em> array of vertices coordinates, dimension <tt class="docutils literal"><span class="pre">(nq,3)</span></tt> <em>(version 0)</em> or <tt class="docutils literal"><span class="pre">(3,nq)</span></tt> <em>(version 1)</em>.</p>
+<p><tt class="docutils literal"><span class="pre">q[j]</span></tt>  <em>(version 0)</em> or <tt class="docutils literal"><span class="pre">q[:,j]</span></tt> <em>(version 1)</em> are the three coordinates of the <img class="math" src="_images/math/8122aa89ea6e80784c6513d22787ad86e36ad0cc.png" alt="j"/>-th vertex, <img class="math" src="_images/math/2b9097e959a5afa92efb61c445d59316308be71b.png" alt="j\in\{0,..,nq-1\}"/></p>
+</li>
+<li><p class="first"><strong>me</strong>, <em>Numpy</em> connectivity array,  dimension <tt class="docutils literal"><span class="pre">(nme,4)</span></tt> <em>(version 0)</em> or <tt class="docutils literal"><span class="pre">(4,nme)</span></tt> <em>(version 1)</em>.</p>
+<p><tt class="docutils literal"><span class="pre">me[k]</span></tt>  <em>(version 0)</em> or <tt class="docutils literal"><span class="pre">me[:,k]</span></tt> <em>(version 1)</em> are the storage index of the four vertices of the <img class="math" src="_images/math/8c325612684d41304b9751c175df7bcc0f61f64f.png" alt="k"/>-th tetrahedron in the array <tt class="docutils literal"><span class="pre">q</span></tt> of vertices coordinates, <img class="math" src="_images/math/b4b3b1292626590c50fcf4ba5e0fe946e8018234.png" alt="k\in\{0,...,nme-1\}"/>.</p>
+</li>
+<li><p class="first"><strong>volumes</strong>, Array of mesh elements volumes, <tt class="docutils literal"><span class="pre">(nme,)</span></tt> <em>Numpy</em> array.</p>
+<p><tt class="docutils literal"><span class="pre">volumes[k]</span></tt> is the volume of <img class="math" src="_images/math/8c325612684d41304b9751c175df7bcc0f61f64f.png" alt="k"/>-th tetrahedron, <tt class="docutils literal"><span class="pre">k</span> <span class="pre">in</span> <span class="pre">range(0,nme)</span></tt></p>
+</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>N</strong> &#8211; number of points on each edge of the cube</td>
+</tr>
+</tbody>
+</table>
+<p><strong>optional parameter</strong> : <tt class="docutils literal"><span class="pre">version=0</span></tt> or <tt class="docutils literal"><span class="pre">version=1</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyOptFEM.FEM3D.mesh.getMesh">
+<em class="property">class </em><tt class="descclassname">pyOptFEM.FEM3D.mesh.</tt><tt class="descname">getMesh</tt><big>(</big><em>filename</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/mesh.html#getMesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyOptFEM.FEM3D.mesh.getMesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a <em>medit</em> mesh from file <tt class="docutils literal"><span class="pre">meshfile</span></tt>. Class attributes are :</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><strong>nq</strong>, total number of mesh vertices (points), also denoted <img class="math" src="_images/math/d74b57421efe61b98415dd13c897885a98023c8f.png" alt="\nq"/>.</p>
+</li>
+<li><p class="first"><strong>nme</strong>, total number of mesh elements (tetrahedra in 3d),</p>
+</li>
+<li><p class="first"><strong>version</strong>, mesh structure version,</p>
+</li>
+<li><p class="first"><strong>q</strong>, <em>Numpy</em> array of vertices coordinates, dimension <tt class="docutils literal"><span class="pre">(nq,3)</span></tt> <em>(version 0)</em> or <tt class="docutils literal"><span class="pre">(3,nq)</span></tt> <em>(version 1)</em>.</p>
+<p><tt class="docutils literal"><span class="pre">q[j]</span></tt>  <em>(version 0)</em> or <tt class="docutils literal"><span class="pre">q[:,j]</span></tt> <em>(version 1)</em> are the three coordinates of the <img class="math" src="_images/math/8122aa89ea6e80784c6513d22787ad86e36ad0cc.png" alt="j"/>-th vertex, <img class="math" src="_images/math/2b9097e959a5afa92efb61c445d59316308be71b.png" alt="j\in\{0,..,nq-1\}"/></p>
+</li>
+<li><p class="first"><strong>me</strong>, <em>Numpy</em> connectivity array,  dimension <tt class="docutils literal"><span class="pre">(nme,4)</span></tt> <em>(version 0)</em> or <tt class="docutils literal"><span class="pre">(4,nme)</span></tt> <em>(version 1)</em>.</p>
+<p><tt class="docutils literal"><span class="pre">me[k]</span></tt>  <em>(version 0)</em> or <tt class="docutils literal"><span class="pre">me[:,k]</span></tt> <em>(version 1)</em> are the storage index of the four vertices of the <img class="math" src="_images/math/8c325612684d41304b9751c175df7bcc0f61f64f.png" alt="k"/>-th tetrahedron in the array <tt class="docutils literal"><span class="pre">q</span></tt> of vertices coordinates, <img class="math" src="_images/math/b4b3b1292626590c50fcf4ba5e0fe946e8018234.png" alt="k\in\{0,...,nme-1\}"/>.</p>
+</li>
+<li><p class="first"><strong>volumes</strong>, Array of mesh elements volumes, <tt class="docutils literal"><span class="pre">(nme,)</span></tt> <em>Numpy</em> array.</p>
+<p><tt class="docutils literal"><span class="pre">volumes[k]</span></tt> is the volume of <img class="math" src="_images/math/8c325612684d41304b9751c175df7bcc0f61f64f.png" alt="k"/>-th tetrahedron, <tt class="docutils literal"><span class="pre">k</span> <span class="pre">in</span> <span class="pre">range(0,nme)</span></tt></p>
+</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>meshfile</strong> &#8211; <em>medit</em> mesh file</td>
+</tr>
+</tbody>
+</table>
+<p><strong>optional parameter</strong> : <tt class="docutils literal"><span class="pre">version=0</span></tt> or <tt class="docutils literal"><span class="pre">version=1</span></tt></p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">FEM3D module</a><ul>
+<li><a class="reference internal" href="#assembly-matrix-base-optv1-and-optv2-versions">Assembly matrix (<tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions)</a><ul>
+<li><a class="reference internal" href="#mass-matrix">Mass Matrix</a></li>
+<li><a class="reference internal" href="#stiffness-matrix">Stiffness Matrix</a></li>
+<li><a class="reference internal" href="#elastic-stiffness-matrix">Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#element-matrix-used-by-base-and-optv1-versions">Element matrix (used by <tt class="docutils literal"><span class="pre">base</span></tt> and <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions)</a><ul>
+<li><a class="reference internal" href="#element-mass-matrix">Element Mass Matrix</a></li>
+<li><a class="reference internal" href="#element-stiffness-matrix">Element Stiffness Matrix</a></li>
+<li><a class="reference internal" href="#element-elastic-stiffness-matrix">Element Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vectorized-tools-used-by-optv2-version">Vectorized tools (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a><ul>
+<li><a class="reference internal" href="#vectorized-computation-of-basis-functions-gradients">Vectorized computation of basis functions gradients</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vectorized-element-matrix-used-by-optv2-version">Vectorized element matrix (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a><ul>
+<li><a class="reference internal" href="#id1">Element Mass Matrix</a></li>
+<li><a class="reference internal" href="#id2">Element Stiffness Matrix</a></li>
+<li><a class="reference internal" href="#id3">Element Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pyOptFEM.FEM3D.mesh">Mesh</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="FEM2D.html"
+                        title="previous chapter">FEM2D module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="valid2D.html"
+                        title="next chapter">valid2D module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/FEM3D.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="valid2D.html" title="valid2D module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="FEM2D.html" title="FEM2D module"
+             >previous</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

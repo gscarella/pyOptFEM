@@ -1,0 +1,294 @@
+:Author: Francois Cuvelier <cuvelier@math.univ-paris13.fr>
+:Date: 15/09/2013
+
+.. _valid3D-label:
+
+valid3D module
+++++++++++++++
+
+.. contents:: Contents
+   :local:
+
+Mass Matrix
+-----------
+
+Validation program for the assembly of the **Mass** matrix for :math:`P_1`-Lagrange finite element method in 3d
+(see :ref:`FEM3D-MassAssembling-label`). Meshes of the unit cube are used.
+
+  - Test 1: Computation of the **Mass** Matrix using the ``base``, ``OptV1`` and ``OptV2`` versions : it gives errors and computation times
+  - Test 2: Computation of the integral 
+
+    .. math::
+      \int_{\Omega_h} u(\q) v(\q) d\q \approx \pmb{V}^t\mathbb{M} \pmb{U}
+  
+    where :math:`\pmb{U}_i=u(q^i)` and :math:`\pmb{V}_i=v(q^i)`. Functions :math:`u` and :math:`v` are 
+    those defined in ... 
+  - Test 3: Ones retrieves the order 2 of :math:`P_1`-Lagrange integration 
+    
+    .. math::
+      |\int_{\Omega_h} u\,v -\Pi_h(u)\,\Pi_h(v)d\Omega| \leq C h^2
+
+.. note:: 
+  source code
+  
+  .. automodule:: pyOptFEM.valid3D.validMass3DP1
+    :members: validMass3DP1
+    :noindex:
+
+>>> from pyOptFEM.valid3D import validMass3DP1
+>>> validMass3DP1()
+*********************************************
+*     3D Mass Assembling P1 validations     *
+*********************************************
+-----------------------------------------
+  Test 1: Matrices errors and CPU times  
+-----------------------------------------
+    Matrix size           : (216,216)
+    Error P1base vs OptV1 : 1.734723e-18
+    Error P1base vs OptV2 : 1.734723e-18
+    CPU times base (ref)  : 0.9355 (s)
+    CPU times OptV1       : 0.0481 (s) - Speed Up X19.438
+    CPU times OptV2       : 0.0016 (s) - Speed Up X592.083
+----------------------------
+  Test 1 (results): OK
+----------------------------
+-----------------------------------------------------
+  Test 2: Validations by integration on [0,1]x[0,1]  
+-----------------------------------------------------
+    function 0 :
+      u(x,y,z)=x + y + z,
+      v(x,y,z)=x - y - z,
+           -> Stiff error=3.330669e-16
+    function 1 :
+      u(x,y,z)=3*x + 2*y - z - 1,
+      v(x,y,z)=2*x - 2*y + 2*z + 1,
+           -> Stiff error=8.881784e-16
+    function 2 :
+      u(x,y,z)=3*x**2 - x*y + 2*y**2 + y*z - z**2 - 3,
+      v(x,y,z)=2*x**2 + x*y - 3*y**2 - x*z - y,
+           -> Stiff error=1.173244e-02
+----------------------------
+  Test 2 (results): OK
+----------------------------
+--------------------------------
+  Test 3: Validations by order  
+--------------------------------
+    function 2 :
+      u(x,y,z)=3*x**2 - x*y + 2*y**2 + y*z - z**2 - 3,
+      v(x,y,z)=2*x**2 + x*y - 3*y**2 - x*z - y
+        Matrix size                     : (216,216)
+        MassAssemblingP1OptV2 CPU times : 0.002(s)
+        -> Error                         : 1.173244e-02
+        Matrix size                     : (1331,1331)
+        MassAssemblingP1OptV2 CPU times : 0.009(s)
+        -> Error                         : 2.800865e-03
+        ...
+        Matrix size                     : (132651,132651)
+        MassAssemblingP1OptV2 CPU times : 1.418(s)
+        -> Error                         : 1.110034e-04
+
+At last, this program plots the figure :
+        
+.. figure::  images/validMass3DP1.png
+   :width: 400px
+   :scale: 100%
+   :align:   center
+     
+   Graphical results of validMass3DP1-Test 3
+   
+Stiffness matrix
+----------------
+
+Validation function for the assembly of the **Stiffness** matrix for :math:`P_1`-Lagrange 
+finite element method in 3d (see :ref:`FEM2D-StiffAssembling-label`). Meshes of the unit cube are used.
+
+  - Test 1: Computation of the **Stiffness** Matrix using the ``base``, ``OptV1`` and ``OptV2`` versions : it gives errors and computation times
+  - Test 2: Computation of the integral 
+
+    .. math::
+      \int_{\Omega_h} \nabla u(q).\nabla v(q)dq \approx \pmb{V}^t\mathbb{M} \pmb{U}
+  
+    where :math:`\pmb{U}_i=u(q^i)` and :math:`\pmb{V}_i=v(q^i)`. Functions :math:`u` and :math:`v` are 
+    those defined in ... 
+  - Test 3: Ones retrieves the order 2 of :math:`P_1`-Lagrange integration 
+    
+    .. math::
+      |\int_{\Omega_h} \nabla u . \nabla v -\nabla\Pi_h(u) . \nabla\Pi_h(v)d\Omega| \leq C h^2
+      
+.. note:: 
+  source code
+  
+  .. automodule:: pyOptFEM.valid3D.validStiff3DP1
+    :members: validStiff3DP1
+    :noindex:
+      
+>>> from pyOptFEM.valid3D import validStiff3DP1
+>>> validStiff3DP1()
+**********************************************
+*     3D Stiff Assembling P1 validations     *
+**********************************************
+-----------------------------------------
+  Test 1: Matrices errors and CPU times  
+-----------------------------------------
+    Matrix size           : (216,216)
+    Error P1base vs OptV1 : 2.220446e-15
+    Error P1base vs OptV2 : 2.220446e-15
+    CPU times base (ref)  : 0.9563 (s)
+    CPU times OptV1       : 0.0566 (s) - Speed Up X16.901
+    CPU times OptV2       : 0.0032 (s) - Speed Up X299.656
+----------------------------
+  Test 1 (results): OK
+----------------------------
+-----------------------------------------------------
+  Test 2: Validations by integration on [0,1]x[0,1]  
+-----------------------------------------------------
+    function 0 :
+      u(x,y,z)=x + y + z,
+      v(x,y,z)=x - y - z,
+           -> Stiff error=6.217249e-15
+    function 1 :
+      u(x,y,z)=3*x + 2*y - z - 1,
+      v(x,y,z)=2*x - 2*y + 2*z + 1,
+           -> Stiff error=7.771561e-15
+    function 2 :
+      u(x,y,z)=3*x**2 - x*y + 2*y**2 + y*z - z**2 - 3,
+      v(x,y,z)=2*x**2 + x*y - 3*y**2 - x*z - y,
+           -> Stiff error=2.077333e-02
+----------------------------
+  Test 2 (results): OK
+----------------------------
+--------------------------------
+  Test 3: Validations by order  
+--------------------------------
+    function 2 :
+      u(x,y,z)=3*x**2 - x*y + 2*y**2 + y*z - z**2 - 3,
+      v(x,y,z)=2*x**2 + x*y - 3*y**2 - x*z - y
+        Matrix size                        : (216,216)
+        StiffAssembling3DP1OptV2 CPU times : 0.003(s)
+        Error                              : 2.077333e-02
+        Matrix size                        : (1331,1331)
+        StiffAssembling3DP1OptV2 CPU times : 0.019(s)
+        Error                              : 3.330000e-03
+        ...
+        Matrix size                        : (132651,132651)
+        StiffAssembling3DP1OptV2 CPU times : 2.784(s)
+        Error                              : 1.828928e-04
+
+
+
+At last, this program plots the figure :
+        
+.. figure::  images/validStiff3DP1.png
+   :width: 400px
+   :scale: 100%
+   :align:   center
+     
+   Graphical results of validStiff3DP1-Test 3
+   
+Elastic Stiffness Matrix
+---------------------------
+
+Validation function for the assembly of the **Elastic Stiffness** matrix for :math:`P_1`-Lagrange 
+finite element method in 3d (see :ref:`FEM2D-StiffElasAssembling-label`). Meshes of the unit cube are used.
+
+  - Test 1: Computation of the **Elastic Stiffness** Matrix using the ``base``, ``OptV1`` and ``OptV2`` versions : it gives errors and computation times
+  - Test 2: Computation of the integral 
+
+    .. math::
+      \int_{\Omega_h} \underline{\pmb{\epsilon}}^t(u) \underline{\pmb{\sigma}}(v)dq \approx \pmb{V}^t\mathbb{M} \pmb{U}
+  
+    where :math:`\pmb{U}_i=u(q^i)` and :math:`\pmb{V}_i=v(q^i)`. Functions :math:`u` and :math:`v` are 
+    those defined in ... 
+  - Test 3: Ones retrieves the order 2 of :math:`P_1`-Lagrange integration 
+    
+    .. math::
+      |\int_{\Omega_h} \underline{\pmb{\epsilon}}^t(u) \underline{\pmb{\sigma}}(v) - \underline{\pmb{\epsilon}}^t(\Pi_h(u)) 
+      \underline{\pmb{\sigma}}(\Pi_h(v)) d\Omega| \leq C h^2
+      
+.. note:: 
+  .. function:: validStiffElas3DP1([Num=0, la=1.5, mu=0.5])
+  
+     :param Num: *(optional)* Numbering choice.
+     :param la: *(optional)* the first Lame coefficient in Hooke's law, denoted by :math:`\lambda`.
+     :param    mu: *(optional)* the second Lame coefficient in Hooke's law, denoted by :math:`\mu`.
+  
+  .. automodule:: pyOptFEM.valid3D.validStiffElas3DP1
+    :members: validStiffElas3DP1
+    :noindex:
+      
+>>> from pyOptFEM.valid3D import validStiffElas3DP1
+>>> validStiffElas3DP1()
+**************************************************
+*     3D StiffElas Assembling P1 validations     *
+**************************************************
+-----------------------------------------
+  Test 1: Matrices errors and CPU times  
+-----------------------------------------
+    Matrix size           : (648,648)
+    Error P1base vs OptV1 : 1.554312e-15
+    Error P1base vs OptV2 : 1.776357e-15
+    CPU times base (ref)  : 2.8850 (s)
+    CPU times OptV1       : 0.2925 (s) - Speed Up X9.862
+    CPU times OptV2       : 0.0152 (s) - Speed Up X189.919
+----------------------------
+  Test 1 (results): OK
+----------------------------
+-----------------------------------------------------
+  Test 2: Validations by integration on [0,1]x[0,1]  
+-----------------------------------------------------
+    functions 0 :
+        u(x,y,z)=['x - 2*y', 'x + y - z', '3*x + 2*z'],
+        v(x,y,z)=['x + 2*y + 4*z', '2*x - y + 4*z', '3*x - 2*y'],
+           -> StiffElas error=5.329071e-14
+    functions 1 :
+        u(x,y,z)=['5*x - 2*y+z', 'x + y - 3*z', '3*x + -2*y+ 2*z'],
+        v(x,y,z)=['2*x - 2*y + 4*z +1', '5*x - y + 4*z', '4*x - 2*y+4'],
+           -> StiffElas error=2.131628e-14
+    functions 2 :
+        u(x,y,z)=['x**2 - 2*x*y + x*z', 'y**2 - y*z + z**2 + x', 'x**2 - x*z - y*z - z**2'],
+        v(x,y,z)=['x**2 + 2*y**2 - x*z', '2*x**2 - x*y + y*z', 'x*y - y*z + z**2'],
+           -> StiffElas error=5.712000e-02
+    functions 3 :
+        u(x,y,z)=['x**2 - 2*x*y + x*z', 'x**3 + y**2 - y*z + z**2', '-x**2*z - x*y*z + x**2 - z**2'],
+        v(x,y,z)=['-x*z**2 + x**2 + 2*y**2', '2*x**2 - x*y + y*z', 'x*y - y*z + z**2'],
+           -> StiffElas error=1.221381e-01
+----------------------------
+  Test 2 (results): OK
+----------------------------
+--------------------------------
+  Test 3: Validations by order  
+--------------------------------
+    functions 3 :
+        u(x,y,z)=[x**2 - 2*x*y + x*z,x**3 + y**2 - y*z + z**2,-x**2*z - x*y*z + x**2 - z**2],
+        v(x,y)=[-x*z**2 + x**2 + 2*y**2,2*x**2 - x*y + y*z,x*y - y*z + z**2]
+      Matrix size                            : (3993,3993)
+      StiffElasAssembling3DP1OptV2 CPU times : 0.121(s)
+      -> Error                               : 3.036230e-02
+      Matrix size                            : (12288,12288)
+      StiffElasAssembling3DP1OptV2 CPU times : 0.422(s)
+      -> Error                               : 1.515389e-02
+      Matrix size                            : (27783,27783)
+      StiffElasAssembling3DP1OptV2 CPU times : 0.999(s)
+      -> Error                               : 8.314471e-03
+      Matrix size                            : (52728,52728)
+      StiffElasAssembling3DP1OptV2 CPU times : 2.019(s)
+      -> Error                               : 5.618296e-03
+      Matrix size                            : (89373,89373)
+      StiffElasAssembling3DP1OptV2 CPU times : 3.528(s)
+      -> Error                               : 3.666314e-03
+      Matrix size                            : (139968,139968)
+      StiffElasAssembling3DP1OptV2 CPU times : 5.668(s)
+      -> Error                               : 2.932322e-03
+
+
+
+
+At last, this program plots the figure :
+        
+.. figure::  images/validStiffElas3DP1.png
+   :width: 400px
+   :scale: 100%
+   :align:   center
+     
+   Graphical results of validStiffElas3DP1-Test 3
+  

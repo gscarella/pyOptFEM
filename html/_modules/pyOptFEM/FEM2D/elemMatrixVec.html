@@ -1,0 +1,331 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyOptFEM.FEM2D.elemMatrixVec &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyOptFEM.FEM2D.elemMatrixVec</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="ElemMassMat2DP1Vec"><a class="viewcode-back" href="../../../FEM2D.elemMatrixVec.html#pyOptFEM.FEM2D.elemMatrixVec.ElemMassMat2DP1Vec">[docs]</a><span class="k">def</span> <span class="nf">ElemMassMat2DP1Vec</span><span class="p">(</span><span class="n">areas</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;  Computes all the element Mass matrices :math:`\\mathbb{M}^e(T_k)` for :math:`k\\in\{0,\hdots,\\nme-1\\}`</span>
+<span class="sd">  </span>
+<span class="sd">  :param areas: areas of all the mesh elements.</span>
+<span class="sd">  :type areas: :math:`\\nme` *numpy* array of floats</span>
+<span class="sd">  :returns: a one dimensional *numpy* array of size :math:`9 \\nme`</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">nme</span><span class="o">=</span><span class="n">areas</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">Kg</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nme</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span>
+  <span class="n">Kg</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">4</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">8</span><span class="p">]</span><span class="o">=</span><span class="n">areas</span><span class="o">/</span><span class="mi">6</span>
+  <span class="n">Kg</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">6</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">5</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">7</span><span class="p">]</span><span class="o">=</span><span class="n">areas</span><span class="o">/</span><span class="mi">12</span> 
+  <span class="k">return</span> <span class="n">Kg</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">9</span><span class="o">*</span><span class="n">nme</span><span class="p">))</span>
+</div>
+<span class="k">def</span> <span class="nf">ComputeGradientVec</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">areas</span><span class="p">):</span>
+  <span class="n">coef</span><span class="o">=</span><span class="mf">0.5</span><span class="o">/</span><span class="n">sqrt</span><span class="p">(</span><span class="n">areas</span><span class="p">)</span>
+  <span class="n">u</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="n">me</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]]</span><span class="o">-</span><span class="n">q</span><span class="p">[</span><span class="n">me</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]]</span>
+  <span class="n">G1</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">u</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">coef</span><span class="p">,</span><span class="o">-</span><span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">coef</span><span class="p">])</span> 
+  <span class="n">u</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="n">me</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]]</span><span class="o">-</span><span class="n">q</span><span class="p">[</span><span class="n">me</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]]</span>
+  <span class="n">G2</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">u</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">coef</span><span class="p">,</span><span class="o">-</span><span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">coef</span><span class="p">])</span>
+  <span class="n">u</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="n">me</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]]</span><span class="o">-</span><span class="n">q</span><span class="p">[</span><span class="n">me</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]]</span>
+  <span class="n">G3</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">u</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">coef</span><span class="p">,</span><span class="o">-</span><span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">coef</span><span class="p">])</span>
+  <span class="k">return</span> <span class="p">[</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">G3</span><span class="p">]</span>
+  
+<span class="c"># q (2,nq), me (3,nme)</span>
+<span class="k">def</span> <span class="nf">ComputeGradientVecTr</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">areas</span><span class="p">):</span>
+  <span class="n">nme</span><span class="o">=</span><span class="n">me</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="c">#coef=1/(2*areas)</span>
+  <span class="n">G</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">nme</span><span class="p">))</span>
+  <span class="n">u</span><span class="o">=</span><span class="n">q</span><span class="p">[:,</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">-</span><span class="n">q</span><span class="p">[:,</span><span class="n">me</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+  <span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">=-</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">u</span><span class="o">=</span><span class="n">q</span><span class="p">[:,</span><span class="n">me</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span><span class="o">-</span><span class="n">q</span><span class="p">[:,</span><span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+  <span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">=-</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">u</span><span class="o">=</span><span class="n">q</span><span class="p">[:,</span><span class="n">me</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">-</span><span class="n">q</span><span class="p">[:,</span><span class="n">me</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+  <span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">=-</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="k">return</span> <span class="n">G</span>
+  
+<span class="c"># q (nq,2), me (nme,3) </span>
+<div class="viewcode-block" id="ElemStiffMat2DP1Vec"><a class="viewcode-back" href="../../../FEM2D.elemMatrixVec.html#pyOptFEM.FEM2D.elemMatrixVec.ElemStiffMat2DP1Vec">[docs]</a><span class="k">def</span> <span class="nf">ElemStiffMat2DP1Vec</span><span class="p">(</span><span class="n">nme</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">areas</span><span class="p">):</span> 
+  <span class="sd">&quot;&quot;&quot;  Computes all the element stiffness matrices :math:`\\mathbb{S}^e(T_k)` for :math:`k\\in\{0,\hdots,\\nme-1\\}`</span>
+<span class="sd">  </span>
+<span class="sd">  :param nme: number of mesh elements,</span>
+<span class="sd">  :type nme: int</span>
+<span class="sd">  :param q: mesh vertices,</span>
+<span class="sd">  :type q: :math:`\\nq\\times 2` *numpy* array of floats</span>
+<span class="sd">  :param me: mesh connectivity,</span>
+<span class="sd">  :type me: :math:`\\nme\\times 3` *numpy* array of integers</span>
+<span class="sd">  :param areas: areas of all the mesh elements.</span>
+<span class="sd">  :type areas: :math:`\\nme` *numpy* array of floats</span>
+<span class="sd">  :returns: a one dimensional *numpy* array of size :math:`9 \\nme`</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">q1</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="n">me</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]]</span>
+  <span class="n">q2</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="n">me</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]]</span>
+  <span class="n">q3</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="n">me</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]]</span>
+  <span class="n">u</span><span class="o">=</span><span class="n">q2</span><span class="o">-</span><span class="n">q3</span>
+  <span class="n">v</span><span class="o">=</span><span class="n">q3</span><span class="o">-</span><span class="n">q1</span>
+  <span class="n">w</span><span class="o">=</span><span class="n">q1</span><span class="o">-</span><span class="n">q2</span> 
+  <span class="n">Kg</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nme</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span>
+  <span class="n">areas4</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="n">areas</span>
+  <span class="n">Kg</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>        <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">u</span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">areas4</span>
+  <span class="n">Kg</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">u</span><span class="o">*</span><span class="n">v</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">areas4</span>
+  <span class="n">Kg</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">6</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">u</span><span class="o">*</span><span class="n">w</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">areas4</span>
+  <span class="n">Kg</span><span class="p">[:,</span><span class="mi">4</span><span class="p">]</span>        <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v</span><span class="o">*</span><span class="n">v</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">areas4</span>
+  <span class="n">Kg</span><span class="p">[:,</span><span class="mi">5</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[:,</span><span class="mi">7</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v</span><span class="o">*</span><span class="n">w</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">areas4</span>
+  <span class="n">Kg</span><span class="p">[:,</span><span class="mi">8</span><span class="p">]</span>        <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">w</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">areas4</span>
+  <span class="k">return</span> <span class="n">Kg</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">9</span><span class="o">*</span><span class="n">nme</span><span class="p">))</span>  
+  
+<span class="c"># q (2,nq), me (3,nme) </span></div>
+<div class="viewcode-block" id="ElemStiffElasMatBaVec2DP1"><a class="viewcode-back" href="../../../FEM2D.elemMatrixVec.html#pyOptFEM.FEM2D.elemMatrixVec.ElemStiffElasMatBaVec2DP1">[docs]</a><span class="k">def</span> <span class="nf">ElemStiffElasMatBaVec2DP1</span><span class="p">(</span><span class="n">nme</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">areas</span><span class="p">,</span><span class="n">L</span><span class="p">,</span><span class="n">M</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;  Computes all the element elastic stiffness matrices :math:`\\mathbb{K}^e(T_k)` for :math:`k\\in\{0,\hdots,\\nme-1\\}`   in local *alternate* basis.</span>
+<span class="sd">  </span>
+<span class="sd">  :param nme: number of mesh elements,</span>
+<span class="sd">  :type nme: int</span>
+<span class="sd">  :param q: mesh vertices,</span>
+<span class="sd">  :type q: ``(2,nq)`` *numpy* array of floats</span>
+<span class="sd">  :param me: mesh connectivity,</span>
+<span class="sd">  :type me: ``(3,nme)`` *numpy* array of integers</span>
+<span class="sd">  :param areas: areas of all the mesh elements.</span>
+<span class="sd">  :type areas: ``(nme,)`` *numpy* array of floats</span>
+<span class="sd">  :param L: the  :math:`\\lambda` Lame parameter,</span>
+<span class="sd">  :type L: float</span>
+<span class="sd">  :param M: the  :math:`\\mu` Lame parameter.</span>
+<span class="sd">  :type M: float</span>
+<span class="sd">  :returns: a ``(36*nme,)`` *numpy* array of floats.</span>
+<span class="sd">  &quot;&quot;&quot;</span>  
+  <span class="n">memory</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;memory&#39;</span><span class="p">,</span><span class="bp">False</span><span class="p">)</span>
+  <span class="n">ndf2</span><span class="o">=</span><span class="mi">36</span><span class="p">;</span>
+  <span class="n">G</span><span class="o">=</span><span class="n">ComputeGradientVecTr</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">areas</span><span class="p">)</span>
+  <span class="n">coef</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">areas</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">il</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+      <span class="n">G</span><span class="p">[</span><span class="n">il</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="n">il</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">coef</span>
+  <span class="n">Kg</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">ndf2</span><span class="p">,</span><span class="n">nme</span><span class="p">))</span>  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">memory</span><span class="p">:</span>
+    <span class="n">mem</span><span class="o">=</span><span class="n">G</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">T1</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">T2</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">C</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">coef</span><span class="o">.</span><span class="n">nbytes</span>
+    <span class="k">return</span> <span class="n">mem</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">35</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T2</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T1</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">24</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">31</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">23</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">33</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> 
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">20</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">29</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">34</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">30</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T2</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T1</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">32</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T2</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">27</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T1</span>
+
+  <span class="k">return</span> <span class="n">Kg</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">ndf2</span><span class="o">*</span><span class="n">nme</span><span class="p">))</span>
+
+  </div>
+<div class="viewcode-block" id="ElemStiffElasMatBbVec2DP1"><a class="viewcode-back" href="../../../FEM2D.elemMatrixVec.html#pyOptFEM.FEM2D.elemMatrixVec.ElemStiffElasMatBbVec2DP1">[docs]</a><span class="k">def</span> <span class="nf">ElemStiffElasMatBbVec2DP1</span><span class="p">(</span><span class="n">nme</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">areas</span><span class="p">,</span><span class="n">L</span><span class="p">,</span><span class="n">M</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;  Computes all the element elastic stiffness matrices :math:`\\mathbb{K}^e(T_k)` </span>
+<span class="sd">  for :math:`k\\in\{0,\hdots,\\nme-1\\}` in local *block* basis.</span>
+<span class="sd">  </span>
+<span class="sd">  :param nme: number of mesh elements,</span>
+<span class="sd">  :type nme: int</span>
+<span class="sd">  :param q: mesh vertices,</span>
+<span class="sd">  :type q: ``(2,nq)`` *numpy* array of floats</span>
+<span class="sd">  :param me: mesh connectivity,</span>
+<span class="sd">  :type me: ``(3,nme)`` *numpy* array of integers</span>
+<span class="sd">  :param areas: areas of all the mesh elements.</span>
+<span class="sd">  :type areas: ``(nme,)`` *numpy* array of floats</span>
+<span class="sd">  :param L: the  :math:`\\lambda` Lame parameter,</span>
+<span class="sd">  :type L: float</span>
+<span class="sd">  :param M: the  :math:`\\mu` Lame parameter.</span>
+<span class="sd">  :type M: float</span>
+<span class="sd">  :returns: a ``(36*nme,)`` *numpy* array of floats.</span>
+<span class="sd">  &quot;&quot;&quot;</span>    
+  <span class="n">memory</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;memory&#39;</span><span class="p">,</span><span class="bp">False</span><span class="p">)</span>
+  <span class="n">ndf2</span><span class="o">=</span><span class="mi">36</span>
+  <span class="n">G</span><span class="o">=</span><span class="n">ComputeGradientVecTr</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">areas</span><span class="p">)</span>
+  <span class="n">coef</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">areas</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">il</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+      <span class="n">G</span><span class="p">[</span><span class="n">il</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="n">il</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">coef</span>
+  <span class="n">Kg</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">ndf2</span><span class="p">,</span><span class="n">nme</span><span class="p">))</span>   
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">;</span><span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">;</span><span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">memory</span><span class="p">:</span>
+    <span class="n">mem</span><span class="o">=</span><span class="n">G</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">T1</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">T2</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">C</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">coef</span><span class="o">.</span><span class="n">nbytes</span>
+    <span class="k">return</span> <span class="n">mem</span>
+  
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">;</span><span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">;</span><span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">;</span><span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">;</span><span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">35</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">];</span><span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span><span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">27</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">];</span><span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span><span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">23</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">33</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">];</span><span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span><span class="n">C</span><span class="o">=</span><span class="n">M</span><span class="o">*</span><span class="p">(</span><span class="n">T1</span><span class="o">+</span> <span class="n">T2</span><span class="p">)</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">C</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">29</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">34</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">C</span>  
+  
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">32</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span><span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">];</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">24</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T2</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T1</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span><span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">30</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T2</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">20</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T1</span>
+  
+  <span class="n">T1</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span><span class="n">T2</span><span class="o">=</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">31</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T1</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T2</span>
+  <span class="n">Kg</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span><span class="o">=</span><span class="n">Kg</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span><span class="o">=</span><span class="n">L</span><span class="o">*</span><span class="n">T2</span><span class="o">+</span><span class="n">M</span><span class="o">*</span><span class="n">T1</span>
+  
+  <span class="k">return</span> <span class="n">Kg</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">ndf2</span><span class="o">*</span><span class="n">nme</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

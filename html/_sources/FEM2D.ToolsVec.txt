@@ -1,0 +1,41 @@
+
+Vectorized computation of basis functions gradients
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By construction, the gradients of basis functions are constants on each element :math:`T_k.` 
+So, we denote, :math:`\forall \il\in\ENS{1}{3},` by :math:`\vecb{G}^\il` the :math:`2 \times \nme` array defined,
+:math:`\forall k\in\ENS{1}{\nme},` by
+
+.. math::
+
+   \vecb{G}^\il(:,k)= \GRAD\BasisFunc_{\me(\il,k)}(\q),\ \forall \q\in T_k.
+
+On a triangle :math:`T_k,`
+we define :math:`\vecb{D}^{12}=\q^{\me(1,k)}-\q^{\me(2,k)},`
+:math:`\vecb{D}^{13}=\q^{\me(1,k)}-\q^{\me(3,k)}` and
+:math:`\vecb{D}^{23}=\q^{\me(2,k)}-\q^{\me(3,k)}.` Then, we have
+
+.. math::
+    \GRAD\BasisFunc_{1}^k(\q)=\frac{1}{2|T_k|}
+    \begin{pmatrix}
+    \vecb{D}^{23}_y\\-\vecb{D}^{23}_x
+    \end{pmatrix},\ \GRAD\BasisFunc_{2}^k(\q)=\frac{1}{2|T_k|}
+    \begin{pmatrix}
+    -\vecb{D}^{13}_y\\\vecb{D}^{13}_x
+    \end{pmatrix},\ \GRAD\BasisFunc_{3}^k(\q)=\frac{1}{2|T_k|}
+    \begin{pmatrix}
+    \vecb{D}^{12}_y\\-\vecb{D}^{12}_x
+    \end{pmatrix}.
+    
+With these formulas, we obtain the vectorized algorithm given in Algorithm :num:`gradientvec2dalgo`.
+
+.. admonition:: Algorithm :num:`gradientvec2dalgo`
+
+    .. _GradientVec2Dalgo:  
+          
+    .. figure::  images/GradientVec2D_algo.png
+          :width: 600px
+          :scale: 100%
+          :align:   center
+        
+          Vectorized algorithm for computation of basis functions gradients in 2d

@@ -1,0 +1,326 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyOptFEM.FEM2D.assemblyBench &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyOptFEM.FEM2D.assemblyBench</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.assembly</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.mesh</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">socket</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">errno</span><span class="o">,</span> <span class="nn">platform</span>
+<span class="kn">from</span> <span class="nn">..common</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">AssemblyList</span> <span class="o">=</span> <span class="p">{</span> 
+                 <span class="s">&#39;MassAssembling2DP1&#39;</span>      <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="s">&#39;StiffAssembling2DP1&#39;</span>     <span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="s">&#39;StiffElasAssembling2DP1&#39;</span> <span class="p">:</span> <span class="mi">4</span>
+               <span class="p">}</span>
+
+<span class="n">VersionList</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;OptV2&#39;</span> <span class="p">,</span> <span class="s">&#39;OptV1&#39;</span><span class="p">,</span> <span class="s">&#39;base&#39;</span> <span class="p">]</span>
+
+<span class="n">bench_defaults</span> <span class="o">=</span> <span class="p">{</span>  <span class="s">&#39;LN&#39;</span><span class="p">:</span>     <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+              <span class="s">&#39;meshdir&#39;</span><span class="p">:</span>     <span class="s">&#39;.&#39;</span><span class="p">,</span>
+              <span class="s">&#39;meshbase&#39;</span><span class="p">:</span>    <span class="s">&#39;&#39;</span><span class="p">,</span>
+              <span class="s">&#39;outdir&#39;</span><span class="p">:</span>      <span class="s">&#39;./results&#39;</span><span class="p">,</span>
+              <span class="s">&#39;output&#39;</span><span class="p">:</span>      <span class="s">&#39;bench2D&#39;</span><span class="p">,</span>
+              <span class="s">&#39;save&#39;</span>  <span class="p">:</span>      <span class="bp">False</span><span class="p">,</span>
+              <span class="s">&#39;plot&#39;</span>   <span class="p">:</span>     <span class="bp">True</span><span class="p">,</span>
+              <span class="s">&#39;verbose&#39;</span> <span class="p">:</span>    <span class="bp">True</span><span class="p">,</span>
+              <span class="s">&#39;assembly&#39;</span><span class="p">:</span>    <span class="s">&#39;StiffAssembling2DP1&#39;</span><span class="p">,</span>
+              <span class="s">&#39;versions&#39;</span><span class="p">:</span>     <span class="p">[</span><span class="s">&#39;OptV2&#39;</span><span class="p">,</span> <span class="s">&#39;OptV1&#39;</span><span class="p">,</span> <span class="s">&#39;base&#39;</span> <span class="p">],</span>
+              <span class="s">&#39;tag&#39;</span>     <span class="p">:</span>     <span class="s">&#39;&#39;</span><span class="p">,</span>
+              <span class="s">&#39;nbruns&#39;</span><span class="p">:</span>      <span class="mi">1</span><span class="p">,</span>
+              <span class="s">&#39;la&#39;</span><span class="p">:</span>          <span class="mi">2</span><span class="p">,</span>   <span class="c"># lambda</span>
+              <span class="s">&#39;mu&#39;</span><span class="p">:</span>          <span class="mf">0.3</span><span class="p">,</span> <span class="c"># mu</span>
+              <span class="s">&#39;Num&#39;</span><span class="p">:</span>         <span class="mi">0</span>
+            <span class="p">}</span>          
+
+<span class="k">def</span> <span class="nf">assemblyBench</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot; Benchmark code for :math:`P_1`-Lagrange finite elements Matrices defined in :mod:`FEM2D`.</span>
+<span class="sd">    </span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">LN</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;LN&#39;</span><span class="p">,</span>    <span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;LN&#39;</span><span class="p">]</span> <span class="p">)</span>
+  <span class="n">meshdir</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;meshdir&#39;</span><span class="p">,</span> <span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;meshdir&#39;</span><span class="p">])</span>
+  <span class="n">meshbase</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;meshbase&#39;</span><span class="p">,</span> <span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;meshbase&#39;</span><span class="p">])</span>
+  <span class="n">Release</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">Hostname</span><span class="o">=</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span>
+  <span class="n">outdir</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;outdir&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;outdir&#39;</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">Hostname</span><span class="o">+</span><span class="s">&#39;/Python_&#39;</span><span class="o">+</span><span class="n">Release</span>
+  <span class="n">output</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;output&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;output&#39;</span><span class="p">])</span>
+  <span class="n">save</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;save&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;save&#39;</span><span class="p">])</span>
+  <span class="n">Plot</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;plot&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;plot&#39;</span><span class="p">])</span>
+  <span class="n">assembly</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;assembly&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;assembly&#39;</span><span class="p">])</span>
+  <span class="n">versions</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;versions&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;versions&#39;</span><span class="p">])</span>
+  <span class="n">nbruns</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;nbruns&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;nbruns&#39;</span><span class="p">])</span>
+  <span class="n">la</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;la&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;la&#39;</span><span class="p">])</span>
+  <span class="n">mu</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;mu&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;mu&#39;</span><span class="p">])</span>
+  <span class="n">Num</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Num&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;Num&#39;</span><span class="p">])</span>
+  <span class="n">tag</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;tag&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;tag&#39;</span><span class="p">])</span>
+  <span class="n">Verbose</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;verbose&#39;</span><span class="p">,</span><span class="n">bench_defaults</span><span class="p">[</span><span class="s">&#39;verbose&#39;</span><span class="p">])</span>
+  <span class="n">Date</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="s">_%m_%Y_%H_%M_%S&quot;</span><span class="p">)</span>
+  <span class="n">ext</span><span class="p">,</span><span class="n">cbase</span><span class="o">=</span><span class="n">BasesChoice</span><span class="p">(</span><span class="n">Num</span><span class="p">)</span>
+  <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">assembly</span> <span class="ow">in</span> <span class="n">AssemblyList</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;function </span><span class="si">%s</span><span class="s"> not implemented!&quot;</span> <span class="o">%</span> <span class="n">assembly</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;  &lt;assembly&gt; value must be in </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">AssemblyList</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+    <span class="k">return</span>
+  
+  <span class="k">if</span> <span class="p">(</span><span class="n">tag</span><span class="o">==</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="n">tag</span><span class="o">=</span><span class="n">Date</span>
+    
+  <span class="k">if</span> <span class="p">(</span><span class="n">meshbase</span><span class="o">==</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="n">Meshbase</span><span class="o">=</span><span class="s">&#39;SquareMesh&#39;</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">Meshbase</span><span class="o">=</span><span class="n">meshbase</span>
+    
+  <span class="k">if</span> <span class="n">versions</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="o">!=</span><span class="s">&#39;list&#39;</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;versions paramater must be a &lt;list&gt; class!&quot;</span><span class="p">)</span>
+    <span class="k">return</span>
+    
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">checkVersions</span><span class="p">(</span><span class="n">versions</span><span class="p">,</span><span class="n">VersionList</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;versions contents not allowed!&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;  &lt;versions&gt; values must be in </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">VersionList</span><span class="p">))</span>
+    <span class="k">return</span>
+  <span class="n">memScalar</span><span class="p">,</span><span class="n">memVector</span><span class="o">=</span><span class="n">memoryNeeded</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">LN</span><span class="p">),</span><span class="n">meshbase</span><span class="p">,</span><span class="n">meshdir</span><span class="p">)</span>
+  <span class="n">memRAM</span><span class="o">=</span><span class="n">memoryCheck</span><span class="p">()</span><span class="o">.</span><span class="n">value</span>
+  <span class="k">if</span> <span class="n">Verbose</span> <span class="ow">or</span> <span class="p">(</span><span class="mf">1.3</span><span class="o">*</span><span class="n">memScalar</span><span class="o">/</span><span class="mi">10</span><span class="o">**</span><span class="mi">6</span><span class="o">&gt;=</span><span class="n">memRAM</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="mf">1.3</span><span class="o">*</span><span class="n">memVector</span><span class="o">/</span><span class="mi">10</span><span class="o">**</span><span class="mi">6</span><span class="o">&gt;=</span><span class="n">memRAM</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Minimal memory needed (Scalar): </span><span class="si">%.2f</span><span class="s"> Mo (RAM : </span><span class="si">%.2f</span><span class="s"> Mo)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">memScalar</span><span class="o">/</span><span class="mi">10</span><span class="o">**</span><span class="mi">6</span><span class="p">,</span><span class="n">memRAM</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Minimal memory needed (Vector): </span><span class="si">%.2f</span><span class="s"> Mo (RAM : </span><span class="si">%.2f</span><span class="s"> Mo)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">memVector</span><span class="o">/</span><span class="mi">10</span><span class="o">**</span><span class="mi">6</span><span class="p">,</span><span class="n">memRAM</span><span class="p">))</span> 
+    
+  <span class="n">nV</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">versions</span><span class="p">)</span>
+  <span class="n">versionsname</span><span class="o">=</span><span class="n">versions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nV</span><span class="p">):</span>
+    <span class="n">versionsname</span><span class="o">+=</span><span class="s">&#39;.&#39;</span><span class="o">+</span><span class="n">versions</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
+  <span class="n">Hostname</span><span class="o">=</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span>
+  <span class="k">if</span> <span class="n">AssemblyList</span><span class="p">[</span><span class="n">assembly</span><span class="p">]</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+    <span class="n">ext</span><span class="p">,</span><span class="n">cbase</span><span class="o">=</span><span class="n">BasesChoice</span><span class="p">(</span><span class="n">Num</span><span class="p">)</span>
+    <span class="n">filename</span><span class="o">=</span><span class="n">outdir</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">output</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">assembly</span><span class="o">+</span><span class="n">versionsname</span><span class="o">+</span><span class="n">ext</span><span class="o">+</span><span class="s">&#39;_Python_&#39;</span><span class="o">+</span><span class="n">Release</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">Meshbase</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">Hostname</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">tag</span><span class="o">+</span><span class="s">&#39;.txt&#39;</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">filename</span><span class="o">=</span><span class="n">outdir</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">output</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">assembly</span><span class="o">+</span><span class="n">versionsname</span><span class="o">+</span><span class="s">&#39;_Python_&#39;</span><span class="o">+</span><span class="n">Release</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">Meshbase</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">Hostname</span><span class="o">+</span><span class="s">&#39;_&#39;</span><span class="o">+</span><span class="n">tag</span><span class="o">+</span><span class="s">&#39;.txt&#39;</span>
+  <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">mkdir_p</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Bench           : bench2D</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Software        : python</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Version         : &#39;</span><span class="o">+</span><span class="n">Release</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Computer name   : &#39;</span><span class="o">+</span><span class="n">Hostname</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% System          : &#39;</span><span class="o">+</span><span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">+</span><span class="s">&#39; &#39;</span><span class="o">+</span><span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Assembly matrix : &#39;</span><span class="o">+</span><span class="n">assembly</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">% c</span><span class="s">ode versions   : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">versions</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">AssemblyList</span><span class="p">[</span><span class="n">assembly</span><span class="p">]</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% lambda          : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">la</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% mu              : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Num             : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">Num</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;%      -&gt; &#39;</span><span class="o">+</span><span class="n">cbase</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">meshbase</span><span class="o">==</span><span class="s">&#39;&#39;</span><span class="p">:</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Mesh files      : &#39;</span><span class="o">+</span><span class="n">Meshbase</span><span class="o">+</span><span class="s">&#39;(N)</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Mesh files      : &#39;</span><span class="o">+</span><span class="n">meshdir</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">meshbase</span><span class="o">+</span><span class="s">&#39;-&lt;N&gt;.msh</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Mesh format     : FreeFEM</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% Number of runs  : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nbruns</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">% Li</span><span class="s">st of N       : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">LN</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">);</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;%-------------------------------</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;% N       nq     ndof   &#39;</span><span class="p">)</span>  
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nV</span><span class="p">):</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;   &#39;</span><span class="o">+</span><span class="n">versions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;(s)&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+  <span class="n">nN</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">LN</span><span class="p">)</span>
+  <span class="n">T</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nN</span><span class="p">,</span><span class="n">nV</span><span class="p">))</span>
+  <span class="n">Lnq</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nN</span><span class="p">)</span>
+  <span class="n">Lndof</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nN</span><span class="p">)</span>
+  <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+  <span class="k">for</span> <span class="n">N</span> <span class="ow">in</span> <span class="n">LN</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">meshbase</span><span class="o">==</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+      <span class="n">Th</span><span class="o">=</span><span class="n">SquareMesh</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+      <span class="n">meshfile</span><span class="o">=</span><span class="s">&#39;SquareMesh(&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;)&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">meshfile</span><span class="o">=</span><span class="n">meshdir</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">meshbase</span><span class="o">+</span><span class="s">&#39;-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;.msh&#39;</span>
+      <span class="n">Th</span><span class="o">=</span><span class="n">getMesh</span><span class="p">(</span><span class="n">meshfile</span><span class="p">)</span>
+   
+    <span class="n">Lnq</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nV</span><span class="p">):</span>
+      <span class="n">T</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">v</span><span class="p">],</span><span class="n">dim</span><span class="o">=</span><span class="n">RunVersion</span><span class="p">(</span><span class="n">meshfile</span><span class="p">,</span><span class="n">assembly</span><span class="p">,</span><span class="n">versions</span><span class="p">[</span><span class="n">v</span><span class="p">],</span><span class="n">Th</span><span class="p">,</span><span class="n">la</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">Num</span><span class="p">,</span><span class="n">nbruns</span><span class="p">,</span><span class="n">Verbose</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">nbruns</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot; -&gt; mean cputime=</span><span class="si">%.6f</span><span class="s">(s)&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">v</span><span class="p">]))</span>
+    <span class="n">Lndof</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">=</span><span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%4d</span><span class="s"> </span><span class="si">%8d</span><span class="s"> </span><span class="si">%8d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="n">Lnq</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">Lndof</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span>
+      <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nV</span><span class="p">):</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;   </span><span class="si">%.6f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">T</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">v</span><span class="p">])</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">BENCH RESUME :&#39;</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">&#39;    Assembly matrix : &#39;</span><span class="o">+</span><span class="n">assembly</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">&#39;    code versions   : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">versions</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span> 
+  <span class="n">PrintResultsSphinx</span><span class="p">(</span><span class="n">versions</span><span class="p">,</span><span class="n">LN</span><span class="p">,</span><span class="n">Lnq</span><span class="p">,</span><span class="n">Lndof</span><span class="p">,</span><span class="n">T</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Write results in file :</span><span class="se">\n</span><span class="s">  </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">Plot</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">=</span><span class="n">plotBench</span><span class="p">(</span><span class="n">versions</span><span class="p">,</span><span class="n">Lndof</span><span class="p">,</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plt</span><span class="p">,</span><span class="nb">int</span><span class="p">):</span>
+      <span class="k">print</span><span class="p">(</span><span class="s">&#39;Unable to plot bench results&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  
+  
+<span class="k">def</span> <span class="nf">RunVersion</span><span class="p">(</span><span class="n">meshfile</span><span class="p">,</span><span class="n">assembly</span><span class="p">,</span><span class="n">version</span><span class="p">,</span><span class="n">Th</span><span class="p">,</span><span class="n">la</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">Num</span><span class="p">,</span><span class="n">nbruns</span><span class="p">,</span><span class="n">Verbose</span><span class="p">):</span>
+  <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">:</span><span class="se">\n</span><span class="s"> -&gt; </span><span class="si">%s</span><span class="s">(nq=</span><span class="si">%d</span><span class="s">, nme=</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">meshfile</span><span class="p">,</span><span class="n">assembly</span><span class="o">+</span><span class="n">version</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">))</span>
+  <span class="n">Tmean</span><span class="o">=</span><span class="mi">0</span>
+  <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nbruns</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">AssemblyList</span><span class="p">[</span><span class="n">assembly</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="c">#Mass</span>
+      <span class="n">tstart</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+      <span class="n">R</span><span class="o">=</span><span class="nb">globals</span><span class="p">()[</span><span class="n">assembly</span><span class="o">+</span><span class="n">version</span><span class="p">](</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">areas</span><span class="p">)</span>
+      <span class="n">T</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">tstart</span>
+    <span class="k">elif</span> <span class="n">AssemblyList</span><span class="p">[</span><span class="n">assembly</span><span class="p">]</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span> <span class="c"># Stiff</span>
+      <span class="k">if</span> <span class="n">version</span><span class="o">==</span><span class="s">&#39;OptV2new&#39;</span><span class="p">:</span>
+        <span class="n">q</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">T</span><span class="p">;</span><span class="n">me</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">T</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">q</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">;</span><span class="n">me</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span>
+      <span class="n">tstart</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+      <span class="n">R</span><span class="o">=</span><span class="nb">globals</span><span class="p">()[</span><span class="n">assembly</span><span class="o">+</span><span class="n">version</span><span class="p">](</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">areas</span><span class="p">)</span>
+      <span class="n">T</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">tstart</span>
+    <span class="k">elif</span> <span class="n">AssemblyList</span><span class="p">[</span><span class="n">assembly</span><span class="p">]</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span> <span class="c">#StiffElas</span>
+      <span class="k">if</span> <span class="n">version</span><span class="o">==</span><span class="s">&#39;OptV2&#39;</span><span class="p">:</span>
+        <span class="n">q</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">T</span><span class="p">;</span><span class="n">me</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">T</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">q</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">;</span><span class="n">me</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span>
+      <span class="n">tstart</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+      <span class="n">R</span><span class="o">=</span><span class="nb">globals</span><span class="p">()[</span><span class="n">assembly</span><span class="o">+</span><span class="n">version</span><span class="p">](</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">q</span><span class="p">,</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">areas</span><span class="p">,</span><span class="n">la</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">Num</span><span class="p">)</span>
+      <span class="n">T</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">tstart</span>
+    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;  run (</span><span class="si">%2d</span><span class="s">/</span><span class="si">%2d</span><span class="s">) : cputime=</span><span class="si">%.6f</span><span class="s">(s) - matrix </span><span class="si">%d</span><span class="s">-by-</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">nbruns</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">R</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">R</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]));</span>
+    <span class="n">Tmean</span><span class="o">+=</span><span class="n">T</span>
+  <span class="k">return</span> <span class="n">Tmean</span><span class="o">/</span><span class="n">nbruns</span><span class="p">,</span><span class="n">R</span><span class="o">.</span><span class="n">shape</span>
+  
+<span class="k">def</span> <span class="nf">PrintResults</span><span class="p">(</span><span class="n">versions</span><span class="p">,</span><span class="n">LN</span><span class="p">,</span><span class="n">Lnq</span><span class="p">,</span><span class="n">Lndof</span><span class="p">,</span><span class="n">T</span><span class="p">):</span>
+  <span class="n">nV</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">versions</span><span class="p">)</span>
+  <span class="n">nN</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">LN</span><span class="p">)</span>
+  <span class="n">S</span><span class="o">=</span><span class="s">&#39;  N       nq     ndof   &#39;</span><span class="p">;</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nV</span><span class="p">):</span>
+    <span class="n">S</span><span class="o">=</span><span class="n">S</span><span class="o">+</span><span class="s">&#39;   &#39;</span><span class="o">+</span><span class="n">versions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;(s)&#39;</span>
+  <span class="n">Title</span><span class="o">=</span><span class="s">&quot; Bench results &quot;</span>
+  <span class="n">nT</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">Title</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="o">*</span><span class="n">nT</span><span class="o">+</span><span class="n">Title</span><span class="o">+</span><span class="s">&#39;=&#39;</span><span class="o">*</span><span class="n">nT</span><span class="p">)</span>
+  <span class="n">S</span><span class="o">=</span><span class="s">&#39;  N       nq     ndof   &#39;</span><span class="p">;</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nV</span><span class="p">):</span>
+    <span class="n">S</span><span class="o">=</span><span class="n">S</span><span class="o">+</span><span class="s">&#39;   &#39;</span><span class="o">+</span><span class="n">versions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;(s)&#39;</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+  
+  <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nN</span><span class="p">):</span>
+    <span class="n">S</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%4d</span><span class="s"> </span><span class="si">%8d</span><span class="s"> </span><span class="si">%8d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">LN</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">Lnq</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">Lndof</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+    <span class="n">X</span><span class="o">=</span><span class="s">&#39;                       &#39;</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nV</span><span class="p">):</span>
+      <span class="n">S</span><span class="o">+=</span><span class="s">&#39;   </span><span class="si">%.6f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">T</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">v</span><span class="p">]</span>
+      <span class="n">X</span><span class="o">+=</span><span class="s">&#39;     x</span><span class="si">%4.2f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">v</span><span class="p">]</span><span class="o">/</span><span class="n">T</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">nT</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">Title</span><span class="p">)))</span>
+  
+  
+<span class="k">def</span> <span class="nf">memoryNeeded</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="n">meshbase</span><span class="p">,</span><span class="n">meshdir</span><span class="p">):</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">meshbase</span><span class="o">==</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="n">Th</span><span class="o">=</span><span class="n">SquareMesh</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">meshfile</span><span class="o">=</span><span class="s">&#39;SquareMesh(&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;)&#39;</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">meshfile</span><span class="o">=</span><span class="n">meshdir</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">meshbase</span><span class="o">+</span><span class="s">&#39;-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;.msh&#39;</span>
+    <span class="n">Th</span><span class="o">=</span><span class="n">getMesh</span><span class="p">(</span><span class="n">meshfile</span><span class="p">)</span>
+  <span class="n">memMesh</span><span class="o">=</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">nbytes</span><span class="o">+</span><span class="n">Th</span><span class="o">.</span><span class="n">areas</span><span class="o">.</span><span class="n">nbytes</span>
+  <span class="n">d</span><span class="o">=</span><span class="mi">2</span><span class="p">;</span>
+  <span class="c"># Kg,Ig,Jg arrays + sparse nnz=7*nq</span>
+  <span class="n">memSparse</span> <span class="o">=</span> <span class="mi">7</span><span class="o">*</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="o">*</span><span class="p">(</span><span class="mi">8</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="o">*</span><span class="mi">4</span>
+  <span class="n">memScalar</span> <span class="o">=</span> <span class="p">(</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="o">*</span><span class="p">(</span><span class="mi">8</span><span class="o">+</span><span class="mi">4</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span> 
+  <span class="n">memVector</span> <span class="o">=</span> <span class="n">d</span><span class="o">*</span><span class="n">d</span><span class="o">*</span><span class="n">memScalar</span>
+  <span class="k">return</span> <span class="p">(</span><span class="n">memScalar</span><span class="o">+</span><span class="n">memMesh</span><span class="o">+</span><span class="n">memSparse</span><span class="p">,</span><span class="n">memVector</span><span class="o">+</span><span class="n">memMesh</span><span class="o">+</span><span class="n">d</span><span class="o">*</span><span class="n">memSparse</span><span class="p">)</span>  
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

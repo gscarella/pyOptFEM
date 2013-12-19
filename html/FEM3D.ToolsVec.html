@@ -1,0 +1,151 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Vectorized computation of basis functions gradients &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="vectorized-computation-of-basis-functions-gradients">
+<h1>Vectorized computation of basis functions gradients<a class="headerlink" href="#vectorized-computation-of-basis-functions-gradients" title="Permalink to this headline">¶</a></h1>
+<p>By construction, the gradients of basis functions are constants on each element <img class="math" src="_images/math/5c06711a6aa08073fa2f134868e97e430894a2e9.png" alt="T_k."/>
+So, we denote, <img class="math" src="_images/math/805ffbfefbe65b78f2574566009699904f3706e6.png" alt="\forall \il\in\ENS{1}{4},"/> by <img class="math" src="_images/math/4abc95a20741ad1165e9871fb64cc6c4a09098a7.png" alt="\vecb{G}^\il"/> the <img class="math" src="_images/math/8d11e47d4d50282de8475ec8afe1e2e2be991bd4.png" alt="3 \times \nme"/> array defined,
+<img class="math" src="_images/math/c29242d77866f3e5c5dbb67028c7e41f1cef8cb7.png" alt="\forall k\in\ENS{1}{\nme},"/> by</p>
+<div class="math">
+<p><img src="_images/math/1c72e95858e542147eb168a3b7d3de550da3a264.png" alt="\vecb{G}^\il(:,k)= \GRAD\BasisFunc_{\me(\il,k)}(\q),\ \forall \q\in T_k."/></p>
+</div><p>On <img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/> tetrahedra
+we set</p>
+<div class="math">
+<p><img src="_images/math/8f75b5902db2273f9eb1196e53014b40c7e852ff.png" alt="\begin{array}{lcllcl}
+\vecb{D}^{12}&amp;=&amp;\q^{\me(1,k)}-\q^{\me(2,k)},\ &amp; \vecb{D}^{23}&amp;=&amp;\q^{\me(2,k)}-\q^{\me(3,k)}\\
+\vecb{D}^{13}&amp;=&amp;\q^{\me(1,k)}-\q^{\me(3,k)},\ &amp; \vecb{D}^{24}&amp;=&amp;\q^{\me(2,k)}-\q^{\me(4,k)}\\
+\vecb{D}^{14}&amp;=&amp;\q^{\me(1,k)}-\q^{\me(4,k)},\ &amp; \vecb{D}^{34}&amp;=&amp;\q^{\me(3,k)}-\q^{\me(4,k)}
+\end{array}"/></p>
+</div><p>Then, we have</p>
+<div class="math">
+<p><img src="_images/math/0083b6dabae51d34578014f115625570f818c6d3.png" alt="\begin{array}{ll}
+  \GRAD\BasisFunc_{1}^k(\q)=\frac{1}{6|T_k|}
+  \begin{pmatrix}
+  -\vecb{D}^{23}_y \vecb{D}^{24}_z + \vecb{D}^{23}_z \vecb{D}^{24}_y\\
+        \vecb{D}^{23}_x \vecb{D}^{24}_z - \vecb{D}^{23}_z \vecb{D}^{24}_x\\
+        -\vecb{D}^{23}_x \vecb{D}^{24}_y + \vecb{D}^{23}_y \vecb{D}^{24}_x
+  \end{pmatrix},&amp;\GRAD\BasisFunc_{2}^k(\q)=\frac{1}{6|T_k|}
+  \begin{pmatrix} \vecb{D}^{13}_y \vecb{D}^{14}_z - \vecb{D}^{13}_z \vecb{D}^{14}_y\\
+        -\vecb{D}^{13}_x \vecb{D}^{14}_z + \vecb{D}^{13}_z \vecb{D}^{14}_x\\
+        \vecb{D}^{13}_x \vecb{D}^{14}_y - \vecb{D}^{13}_y \vecb{D}^{14}_x
+  \end{pmatrix}\\
+  \GRAD\BasisFunc_{3}^k(\q)=\frac{1}{6|T_k|}
+  \begin{pmatrix} -\vecb{D}^{12}_y \vecb{D}^{14}_z + \vecb{D}^{12}_z \vecb{D}^{14}_y\\
+        \vecb{D}^{12}_x \vecb{D}^{14}_z - \vecb{D}^{12}_z \vecb{D}^{14}_x\\
+        -\vecb{D}^{12}_x \vecb{D}^{14}_y + \vecb{D}^{12}_y \vecb{D}^{14}_x
+  \end{pmatrix},&amp;
+  \GRAD\BasisFunc_{4}^k(\q)=\frac{1}{6|T_k|}
+  \begin{pmatrix}
+  \vecb{D}^{12}_y \vecb{D}^{13}_z - \vecb{D}^{12}_z \vecb{D}^{13}_y\\
+        -\vecb{D}^{12}_x \vecb{D}^{13}_z + \vecb{D}^{12}_z \vecb{D}^{13}_x\\
+        \vecb{D}^{12}_x \vecb{D}^{13}_y - \vecb{D}^{12}_y \vecb{D}^{13}_x
+  \end{pmatrix}
+  \end{array}"/></p>
+</div><p>With these formulas, we obtain the vectorized algorithm given in Algorithm <a href="#gradientvec3dalgo">26</a>.</p>
+<div class="admonition-algorithm-num-gradientvec3dalgo admonition">
+<p class="first admonition-title">Algorithm <a href="#gradientvec3dalgo">26</a></p>
+<div class="last figure align-center" id="gradientvec3dalgo">
+<a class="reference internal image-reference" href="_images/GradientVec3D_algo.png"><img alt="_images/GradientVec3D_algo.png" src="_images/GradientVec3D_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 26: Vectorized algorithm for computation of basis functions gradients in 3d</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/FEM3D.ToolsVec.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,476 @@
+
+.. _Presentation-label:
+
+Presentation
+++++++++++++
+
+Let :math:`\Omega_h` be a triangular (2d) or tetrahedral (3d) mesh of :math:`\Omega\subset\R^d` corresponding 
+to the following data structure:
+
+.. math::
+      \mbox{\begin{tabular}{lccll}
+      \hline
+      \textbf{name} & \textbf{type} & \textbf{dimension} & \textbf{description}\\
+      \hline
+      $\nq$ & integer & 1 & number of vertices\\
+      $\nme$ & integer & 1 & number of elements\\
+      $\q$   & double  & $d \times \nq$ & 
+      \begin{minipage}[t]{7.9cm}
+      array of vertices coordinates. $\q(\nu,j)$ is the $\nu$-th coordinate of the $j$-th vertex,
+      $\nu\in\{1,\hdots,d\}$, $j\in\{1,\hdots,\rm{n_q}\}.$
+      The $j$-th vertex will be also denoted by $\rm{q}^j$ 
+      \end{minipage}\\
+      $\me$  & integer & $(d+1) \times \nme$ &  
+      \begin{minipage}[t]{7.9cm}
+      connectivity array. $\me(\beta,k)$ is the storage index of the $\beta$-th vertex
+      of the $k$-th element, in the array~$q$, for $\beta\in\{1,\hdots,(d+1)\}$ and $k\in\{1,\hdots,{\nme}\}$
+      \end{minipage}\\
+      $\rm volumes$  & double & $1\times {\nme}$ &
+      \begin{minipage}[t]{7.9cm}
+      array of volumes in 3d or areas in 2d. ${\rm volumes}(k)$ is the $k$-th element volume (3d)
+      or element area (2d),
+      $k\in\{1,\hdots,{\nme}\}$
+      \end{minipage}\\
+      \hline
+      \end{tabular}}
+
+- **Scalar finite elements :**
+
+  Let :math:`\HUnHD{\DOMH}=\{v \in {\cal C}^0(\overline \DOMH),\ \  {v}_{|T} \in {\cal P}_1(T), \ \forall T \in {\cal T}_h \},`
+  be the finite dimensional space spanned by
+  the :math:`{\cal P}_1`-Lagrange (scalar) basis functions :math:`\{\varphi_i\}_{i\in\ENS{1}{\nq}}`
+  where :math:`{\cal P}_1(T)` denotes the space of all polynomials defined over `T` of total
+  degree less than or equal to :math:`1.` 
+  The functions :math:`\varphi_i` satisfy
+
+  .. math::
+	\varphi_i(\rm{q}^j)=\delta_{i,j},\ \ \forall (i,j)\in\{1,\hdots,\rm{n_q}\}^2
+	
+  Then we have  :math:`\varphi_i\equiv 0` on :math:`T_k`, :math:`\forall k\in\{1,\hdots,{\nme}\}` 
+  such that :math:`\q^i\notin T_k`.
+
+
+  A :math:`{\cal P}_1`-Lagrange (scalar) finite element matrix is of the generic form
+
+  .. math::
+    \MAT{D}_{i,j}=\int_\DOMH \mathcal{D}(\varphi_j,\varphi_i) d\DOMH,\ \ 
+    \forall (i,j)\in\ENS{1}{\nq}^2
+
+  where :math:`\mathcal{D}` is the  bilinear differential operator (order :math:`1`) 
+  defined for all :math:`u,v\in \HUnHD{\DOMH}` by
+
+  .. math::
+    \mathcal{D}(u,v)=\DOT{\MAT{A}\GRAD u}{\GRAD v}
+      -\left(u\DOT{\vecb{b}}{\GRAD v} - v \DOT{\GRAD u}{\vecb{c}}\right)
+      +d uv
+
+  and :math:`\MAT{A}\in (\LInfD{\DOMH})^{d\times d},` :math:`\vecb{b}\in(\LInfD{\DOMH})^{d},` :math:`\vecb{c}\in(\LInfD{\DOMH})^{d}` and :math:`d\in\LInfD{\DOMH}` are given functions on :math:`\DOMH.`
+
+  ..
+      Let defined the bilineare application, :math:`a_h`, by
+
+      .. math::
+	a_h(u,v) = \int_{\Omega_h} \mathcal{A}_h(u,v) d\Omega_h
+	    
+      with
+
+      .. math::
+	  \mathcal{A}_h(u,v)= \sum_{i,j=1}^d a_{i,j} \DP{u}{x_i}\DP{v}{x_j}
+	  +\sum_{i=1}^d (b_i u \DP{v}{x_i} +c_i v \DP{u}{x_i}) + a_0 uv
+	
+      where :math:`a_{i,j},\ b_i,\ c_i,\ a_0` are given functions on :math:`\Omega_h.`
+	    
+      A generic Finite Element matrix may write
+
+      .. math::
+	  \MAT{M}_{i,j}=a_h(\varphi_i,\varphi_j)
+    
+
+  We can notice that :math:`\MAT{D}` is a **sparse** matrix due to
+  support properties of :math:`\varphi_i` functions.
+
+  Let :math:`\ndfe=d+1.` 
+  The element matrix :math:`\MAT{D}_{\il,\jl}(T_k)`, associated to :math:`\MAT{D}`, is the :math:`\ndfe\times\ndfe` matrix defined by
+
+  .. math::
+      \MAT{D}_{\il,\jl}(T_k)=\int_{T_k} \mathcal{D}(\varphi_{\jl}^k,\varphi_{\il}^k)(\q) d\q,\ \ 
+      \forall (\il,\jl)\in\{1,\hdots,\ndfe\}^2
+
+  where :math:`\varphi_{\il}^k=\varphi_{\me(\il,k)}` is the :math:`\il`-th local basis function associated
+  to the :math:`k`-th element.
+  
+  For examples, 
+  
+  * the **Mass** matrix is defined by
+  
+    .. math::
+       \MAT{M}_{i,j}=\int_\DOMH \BasisFunc_j \BasisFunc_i d\DOMH
+     
+    The corresponding bilinear differential operator :math:`\mathcal{D}` is completely defined with
+    :math:`\MAT{A}=0`, :math:`\vecb{b}=\vecb{c}=0` and :math:`d=1.`
+    
+  * the **Stiffness** matrix is defined by
+  
+    .. math::
+       \MAT{S}_{i,j}=\int_\DOMH \DOT{\GRAD\BasisFunc_j}{\GRAD \BasisFunc_i} d\DOMH
+       
+    The corresponding bilinear differential operator :math:`\mathcal{D}` is completely defined with
+    :math:`\MAT{A}=\MAT{I}`, :math:`\vecb{b}=\vecb{c}=0` and :math:`d=0.`
+
+- **Vector finite elements :**
+
+  The dimension of the space :math:`(\HUnHD{\DOMH})^d` is :math:`\ndf=d\,\nq.` 
+  
+  * in dimension :math:`d=2,` we have two natural basis :
+  
+      ..  
+	.. math::
+	  \BasisFuncTwoD_{di-\il}= \BasisFunc_i\begin{pmatrix} \delta_{d-1,\il} \\ \vdots \\ \delta_{0,\il} \end{pmatrix},
+	  \ \forall \il \in \ENS{0}{d-1}, \ \forall i \in \ENS{1}{\nq}.
+
+      the global *alternate* basis :math:`\mathcal{B}_a` defined by
+	
+      .. math::
+	    \mathcal{B}_a=\{\FoncBaseDeuxD_1,\hdots,\FoncBaseDeuxD_{2\rm{n_q}}\}=\left\{
+	    \begin{pmatrix}  \varphi_1 \\ 0 \end{pmatrix},
+	    \begin{pmatrix}  0  \\ \varphi_1 \end{pmatrix},
+	    \begin{pmatrix}  \varphi_2 \\ 0 \end{pmatrix},
+	    \begin{pmatrix}  0  \\ \varphi_2\end{pmatrix}, \hdots,
+	    \begin{pmatrix} \varphi_{\rm n_q} \\ 0 \end{pmatrix},
+	    \begin{pmatrix} 0  \\ \varphi_{\rm n_q} \end{pmatrix}
+	    \right\}
+	    
+      and the global *block* basis :math:`\mathcal{B}_b` defined by
+	
+	.. math::
+	    \mathcal{B}_b=\{\FoncBaseDeuxDB_1,\hdots,\FoncBaseDeuxDB_{2\rm{n_q}}\}=\left\{
+	    \begin{pmatrix}  \varphi_1 \\ 0 \end{pmatrix},
+	    \begin{pmatrix}  \varphi_2 \\ 0 \end{pmatrix},\hdots,
+	    \begin{pmatrix}  \varphi_{\rm n_q} \\ 0 \end{pmatrix},
+	    \begin{pmatrix}  0  \\ \varphi_1 \end{pmatrix},
+	    \begin{pmatrix}  0  \\ \varphi_2\end{pmatrix},\hdots,
+	    \begin{pmatrix} 0  \\ \varphi_{\rm n_q} \end{pmatrix}
+	    \right\}.
+	    
+  * in dimension :math:`d=3,` we have two natural basis :
+  
+    the global *alternate* basis :math:`\mathcal{B}_a` defined by
+      
+    .. math::
+	  \mathcal{B}_a=\{\FoncBaseDeuxD_1,\hdots,\FoncBaseDeuxD_{3\nq}\}=\left\{
+	  \begin{pmatrix}  \varphi_1 \\ 0 \\ 0 \end{pmatrix},
+	  \begin{pmatrix}  0  \\ \varphi_1 \\ 0 \end{pmatrix},
+	  \begin{pmatrix}  0  \\ 0 \\ \varphi_1 \end{pmatrix}, \hdots,
+	  \begin{pmatrix}  \varphi_\nq \\ 0 \\ 0 \end{pmatrix},
+	  \begin{pmatrix}  0  \\ \varphi_\nq \\ 0 \end{pmatrix},
+	  \begin{pmatrix}  0  \\ 0 \\ \varphi_\nq \end{pmatrix}
+	  \right\}
+	  
+    and the global *block* basis :math:`\mathcal{B}_b` defined by
+      
+      .. math::
+	  \mathcal{B}_b=\{\FoncBaseDeuxDB_1,\hdots,\FoncBaseDeuxDB_{3\nq}\}=\left\{
+	  \begin{pmatrix}  \varphi_1 \\ 0 \\ 0\end{pmatrix},\hdots,
+	  \begin{pmatrix}  \varphi_\nq \\ 0 \\0\end{pmatrix},
+	  \begin{pmatrix}  0  \\ \varphi_1 \\ 0\end{pmatrix},\hdots,
+	  \begin{pmatrix} 0  \\ \varphi_\nq \\0 \end{pmatrix},
+	  \begin{pmatrix}  0  \\ 0\\ \varphi_1 \end{pmatrix},\hdots,
+	  \begin{pmatrix} 0  \\ 0\\ \varphi_\nq \end{pmatrix}
+	  \right\}.
+     
+  A :math:`{\cal P}_1`-Lagrange (vector) finite element matrix in :math:`\mathcal{B}_a` basis
+  is of the generic form
+
+  .. math::
+    \MAT{H}_{l,m}=\int_\DOMH \mathcal{H}(\BasisFuncTwoD_m,\BasisFuncTwoD_l) d\DOMH,\ \ 
+    \forall (l,m)\in\ENS{1}{d\nq}^2
+
+  where :math:`\mathcal{H}` is the bilinear differential operator (order :math:`1`) 
+  defined by
+  
+  .. math::
+     \mathcal{H}(\vecb{u},\vecb{v})=\sum_{\il,\jl=1}^d \mathcal{D}^{\il,\jl}(u_\il,v_\jl)
+
+  and :math:`\mathcal{D}^{\il,\jl}` is a bilinear differential operator of scalar type.
+
+  For example, in dimension :math:`d=2,` the **Elastic Stiffness** matrix is defined by
+  
+    .. math::
+      \mathbb{K}_{m,l}=\int_{\Omega_h} \underline{\pmb{\epsilon}}^t(\psi_l(q))
+      \MAT{C} \underline{\pmb{\epsilon}}(\psi_m(q))
+      ,
+      \ \ \forall (m,l) \in \{1,...,2\rm{n_q}\}^2.
+
+  where :math:`\underline{\pmb{\epsilon}}=(\epsilon_{xx},\epsilon_{yy},\epsilon_{xy})^t` 
+  is the strain tensor respectively and :math:`\MAT{C}` is the Hooke matrix 
+  
+  .. math::
+      \MAT{C}=\begin{pmatrix}
+                \lambda+2\mu & \lambda & 0\\ 
+                \lambda & \lambda+2\mu & 0\\
+                0 & 0 & \mu 
+              \end{pmatrix}
+  
+  Then the bilinear differential operator associated to this matrix is given by
+  
+  .. math::
+    \begin{array}{lcl}
+    \mathcal{H}(\vecb{u},\vecb{v})&=&
+    \DOT{\begin{pmatrix} \lambda+2\mu & 0\\ 0 & \mu \end{pmatrix}\GRAD u_1 }{\GRAD v_1}
+    +\DOT{\begin{pmatrix} 0 & \mu\\ \lambda & 0 \end{pmatrix}\GRAD u_2 }{\GRAD v_1}\\
+    &+&\DOT{\begin{pmatrix} 0 & \lambda\\ \mu & 0 \end{pmatrix}\GRAD u_1 }{\GRAD v_2}+
+    \DOT{\begin{pmatrix} \mu & 0\\ 0 &\lambda+2\mu\end{pmatrix}\GRAD u_2 }{\GRAD v_2}
+    \end{array}
+  
+  
+    
+We present now three algorithms (``base``, ``OptV1`` and ``OptV2`` versions) for assembling this kind of matrix. 
+
+.. note::
+
+  These algorithms can be successfully implemented in
+  various interpreted languages under some assumptions.
+  For all versions, it must have a sparse matrix implementation. For ``OptV1`` and ``OptV2`` versions,
+  we also need a particular sparse matrix constructor (see :ref:`Sparse_matrix_requirement`). And, finally, ``OptV2`` also required that 
+  the interpreted languages support classical **vectorization** operations.
+  Here is the current list of interpreted languages for which we have successfully implemented these three algorithms :
+
+    - Python with *Numpy* and *Scipy* modules,
+    - Matlab,
+    - Octave,
+    - Scilab
+  
+
+Classical assembly algorithm (``base`` version)
+-------------------------------------------------
+
+Due to support properties of :math:`P_1`-Lagrange basis functions, we have the classical algorithm :
+
+.. note::
+  We recall the classical matrix assembly in dimension :math:`d` with :math:`\ndfe=d+1.` 
+  
+  .. figure::  images/AssemblyMat_base_algo.png
+       :width: 600px
+       :scale: 100%
+       :align:   center
+     
+       Classical matrix assembly in 2d or 3d
+    
+In fact, for each element we add its element matrix to the global sparse matrix 
+(lines 4 to 10 of the previous algorithm). This operation is illustrated in the following figure in 2d scalar fields case :
+    
+.. figure::  images/AssemblyMat_base.png
+       :width: 600px
+       :scale: 90%
+       :align:   center
+     
+       Adding of an element matrix to global matrix in 2d scalar fields case
+       
+The repetition of elements insertion in **sparse** matrix is very expensive. 
+
+.. _Sparse_matrix_requirement:
+       
+Sparse matrix requirement
+-------------------------
+
+The interpreted language must contain a function to generate a sparse matrix ``M`` from three 1d
+arrays of same length  ``Ig``,  ``Jg`` and  ``Kg`` such that  ``M(Ig(k),Jg(k))=Kg(k)`` .
+Furthermore, the elements of ``Kg`` having the same indices in
+``Ig`` and  ``Jg``  must be summed.
+
+We give for several interpreted languages the corresponding function :
+  - Python (*scipy.sparse* module) : ``M=sparse.<format>_matrix(Kg,(Ig,Jg),shape=(m,n)``
+    where ``<format>`` is the sparse matrix format chosen in ``csc`` , ``csr`` , ``lil`` ,...
+  - Matlab : ``M=sparse(Ig,Jg,Kg,m,n)``, only ``csc`` format.
+  - Octave : ``M=sparse(Ig,Jg,Kg,m,n)``, only ``csc`` format.
+  - Scilab : ``M=sparse([Ig,Jg],Kg,[m,n])``, only ``row-by-row`` format.
+ 
+Obviously, this kind of function exists in compiled languages. For example, in C language, one can use 
+the *SuiteSparse* from T. Davis and with Nvidia GPU, one can use *Thrust* library.
+
+ 
+Optimized classical assembly algorithm (``OptV1`` version)
+------------------------------------------------------------
+
+The idea is to create three global 1d-arrays :math:`\vecb{I}_g,`  :math:`\vecb{J}_g` and :math:`\vecb{K}_g` 
+allowing the storage of the element matrices as well as the position of their elements in the global matrix.
+The length of each array is :math:`\ndfes \nme.`  (i.e. :math:`9 \nme` for :math:`d=2` and :math:`16 \nme` for :math:`d=3` ).
+Once these arrays are created, the matrix assembly is obtained with one of the previous commands. 
+
+To create these three arrays, we first define three local 1d-arrays :math:`\vecb{K}^e_k,` :math:`\vecb{I}^e_k` 
+and :math:`\vecb{J}^e_k` of :math:`\ndfes` elements obtained from a generic element matrix :math:`\MAT{E}(T_k)` of 
+dimension :math:`\ndfe` :
+
+.. figure::  images/OptV1_IgeJgeKge.png
+       :width: 700px
+       :scale: 100%
+       :align:   center
+     
+From these arrays, it is then possible to build the three global arrays
+:math:`\vecb{I}_g,` :math:`\vecb{J}_g` and :math:`\vecb{K}_g,` of size 
+:math:`\ndfes\nme \times 1` defined, 
+:math:`\forall k \in \ENS{1}{\nme},` :math:`\forall l \in\ENS{1}{\ndfes},` by
+
+.. math::
+  \begin{array}{lcl}
+    \vecb{K}(\ndfes(k-1)+l)&=&\vecb{K}^e_k(l),\\
+    \vecb{I}(\ndfes(k-1)+l)&=&\vecb{I}^e_k(l)=\mathcal{I}^k((l-1) \bmod m +1),\\
+    \vecb{J}(\ndfes(k-1)+l)&=&\vecb{J}^e_k(l)=\mathcal{I}^k(E((l-1)/ m)+1).
+  \end{array}
+  
+So, for each triangle :math:`T_k`, we have 
+
+.. figure::  images/AssemblyMat_OptV1_generic.png
+       :width: 700px
+       :scale: 100%
+       :align:   center
+       
+Then, a simple algorithm can build these three arrays using a loop over each triangle.
+       
+.. note::
+   We give the complete ``OptV1`` algorithm 
+
+   .. figure::  images/AssemblyMat_OptV1_algo.png
+       :width: 600px
+       :scale: 100%
+       :align:   center
+     
+      
+.. _PresentationOptV2-label:
+      
+New Optimized assembly algorithm (``OptV2`` version)
+------------------------------------------------------
+
+We present the optimized version 2 algorithm where no loop is used.
+We define three 2d-arrays that allow to store all the element matrices 
+as well as their positions in the global matrix. We denote by :math:`\MAT{K}_g,` :math:`\MAT{I}_g`
+and :math:`\MAT{J}_g` these :math:`\ndfes-by-\nme` arrays, defined :math:`\forall k \in \{1,\hdots,\nme\},` 
+:math:`\forall il \in\{1,\hdots,\ndfes\}` by
+
+.. math::
+    \MAT{K}_g(il,k)=\vecb{K}^e_k(il),\quad\quad \MAT{I}_g(il,k)=\vecb{I}^e_k(il),\quad\quad \MAT{J}_g(il,k)=\vecb{J}^e_k(il).
+    :label: eq_IgJgKgdef
+
+The three local arrays :math:`\vecb{K}^e_k,`  :math:`\vecb{I}^e_k` and :math:`\vecb{J}^e_k` are thus stored
+in the :math:`k^{th}` column of the global arrays :math:`\MAT{K}_g,` :math:`\MAT{I}_g` and :math:`\MAT{J}_g` respectively.
+
+A natural way to build these three arrays consists in using a loop through the triangles
+:math:`T_k` in which we insert the local arrays column-wise
+
+.. figure::  images/AssembleMatV2d.png
+       :width: 800px
+       :scale: 100%
+       :align:   center
+     
+       Construction of :math:`\mathbb{K}_g`, :math:`\mathbb{I}_g` and :math:`\mathbb{J}_g` with loop
+       
+The natural construction of these three arrays is done column-wise. So, for each array there are 
+:math:`\nme` columns to compute, which depends on the mesh size. 
+To vectorize, we must fill these arrays by row-wise operations and then for each array there are
+:math:`\ndfes` rows to compute. We recall that :math:`\ndfe` does not depend on the mesh size. 
+These  rows insertions are represented in Figure :num:`#figureigjgkgoptv2` . We can also remark that,
+:math:`\forall (\il,\jl)\in\ENS{1}{\ndfe}`, with :math:`m=\ndfe,`
+
+.. math::
+  
+  \MAT{K}_g(m(\jl-1)+\il,k)=e^k_{\il,\jl},\ \ 
+  \MAT{I}_g(m(\jl-1)+\il,k)=\mathcal{I}^k_\il,\ \ 
+  \MAT{J}_g(m(\jl-1)+\il,k)=\mathcal{I}^k_\jl.
+
+where, in scalar fields case, :math:`\mathcal{I}^k_\il=\me(\il,k),` :math:`\forall \il\in\ENS{1}{d+1}`
+and in vector fields case, :math:`\mathcal{I}^k_{d a - b}=d \me(a,k)-b,` 
+:math:`\forall a \in \ENS{1}{d+1},` :math:`\forall b \in \ENS{0}{d-1}.`
+
+.. _figureIgJgKgOptV2:
+
+.. figure::  images/IgJgKg_OptV2.png
+       :width: 800px
+       :scale: 100%
+       :align:   center
+     
+       Row-wise operations on global arrays :math:`\mathbb{I}_g,` :math:`\mathbb{J}_g` and :math:`\mathbb{K}_g`
+
+
+As we can see in Figures :num:`#figurebuild2digjgoptv2scalar` and :num:`#figurebuild3digjgoptv2scalar`, 
+it is quite easy to vectorize :math:`\MAT{I}_g` and :math:`\MAT{J}_g` computations in scalar fields case
+by filling these arrays lines by lines :
+
+.. _figureBuild2DIgJgOptV2scalar:
+
+.. figure::  images/Build2D_IgJg_OptV2.png
+       :width: 800px
+       :scale: 100%
+       :align:   center
+     
+       Construction of :math:`\mathbb{I}_g` and :math:`\mathbb{J}_g` : ``OptV2`` version for 2d *scalar* matrix
+
+.. _figureBuild3DIgJgOptV2scalar:
+
+       
+.. figure::  images/Build3D_IgJg_OptV2.png
+       :width: 800px
+       :scale: 100%
+       :align:   center
+     
+       Construction of  :math:`\mathbb{I}_g` and :math:`\mathbb{J}_g` : ``OptV2`` version for 3d *scalar* matrix
+       
+Using vectorization tools, we can compute :math:`\MAT{I}_g` and :math:`\MAT{J}_g` in one line. The vectorized algorithms in 2d and 3d scalar fields are represented by Figure :num:`figurebuildigjgoptv2scalaralgo`.
+
+
+.. _FigureBuildIgJgOptV2scalaralgo:
+
+.. figure::  images/BuildIgJg_scalar_algo.png 
+     :width: 600px
+     :scale: 100%
+     :align:   center
+
+     Vectorized algorithms for :math:`\mathbb{I}_g` and :math:`\mathbb{J}_g` computations 
+     
+     
+In vector fields case, we construct the tabular :math:`\MAT{T}` such that
+:math:`\MAT{T}(\alpha,k)=\mathcal{I}^k_\il,` :math:`\forall \il\in\ENS{1}{\ndfe}.` 
+Then we can vectorize :math:`\MAT{I}_g` and :math:`\MAT{J}_g` computations in vector fields case. 
+We represent in Figure :num:`figurebuild2digjgoptv2vector` these operations in 2d.
+
+.. _figureBuild2DIgJgOptV2vector:      
+
+.. figure::  images/IgJgTabularMECA.png
+       :width: 800px
+       :scale: 100%
+       :align:   center
+     
+       Construction of :math:`\mathbb{I}_g` and :math:`\mathbb{J}_g` : ``OptV2`` version in 2d vector fields case       
+
+       
+       
+       
+     
+Now, it remains to vectorize the computation of :math:`\mathbb{K}_g` array 
+which contains all the element matrices associated to :math:`\MAT{D}` or :math:`\MAT{H}` :
+it should be done by **row-wise** vector operations.      
+     
+       
+We now describe a vectorized construction of :math:`\mathbb{K}_g` array associated to a generic
+bilinear form :math:`a`. For the mesh element :math:`T_k`, the element matrix is then given by
+
+.. math::
+     \MAT{E}(T_k)=\begin{pmatrix}
+        a(\varphi_{i_1^k},\varphi_{i_1^k}) & a(\varphi_{i_1^k},\varphi_{i_2^k}) & a(\varphi_{i_1^k},\varphi_{i_3^k})\\
+        a(\varphi_{i_2^k},\varphi_{i_1^k}) & a(\varphi_{i_2^k},\varphi_{i_2^k}) & a(\varphi_{i_2^k},\varphi_{i_3^k})\\
+        a(\varphi_{i_3^k},\varphi_{i_1^k}) & a(\varphi_{i_3^k},\varphi_{i_2^k}) & a(\varphi_{i_3^k},\varphi_{i_3^k})
+     \end{pmatrix}
+     
+
+.. figure::  images/Build2D_Kg_generic_OptV2.png
+       :width: 800px
+       :scale: 100%
+       :align:   center
+     
+       Construction of :math:`\mathbb{K}_g` for **Mass** matrix 
+
+.. figure::  images/Build2D_Kg_Mass_OptV2.png
+       :width: 800px
+       :scale: 100%
+       :align:   center
+     
+       Construction of :math:`\mathbb{K}_g` for **Mass** matrix 

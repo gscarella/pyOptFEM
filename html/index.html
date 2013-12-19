@@ -1,0 +1,304 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to pyOptFEM’s documentation! &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="#" />
+    <link rel="next" title="Presentation" href="presentation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="presentation.html" title="Presentation"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-pyoptfem-s-documentation">
+<h1>Welcome to pyOptFEM&#8217;s documentation!<a class="headerlink" href="#welcome-to-pyoptfem-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p><strong>pyOptFEM</strong> is a Python module which aims at measuring and comparing
+the performance of three programming techniques for <strong>assembling finite element matrices in 2D and 3D</strong>.
+For each of the matrices studied, three assembly versions are available: <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and <tt class="docutils literal"><span class="pre">OptV2</span></tt></p>
+<p>Three matrices are currently implemented (more details are given in <a class="reference internal" href="FEM2D.html#fem2d-label"><em>FEM2D module</em></a> and <a class="reference internal" href="FEM3D.html#fem3d-label"><em>FEM3D module</em></a>) :</p>
+<ul>
+<li><p class="first"><strong>Mass matrix</strong> :</p>
+<div class="math">
+<p><img src="_images/math/d18d5dc23198d5909be033725dd00a0c89b5acd8.png" alt="\mathbb{M}_{i,j}=\int_{\Omega_h} \varphi_j(q)\ \varphi_i(q)dq,\ \ \forall (i,j) \in \{1,...,\nq\}^2."/></p>
+</div></li>
+<li><p class="first"><strong>Stiffness matrix</strong> :</p>
+<div class="math">
+<p><img src="_images/math/1b447d4fc84e416d41fe85153800a9ca6839834c.png" alt="\mathbb{S}_{i,j}=\int_{\Omega_h} \nabla\varphi_j(q).\nabla \varphi_i(q)dq,\ \ \forall (i,j) \in \{1,...,\nq\}^2."/></p>
+</div></li>
+<li><p class="first"><strong>Elastic stiffness matrix</strong> :</p>
+<div class="math">
+<p><img src="_images/math/49b46bd4508c2b1588617ad807c91c8c71190791.png" alt="\mathbb{K}_{m,l}=\int_{\Omega_h} \underline{\pmb{\epsilon}}^t(\psi_l(q))
+\underline{\pmb{\sigma}}(\psi_m(q))dq,
+\ \ \forall (m,l) \in \{1,...,d\nq\}^2."/></p>
+</div><p>where <img class="math" src="_images/math/96ab646de7704969b91c76a214126b45f2b07b25.png" alt="d"/> is the space dimension.</p>
+</li>
+</ul>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="presentation.html">Presentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="presentation.html#classical-assembly-algorithm-base-version">Classical assembly algorithm (<tt class="docutils literal"><span class="pre">base</span></tt> version)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="presentation.html#sparse-matrix-requirement">Sparse matrix requirement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="presentation.html#optimized-classical-assembly-algorithm-optv1-version">Optimized classical assembly algorithm (<tt class="docutils literal"><span class="pre">OptV1</span></tt> version)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="presentation.html#new-optimized-assembly-algorithm-optv2-version">New Optimized assembly algorithm (<tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks2D.html">2D benchmarks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks2D.html#module-pyOptFEM.FEM2D.assemblyBench">Benchmark usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks2D.html#mass-matrix">Mass Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks2D.html#stiffness-matrix">Stiffness Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks2D.html#elastic-stiffness-matrix">Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks3D.html">3D benchmarks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks3D.html#module-pyOptFEM.FEM3D.assemblyBench">Benchmark usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks3D.html#mass-matrix">Mass Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks3D.html#stiffness-matrix">Stiffness Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks3D.html#elastic-stiffness-matrix">Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="FEM2D.html">FEM2D module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="FEM2D.html#assembly-matrices-base-optv1-and-optv2-versions">Assembly matrices (<tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEM2D.html#element-matrices-used-by-base-and-optv1-versions">Element matrices (used by <tt class="docutils literal"><span class="pre">base</span></tt> and <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEM2D.html#vectorized-tools-used-by-optv2-version">Vectorized tools (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEM2D.html#vectorized-element-matrices-used-by-optv2-version">Vectorized element matrices (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEM2D.html#module-pyOptFEM.FEM2D.mesh">Mesh</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="FEM3D.html">FEM3D module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="FEM3D.html#assembly-matrix-base-optv1-and-optv2-versions">Assembly matrix (<tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEM3D.html#element-matrix-used-by-base-and-optv1-versions">Element matrix (used by <tt class="docutils literal"><span class="pre">base</span></tt> and <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEM3D.html#vectorized-tools-used-by-optv2-version">Vectorized tools (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEM3D.html#vectorized-element-matrix-used-by-optv2-version">Vectorized element matrix (used by <tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FEM3D.html#module-pyOptFEM.FEM3D.mesh">Mesh</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="valid2D.html">valid2D module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="valid2D.html#mass-matrix">Mass Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="valid2D.html#stiffness-matrix">Stiffness matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="valid2D.html#elastic-stiffness-matrix">Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="valid3D.html">valid3D module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="valid3D.html#mass-matrix">Mass Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="valid3D.html#stiffness-matrix">Stiffness matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="valid3D.html#elastic-stiffness-matrix">Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="quick-testing">
+<h1>Quick testing<a class="headerlink" href="#quick-testing" title="Permalink to this headline">¶</a></h1>
+<p>To test the <strong>pyOptFEM</strong> library, you can run validation tests <tt class="docutils literal"><span class="pre">runValids()</span></tt> or some benchmarks (see <tt class="docutils literal"><span class="pre">runBenchs()</span></tt>)</p>
+</div>
+<div class="section" id="testing-and-working">
+<h1>Testing and Working<a class="headerlink" href="#testing-and-working" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><ul class="simple">
+<li>Ubuntu 12.04 LTS (x86_64) with<ul>
+<li>python3.3</li>
+<li>python3.2</li>
+</ul>
+</li>
+<li>Works on Windows 7 64 bits (???)</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="requirements">
+<h1>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h1>
+<p><strong>pyOptFEM</strong> works with python3.3.</p>
+<p>How to install python3.3.2?</p>
+<p>A description of how to compile/install python3.3 under Ubuntu 12.04 LTS (x86_64) is given on <a class="reference external" href="http://www.math.univ-paris13.fr/~cuvelier/">François Cuvelier&#8217;s website</a>, (section Python in the left menu) and repeated here.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>How to install python3.3.2</p>
+<div class="last highlight-python"><pre>wget http://www.python.org/ftp/python/3.3.2/Python-3.3.2.tar.bz2
+tar jxvf ./Python-3.3.2.tar.bz2
+cd Python-3.3.2
+./configure --prefix=/opt/python3.3.2
+make
+sudo make install</pre>
+</div>
+</div>
+<p>As a result, python is installed in <tt class="docutils literal"><span class="pre">/opt/python3.3.2</span></tt> directory.</p>
+<p>For <strong>pyOptFEM</strong>, you need some python modules. To install them you need easy_install which can be installed like this.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>How to install setuptools module</p>
+<div class="last highlight-python"><pre>wget --check-certificate https://pypi.python.org/packages/source/s/setuptools/setuptools-1.1.4.tar.gz
+tar zxvf setuptools-1.1.4.tar.gz
+cd setuptools-1.1.4
+sudo /opt/python3.3.2/bin/python3 setup.py install</pre>
+</div>
+</div>
+<p>For <strong>pyOptFEM</strong>, you need numpy, scipy, sympy and matplotlib. (For matplotlib, the package libfreetype6-dev may be necessary!)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>How to install scientific computation modules : numpy, scipy, sympy, matplotlib</p>
+<div class="last highlight-python"><pre>sudo /opt/python3.3.2/bin/easy_install numpy
+sudo /opt/python3.3.2/bin/easy_install scipy
+sudo /opt/python3.3.2/bin/easy_install sympy
+sudo /opt/python3.3.2/bin/easy_install matplotlib</pre>
+</div>
+</div>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>To install <strong>pyOptFEM</strong> as root, you should run the following command:</p>
+<div class="last highlight-python"><pre>/opt/python3.3.2/bin/python3 setup.py install</pre>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>To install <strong>pyOptFEM</strong> as a single user, you should run the following command:</p>
+<div class="last highlight-python"><pre>/opt/python3.3.2/bin/python3 setup.py install --user</pre>
+</div>
+</div>
+</div>
+<div class="section" id="license-issues">
+<h1>License issues<a class="headerlink" href="#license-issues" title="Permalink to this headline">¶</a></h1>
+<p><strong>pyOptFEM</strong> is published under the terms of the <a class="reference external" href="http://www.gnu.org/licenses/">GNU General Public License</a>.</p>
+<p><strong>pyOptFEM</strong> is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p><strong>pyOptFEM</strong> is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License along with this program.  If not, see <a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
+<p>Software using source files of this project or significant parts of it, should include the following attribution notice:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">--------------------------------------------------------------------</span></tt></dt>
+<dd><p class="first">ATTRIBUTION NOTICE:
+This product includes software developed for the <strong>pyOptFEM</strong> project at
+(C) University Paris XIII, Galilee Institute, LAGA, France.</p>
+<p><strong>pyOptFEM</strong> is a python software package for <cite>P_1</cite>-Lagrange Finite Element Methods in 3D.
+The project is maintained by
+F. Cuvelier, C. Japhet and  G. Scarella.
+For Online Documentation and Download we refer to</p>
+<blockquote class="last">
+<div><a class="reference external" href="http://www.math.univ-paris13.fr/~cuvelier">http://www.math.univ-paris13.fr/~cuvelier</a></div></blockquote>
+</dd>
+</dl>
+<p><tt class="docutils literal"><span class="pre">--------------------------------------------------------------------</span></tt></p>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to pyOptFEM&#8217;s documentation!</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#quick-testing">Quick testing</a></li>
+<li><a class="reference internal" href="#testing-and-working">Testing and Working</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#license-issues">License issues</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="presentation.html"
+                        title="next chapter">Presentation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="presentation.html" title="Presentation"
+             >next</a> |</li>
+        <li><a href="#">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

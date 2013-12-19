@@ -1,0 +1,265 @@
+
+Element Mass Matrix
+~~~~~~~~~~~~~~~~~~~~~~
+
+We have 
+
+.. math::
+    \mathbb{M}^e(T) =\frac{|T|}{20}\begin{pmatrix} 
+                                      2 & 1 & 1 & 1\\ 
+                                      1 & 2 & 1 & 1\\ 
+                                      1 & 1 & 2 & 1\\
+                                      1 & 1 & 1 & 2
+                                    \end{pmatrix}
+                                    
+Then with :math:`\MAT{K}_g` definition (see Section :ref:`PresentationOptV2-label`) , we obtain
+ 
+.. math::
+   \MAT{K}_g(4(i-1)+j,k)=|T_k|\frac{1+\delta_{i,j}}{20}  \quad 1\le i,j \le 4,
+
+So the vectorized algorithm for :math:`\mathbb{K}_g` computation is simple and given in Algorithm :num:`elemmassmat3dp1vectoralgo`.
+       
+.. admonition:: Algorithm :num:`elemmassmat3dp1vectoralgo`
+
+    .. _ElemMassMat3DP1vectoralgo:  
+          
+    .. figure::  images/ElemMassMat3DP1_algo.png
+          :width: 600px
+          :scale: 100%
+          :align:   center
+        
+          Vectorized algorithm for :math:`\mathbb{K}_g` associated to 3d **Mass** matrix      
+   
+.. note::
+  .. automodule:: pyOptFEM.FEM3D.elemMatrixVec
+      :members: ElemMassMat3DP1Vec
+      :noindex:
+        
+Element Stiffness Matrix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We have :math:`\forall (\il,\jl)\in\ENS{1}{4}^2`
+
+.. math::
+    \mathbb{S}_{\il,\jl}^e(T_k)= |T_k| \DOT{\GRAD\BasisFunc_{\jl}^k}{\GRAD\BasisFunc_{\il}^k}.
+
+Using vectorized algorithm function :math:`\FNametxt{GradientVec3D}`  given in Algorithm :num:`gradientvec3dalgo`, we obtain
+the vectorized algorithm :num:`elemstiffmat3dp1vectoralgo` for :math:`\mathbb{K}_g` computation for the **Stiffness** matrix in 3d.
+       
+.. admonition:: Algorithm :num:`elemstiffmat3dp1vectoralgo`
+
+    .. _ElemStiffMat3DP1vectoralgo:  
+          
+    .. figure::  images/ElemStiffMat3DP1_algo.png
+          :width: 600px
+          :scale: 100%
+          :align:   center
+        
+          Vectorized algorithm for :math:`\mathbb{K}_g` associated to 3d **Stiffness** matrix    
+
+.. note::
+  .. automodule:: pyOptFEM.FEM3D.elemMatrixVec
+    :members: ElemStiffMat3DP1Vec
+    :noindex:
+        
+Element Elastic Stiffness Matrix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   
+- We define on the tetrahedron :math:`T_k` the local *alternate* basis :math:`\mathcal{B}_a^k`  by
+   
+  .. math::
+    \begin{array}{c}
+      \mathcal{B}_a^k=\{\BasisFuncTwoD_1^k,\hdots,\BasisFuncTwoD_{12}^k\}\\=\\
+      \left\{\tiny
+      \begin{pmatrix}  \BasisFunc_1^k \\ 0 \\ 0\end{pmatrix},
+      \begin{pmatrix}  0  \\ \BasisFunc_1^k \\0  \end{pmatrix},
+      \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_1^k  \end{pmatrix},
+      \begin{pmatrix}  \BasisFunc_2^k \\ 0 \\ 0\end{pmatrix},
+      \begin{pmatrix}  0  \\ \BasisFunc_2^k \\0  \end{pmatrix},
+      \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_2^k  \end{pmatrix},
+      \begin{pmatrix}  \BasisFunc_3^k \\ 0 \\ 0\end{pmatrix},
+      \begin{pmatrix}  0  \\ \BasisFunc_3^k \\0  \end{pmatrix},
+      \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_3^k   \end{pmatrix},
+      \begin{pmatrix}  \BasisFunc_4^k \\ 0 \\ 0\end{pmatrix},
+      \begin{pmatrix}  0  \\ \BasisFunc_4^k \\0  \end{pmatrix},
+      \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_4^k  \end{pmatrix}
+      \right\}
+    \end{array}
+
+  where :math:`\BasisFunc_\il^k=\BasisFunc_{\me(\il,k)}.` With notations of :ref:`Presentation-label`, 
+  we have :math:`\forall (\il,\jl) \in \ENS{1}{12}^2` 
+    
+  .. math::
+    \StiffElasElem_{\il,\jl}(T_k)=
+    \int_{T_k} \Odv^t(\BasisFuncTwoD^k_\jl) \mathbb{C}\Odv(\BasisFuncTwoD^k_\il)d\q=
+    \int_{T_k} \mathcal{H}(\BasisFuncTwoD^k_\jl,\BasisFuncTwoD^k_\il)(\q)d\q
+  
+  with, :math:`\forall \vecb{u}=(u_1,u_2,u_3)\in\HUnD{\DOM}^3,` :math:`\forall \vecb{v}=(v_1,v_2,v_3)\in\HUnD{\DOM}^3,` by
+
+  .. math::
+    \begin{array}{c}
+    \mathcal{H}(\vecb{u},\vecb{v})\\=\\
+    \tiny{
+    \DOT{\begin{pmatrix} \gamma & 0 &0\\ 0 & \mu &0\\ 0 & 0 &\mu\end{pmatrix}\GRAD u_1 }{\GRAD v_1}
+    +\DOT{\begin{pmatrix} 0 & \lambda & 0\\ \mu & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}\GRAD u_2 }{\GRAD v_1}
+    +\DOT{\begin{pmatrix} 0 & 0 & \lambda\\ 0 & 0 & 0 \\ \mu & 0 & 0 \end{pmatrix}\GRAD u_3 }{\GRAD v_1}
+    }\\
+    %&+&
+    \tiny{+
+    \DOT{\begin{pmatrix} 0 & \mu &0\\ \lambda & 0 &0\\ 0 & 0 &0\end{pmatrix}\GRAD u_1 }{\GRAD v_2}
+    +\DOT{\begin{pmatrix} \mu & 0 & 0\\ 0 & \gamma & 0 \\ 0 & 0 & \mu \end{pmatrix}\GRAD u_2 }{\GRAD v_2}
+    +\DOT{\begin{pmatrix} 0 & 0 & 0\\ 0 & 0 & \lambda \\ 0 & \mu & 0 \end{pmatrix}\GRAD u_3 }{\GRAD v_2}
+    }\\
+    %&+&
+    \tiny{+
+    \DOT{\begin{pmatrix} 0 & 0 &\mu\\ 0 & 0 &0\\ \lambda & 0 & 0\end{pmatrix}\GRAD u_1 }{\GRAD v_3}
+    +\DOT{\begin{pmatrix} 0 & 0 & 0\\ 0 & 0 & \mu \\ 0 & \lambda & 0 \end{pmatrix}\GRAD u_2 }{\GRAD v_3}
+    +\DOT{\begin{pmatrix} \mu & 0 & 0\\ 0 & \mu & 0 \\ 0 & 0 & \gamma \end{pmatrix}\GRAD u_3 }{\GRAD v_3}
+    }
+    \end{array}
+    
+  where :math:`\lambda` and :math:`\mu` are the Lame coefficients and :math:`\gamma=\lambda+2\mu.`
+
+  For example, we can explicitly compute the first two terms in the first column of :math:`\StiffElasElem(T_k)` which are given by
+  
+  .. math::
+    \begin{array}{lcl}
+    \StiffElasElem_{1,1}(T_k)&=&\int_{T_k} \mathcal{H}(\BasisFuncTwoD^k_{1},\BasisFuncTwoD^k_{1})(\q)d\q\\
+    &=&\int_{T_k} \mathcal{H}\left(
+    \tiny\begin{pmatrix}
+    \BasisFunc^k_{1}\\
+    0\\
+    0
+    \end{pmatrix},
+    \tiny\begin{pmatrix}
+    \BasisFunc^k_{1}\\
+    0\\ 0
+    \end{pmatrix}
+    \right)(\q)d\q\\
+    &=&|T_k|
+    \DOT{\tiny\begin{pmatrix} \gamma & 0 &0\\ 0 & \mu &0\\ 0 & 0 &\mu\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{1}}
+    =|T_k|\left(\gamma\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{1}}{x}+\mu(\DP{\BasisFunc^k_{1}}{y}\DP{\BasisFunc^k_{1}}{y}+\DP{\BasisFunc^k_{1}}{z}\DP{\BasisFunc^k_{1}}{z}) \right).
+    \end{array}
+  
+  and
+  
+  .. math::
+    \begin{array}{lcl}
+    \StiffElasElem_{2,1}(T_k)&=&\int_{T_k} \mathcal{H}(\BasisFuncTwoD^k_{1},\BasisFuncTwoD^k_{2})(\q)d\q\\
+    &=&\int_{T_k} \mathcal{H}\left(
+    \tiny\begin{pmatrix}
+    \BasisFunc^k_{1}\\
+    0\\0
+    \end{pmatrix},
+    \begin{pmatrix}
+    0\\
+    \BasisFunc^k_{1}\\ 0
+    \end{pmatrix}
+    \right)(\q)d\q\\
+    &=&|T_k|
+    \DOT{\tiny\begin{pmatrix} 0 & \mu &0\\ \lambda & 0 &0\\ 0 & 0 &0\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{1}}
+    =|T_k|(\lambda+\mu)\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{1}}{y}.
+    \end{array}
+ 
+  Using vectorized algorithm function :math:`\FNametxt{GradientVec3D}`  given in Algorithm :num:`gradientvec3dalgo`, we obtain
+  the vectorized algorithm :num:`elemstiffelasmatba3dp1vectoralgo` for :math:`\mathbb{K}_g` computation for the **Elastic Stiffness** matrix in 3d.
+        
+  .. admonition:: Algorithm :num:`elemstiffelasmatba3dp1vectoralgo`
+
+      .. _ElemStiffElasMatBa3DP1vectoralgo:  
+            
+      .. figure::  images/ElemStiffElasMatBa3DP1_algo.png
+            :width: 600px
+            :scale: 100%
+            :align:   center
+          
+            Vectorized algorithm for :math:`\mathbb{K}_g` associated to 3d **Elastic Stiffness** matrix       
+ 
+  .. note::
+     .. automodule:: pyOptFEM.FEM3D.elemMatrixVec
+       :members: ElemStiffElasMatBa3DP1Vec
+       :noindex:
+
+- We define on :math:`T_k` the local *block* basis :math:`\mathcal{B}_b^k`  by
+   
+  .. math::
+      \begin{array}{c}
+        \mathcal{B}_b^k=\{\BasisFuncTwoDB_1^k,\hdots,\BasisFuncTwoDB_{12}^k\} \\ = \\
+        \left\{\tiny
+        \begin{pmatrix} \BasisFunc_1^k \\ 0 \\ 0 \end{pmatrix},
+        \begin{pmatrix} \BasisFunc_2^k \\ 0 \\ 0 \end{pmatrix},
+        \begin{pmatrix} \BasisFunc_3^k \\ 0 \\ 0 \end{pmatrix},
+        \begin{pmatrix} \BasisFunc_4^k \\ 0 \\ 0 \end{pmatrix},
+        \begin{pmatrix}  0  \\ \BasisFunc_1^k \\ 0 \end{pmatrix},
+        \begin{pmatrix}  0  \\ \BasisFunc_2^k \\ 0 \end{pmatrix},
+        \begin{pmatrix}  0  \\ \BasisFunc_3^k \\ 0 \end{pmatrix},
+        \begin{pmatrix}  0  \\ \BasisFunc_4^k \\ 0 \end{pmatrix},
+        \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_1^k  \end{pmatrix},
+        \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_2^k  \end{pmatrix},
+        \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_3^k  \end{pmatrix},
+        \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_4^k  \end{pmatrix}        
+        \right\}
+      \end{array} 
+        
+  where :math:`\BasisFunc_\il^k=\BasisFunc_{\me(\il,k)}.` 
+    
+  For example, using formula :eq:`eq_StiffElasHop`, we can  explicitly compute the first two terms in the first column of :math:`\StiffElasElem(T_k)` which are given by
+  
+  .. math::
+    \begin{array}{lcl}
+    \StiffElasElem_{1,1}(T_k)&=&\int_{T_k} \mathcal{H}(\BasisFuncTwoDB^k_{1},\BasisFuncTwoDB^k_{1})(\q)d\q\\
+    &=&\int_{T_k} \mathcal{H}\left(
+    \tiny\begin{pmatrix}
+    \BasisFunc^k_{1}\\
+    0\\0
+    \end{pmatrix},
+    \begin{pmatrix}
+    \BasisFunc^k_{1}\\
+    0\\0
+    \end{pmatrix}
+    \right)(\q)d\q\\
+    &=&|T_k|
+    \DOT{\tiny\begin{pmatrix} \gamma & 0 &0\\ 0 & \mu &0\\ 0 & 0 &\mu\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{1}}
+    =|T_k|\left(\gamma\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{1}}{x}+\mu(\DP{\BasisFunc^k_{1}}{y}\DP{\BasisFunc^k_{1}}{y} +\DP{\BasisFunc^k_{1}}{z}\DP{\BasisFunc^k_{1}}{z})\right).
+    \end{array}
+  
+  and
+  
+  .. math::
+    \begin{array}{lcl}
+    \StiffElasElem_{2,1}(T_k)&=&\int_{T_k} \mathcal{H}(\BasisFuncTwoDB^k_{1},\BasisFuncTwoDB^k_{2})(\q)d\q\\
+    &=&\int_{T_k} \mathcal{H}\left(
+    \tiny \begin{pmatrix}
+    \BasisFunc^k_{1}\\
+    0\\ 0
+    \end{pmatrix},
+    \begin{pmatrix}
+    \BasisFunc^k_{2}\\
+    0\\ 0
+    \end{pmatrix}
+    \right)(\q)d\q\\
+    &=&|T_k|
+    \DOT{\tiny\begin{pmatrix} \gamma & 0 &0\\ 0 & \mu &0\\ 0 & 0 &\mu\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{2}}
+    =|T_k|\left(\gamma\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{2}}{x}+\mu(\DP{\BasisFunc^k_{1}}{y}\DP{\BasisFunc^k_{2}}{y}+\DP{\BasisFunc^k_{1}}{z}\DP{\BasisFunc^k_{2}}{z}) \right).
+    \end{array}
+    
+  Using vectorized algorithm function :math:`\FNametxt{GradientVec3D}`  given in Algorithm :num:`gradientvec3dalgo`, we obtain
+  the vectorized algorithm :num:`elemstiffelasmatbb3dp1vectoralgo` for :math:`\mathbb{K}_g` computation for the **Elastic Stiffness** matrix in 3d.
+        
+  .. admonition:: Algorithm :num:`elemstiffelasmatbb3dp1vectoralgo`
+
+      .. _ElemStiffElasMatBb3DP1vectoralgo:  
+            
+      .. figure::  images/ElemStiffElasMatBb3DP1_algo.png
+            :width: 600px
+            :scale: 100%
+            :align:   center
+          
+            Vectorized algorithm for :math:`\mathbb{K}_g` associated to 3d **Elastic Stiffness** matrix      
+            
+  .. note::
+    .. automodule:: pyOptFEM.FEM3D.elemMatrixVec
+      :members: ElemStiffElasMatBb3DP1Vec
+      :noindex:
+
+    

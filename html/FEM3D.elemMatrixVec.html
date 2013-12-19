@@ -1,0 +1,415 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Element Mass Matrix &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="element-mass-matrix">
+<h1>Element Mass Matrix<a class="headerlink" href="#element-mass-matrix" title="Permalink to this headline">¶</a></h1>
+<p>We have</p>
+<div class="math">
+<p><img src="_images/math/cafcb6077ca161f28a01827deff42c3fa8ded434.png" alt="\mathbb{M}^e(T) =\frac{|T|}{20}\begin{pmatrix}
+                                  2 &amp; 1 &amp; 1 &amp; 1\\
+                                  1 &amp; 2 &amp; 1 &amp; 1\\
+                                  1 &amp; 1 &amp; 2 &amp; 1\\
+                                  1 &amp; 1 &amp; 1 &amp; 2
+                                \end{pmatrix}"/></p>
+</div><p>Then with <img class="math" src="_images/math/55ad9149a912591433016952afe50e9bd1da9d98.png" alt="\MAT{K}_g"/> definition (see Section <a class="reference internal" href="presentation.html#presentationoptv2-label"><em>New Optimized assembly algorithm (OptV2 version)</em></a>) , we obtain</p>
+<div class="math">
+<p><img src="_images/math/5417b60b0ee4b80eba4a279904f2bb57dbcf32de.png" alt="\MAT{K}_g(4(i-1)+j,k)=|T_k|\frac{1+\delta_{i,j}}{20}  \quad 1\le i,j \le 4,"/></p>
+</div><p>So the vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> computation is simple and given in Algorithm <a href="#elemmassmat3dp1vectoralgo">27</a>.</p>
+<div class="admonition-algorithm-num-elemmassmat3dp1vectoralgo admonition">
+<p class="first admonition-title">Algorithm <a href="#elemmassmat3dp1vectoralgo">27</a></p>
+<div class="last figure align-center" id="elemmassmat3dp1vectoralgo">
+<a class="reference internal image-reference" href="_images/ElemMassMat3DP1_algo.png"><img alt="_images/ElemMassMat3DP1_algo.png" src="_images/ElemMassMat3DP1_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 27: Vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> associated to 3d <strong>Mass</strong> matrix</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrixVec.</tt><tt class="descname">ElemMassMat3DP1Vec</tt><big>(</big><em>nme</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrixVec.html#ElemMassMat3DP1Vec"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes all the element Mass matrices <img class="math" src="_images/math/364f23dff042c528ff9499ae4785fc1b440eeddd.png" alt="\mathbb{M}^e(T_k)"/> for <img class="math" src="_images/math/0c1a5b812f7df75f27ae30d57d614b305c4c4203.png" alt="k\in\{0,\hdots,\nme-1\}"/></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>volumes</strong> (<img class="math" src="_images/math/1b2ddc9345548a0e09b20ac6851e89cc2d81df8e.png" alt="\nme"/> <em>numpy</em> array of floats) &#8211; volumes of all the mesh elements.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a one dimensional <em>numpy</em> array of size <img class="math" src="_images/math/c1bccae0437745ece7b45872924f5be5a9147dd0.png" alt="16 \nme"/></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="element-stiffness-matrix">
+<h1>Element Stiffness Matrix<a class="headerlink" href="#element-stiffness-matrix" title="Permalink to this headline">¶</a></h1>
+<p>We have <img class="math" src="_images/math/5b647f67d2060d11529ee9d47a32708f7533bb58.png" alt="\forall (\il,\jl)\in\ENS{1}{4}^2"/></p>
+<div class="math">
+<p><img src="_images/math/f6cc8620320fd293358b2dc2cce8b859d05a55d4.png" alt="\mathbb{S}_{\il,\jl}^e(T_k)= |T_k| \DOT{\GRAD\BasisFunc_{\jl}^k}{\GRAD\BasisFunc_{\il}^k}."/></p>
+</div><p>Using vectorized algorithm function <img class="math" src="_images/math/81070b3b885b402e04faae49543d43a7c5b18cec.png" alt="\FNametxt{GradientVec3D}"/>  given in Algorithm <a href="FEM3D.ToolsVec.html#gradientvec3dalgo">26</a>, we obtain
+the vectorized algorithm <a href="#elemstiffmat3dp1vectoralgo">28</a> for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> computation for the <strong>Stiffness</strong> matrix in 3d.</p>
+<div class="admonition-algorithm-num-elemstiffmat3dp1vectoralgo admonition">
+<p class="first admonition-title">Algorithm <a href="#elemstiffmat3dp1vectoralgo">28</a></p>
+<div class="last figure align-center" id="elemstiffmat3dp1vectoralgo">
+<a class="reference internal image-reference" href="_images/ElemStiffMat3DP1_algo.png"><img alt="_images/ElemStiffMat3DP1_algo.png" src="_images/ElemStiffMat3DP1_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 28: Vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> associated to 3d <strong>Stiffness</strong> matrix</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrixVec.</tt><tt class="descname">ElemStiffMat3DP1Vec</tt><big>(</big><em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrixVec.html#ElemStiffMat3DP1Vec"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes all the element stiffness matrices <img class="math" src="_images/math/41390009c72e75f920919740275248250c403309.png" alt="\mathbb{S}^e(T_k)"/> for <img class="math" src="_images/math/0c1a5b812f7df75f27ae30d57d614b305c4c4203.png" alt="k\in\{0,\hdots,\nme-1\}"/></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nme</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of mesh elements,</li>
+<li><strong>q</strong> (<img class="math" src="_images/math/58e37a7cde3188c5e13e79c903bf976b080450f1.png" alt="3\times \nq"/> <em>numpy</em> array of floats) &#8211; mesh vertices,</li>
+<li><strong>me</strong> (<img class="math" src="_images/math/dcf0df73a85b8f7bde061a112b9191a101389806.png" alt="4 \times\nme"/> <em>numpy</em> array of integers) &#8211; mesh connectivity,</li>
+<li><strong>areas</strong> (<img class="math" src="_images/math/1b2ddc9345548a0e09b20ac6851e89cc2d81df8e.png" alt="\nme"/> <em>numpy</em> array of floats) &#8211; areas of all the mesh elements.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a one dimensional <em>numpy</em> array of size <img class="math" src="_images/math/b091aced11cff2cca8a1057d148eaf6174158fbf.png" alt="9 \nme"/></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="element-elastic-stiffness-matrix">
+<h1>Element Elastic Stiffness Matrix<a class="headerlink" href="#element-elastic-stiffness-matrix" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p class="first">We define on the tetrahedron <img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/> the local <em>alternate</em> basis <img class="math" src="_images/math/d6a84d09f60683a514d7dffd09af5b6f6e54fe40.png" alt="\mathcal{B}_a^k"/>  by</p>
+<div class="math">
+<p><img src="_images/math/2060c318244a1a093ab4a7a603d13de6e186b4b9.png" alt="\begin{array}{c}
+  \mathcal{B}_a^k=\{\BasisFuncTwoD_1^k,\hdots,\BasisFuncTwoD_{12}^k\}\\=\\
+  \left\{\tiny
+  \begin{pmatrix}  \BasisFunc_1^k \\ 0 \\ 0\end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_1^k \\0  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_1^k  \end{pmatrix},
+  \begin{pmatrix}  \BasisFunc_2^k \\ 0 \\ 0\end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_2^k \\0  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_2^k  \end{pmatrix},
+  \begin{pmatrix}  \BasisFunc_3^k \\ 0 \\ 0\end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_3^k \\0  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_3^k   \end{pmatrix},
+  \begin{pmatrix}  \BasisFunc_4^k \\ 0 \\ 0\end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_4^k \\0  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0 \\ \BasisFunc_4^k  \end{pmatrix}
+  \right\}
+\end{array}"/></p>
+</div><p>where <img class="math" src="_images/math/84859d3a0a3f19f132eb85cf3228e6e7a11983d0.png" alt="\BasisFunc_\il^k=\BasisFunc_{\me(\il,k)}."/> With notations of <a class="reference internal" href="presentation.html#presentation-label"><em>Presentation</em></a>,
+we have <img class="math" src="_images/math/02126df37d248aa7db6571801b991a7dcf4201db.png" alt="\forall (\il,\jl) \in \ENS{1}{12}^2"/></p>
+<div class="math">
+<p><img src="_images/math/2b7a1d1c0db4052ea6c273bcb059afdde8bf734c.png" alt="\StiffElasElem_{\il,\jl}(T_k)=
+\int_{T_k} \Odv^t(\BasisFuncTwoD^k_\jl) \mathbb{C}\Odv(\BasisFuncTwoD^k_\il)d\q=
+\int_{T_k} \mathcal{H}(\BasisFuncTwoD^k_\jl,\BasisFuncTwoD^k_\il)(\q)d\q"/></p>
+</div><p>with, <img class="math" src="_images/math/de8cfc52fc871fe7f23697590b1ebf732dc121e1.png" alt="\forall \vecb{u}=(u_1,u_2,u_3)\in\HUnD{\DOM}^3,"/> <img class="math" src="_images/math/b50312da6d79f69e3c790fb0c2b5c21cea39e3dc.png" alt="\forall \vecb{v}=(v_1,v_2,v_3)\in\HUnD{\DOM}^3,"/> by</p>
+<div class="math">
+<p><img src="_images/math/966dac90c9bb68859a3b173ab0ab2ef0b3d43379.png" alt="\begin{array}{c}
+\mathcal{H}(\vecb{u},\vecb{v})\\=\\
+\tiny{
+\DOT{\begin{pmatrix} \gamma &amp; 0 &amp;0\\ 0 &amp; \mu &amp;0\\ 0 &amp; 0 &amp;\mu\end{pmatrix}\GRAD u_1 }{\GRAD v_1}
++\DOT{\begin{pmatrix} 0 &amp; \lambda &amp; 0\\ \mu &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 0 \end{pmatrix}\GRAD u_2 }{\GRAD v_1}
++\DOT{\begin{pmatrix} 0 &amp; 0 &amp; \lambda\\ 0 &amp; 0 &amp; 0 \\ \mu &amp; 0 &amp; 0 \end{pmatrix}\GRAD u_3 }{\GRAD v_1}
+}\\
+%&amp;+&amp;
+\tiny{+
+\DOT{\begin{pmatrix} 0 &amp; \mu &amp;0\\ \lambda &amp; 0 &amp;0\\ 0 &amp; 0 &amp;0\end{pmatrix}\GRAD u_1 }{\GRAD v_2}
++\DOT{\begin{pmatrix} \mu &amp; 0 &amp; 0\\ 0 &amp; \gamma &amp; 0 \\ 0 &amp; 0 &amp; \mu \end{pmatrix}\GRAD u_2 }{\GRAD v_2}
++\DOT{\begin{pmatrix} 0 &amp; 0 &amp; 0\\ 0 &amp; 0 &amp; \lambda \\ 0 &amp; \mu &amp; 0 \end{pmatrix}\GRAD u_3 }{\GRAD v_2}
+}\\
+%&amp;+&amp;
+\tiny{+
+\DOT{\begin{pmatrix} 0 &amp; 0 &amp;\mu\\ 0 &amp; 0 &amp;0\\ \lambda &amp; 0 &amp; 0\end{pmatrix}\GRAD u_1 }{\GRAD v_3}
++\DOT{\begin{pmatrix} 0 &amp; 0 &amp; 0\\ 0 &amp; 0 &amp; \mu \\ 0 &amp; \lambda &amp; 0 \end{pmatrix}\GRAD u_2 }{\GRAD v_3}
++\DOT{\begin{pmatrix} \mu &amp; 0 &amp; 0\\ 0 &amp; \mu &amp; 0 \\ 0 &amp; 0 &amp; \gamma \end{pmatrix}\GRAD u_3 }{\GRAD v_3}
+}
+\end{array}"/></p>
+</div><p>where <img class="math" src="_images/math/ce4588fd900d02afcbd260bc07f54cce49a7dc4a.png" alt="\lambda"/> and <img class="math" src="_images/math/2d8c833ed800824727cd7bd2fb9de1a12ad7e674.png" alt="\mu"/> are the Lame coefficients and <img class="math" src="_images/math/80ae9900d18b7bb7e7c51e2f397713ebbc73f1db.png" alt="\gamma=\lambda+2\mu."/></p>
+<p>For example, we can explicitly compute the first two terms in the first column of <img class="math" src="_images/math/0b4446e4b61aedda7d45af09681a69a6817d570d.png" alt="\StiffElasElem(T_k)"/> which are given by</p>
+<div class="math">
+<p><img src="_images/math/f31f782483fbaab8941ce8f3c00e6367807572bc.png" alt="\begin{array}{lcl}
+\StiffElasElem_{1,1}(T_k)&amp;=&amp;\int_{T_k} \mathcal{H}(\BasisFuncTwoD^k_{1},\BasisFuncTwoD^k_{1})(\q)d\q\\
+&amp;=&amp;\int_{T_k} \mathcal{H}\left(
+\tiny\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\
+0
+\end{pmatrix},
+\tiny\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\ 0
+\end{pmatrix}
+\right)(\q)d\q\\
+&amp;=&amp;|T_k|
+\DOT{\tiny\begin{pmatrix} \gamma &amp; 0 &amp;0\\ 0 &amp; \mu &amp;0\\ 0 &amp; 0 &amp;\mu\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{1}}
+=|T_k|\left(\gamma\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{1}}{x}+\mu(\DP{\BasisFunc^k_{1}}{y}\DP{\BasisFunc^k_{1}}{y}+\DP{\BasisFunc^k_{1}}{z}\DP{\BasisFunc^k_{1}}{z}) \right).
+\end{array}"/></p>
+</div><p>and</p>
+<div class="math">
+<p><img src="_images/math/3225a4c4059f6c6445664bcd509f69ab55badf13.png" alt="\begin{array}{lcl}
+\StiffElasElem_{2,1}(T_k)&amp;=&amp;\int_{T_k} \mathcal{H}(\BasisFuncTwoD^k_{1},\BasisFuncTwoD^k_{2})(\q)d\q\\
+&amp;=&amp;\int_{T_k} \mathcal{H}\left(
+\tiny\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\0
+\end{pmatrix},
+\begin{pmatrix}
+0\\
+\BasisFunc^k_{1}\\ 0
+\end{pmatrix}
+\right)(\q)d\q\\
+&amp;=&amp;|T_k|
+\DOT{\tiny\begin{pmatrix} 0 &amp; \mu &amp;0\\ \lambda &amp; 0 &amp;0\\ 0 &amp; 0 &amp;0\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{1}}
+=|T_k|(\lambda+\mu)\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{1}}{y}.
+\end{array}"/></p>
+</div><p>Using vectorized algorithm function <img class="math" src="_images/math/81070b3b885b402e04faae49543d43a7c5b18cec.png" alt="\FNametxt{GradientVec3D}"/>  given in Algorithm <a href="FEM3D.ToolsVec.html#gradientvec3dalgo">26</a>, we obtain
+the vectorized algorithm <a href="#elemstiffelasmatba3dp1vectoralgo">29</a> for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> computation for the <strong>Elastic Stiffness</strong> matrix in 3d.</p>
+<div class="admonition-algorithm-num-elemstiffelasmatba3dp1vectoralgo admonition">
+<p class="first admonition-title">Algorithm <a href="#elemstiffelasmatba3dp1vectoralgo">29</a></p>
+<div class="last figure align-center" id="elemstiffelasmatba3dp1vectoralgo">
+<a class="reference internal image-reference" href="_images/ElemStiffElasMatBa3DP1_algo.png"><img alt="_images/ElemStiffElasMatBa3DP1_algo.png" src="_images/ElemStiffElasMatBa3DP1_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 29: Vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> associated to 3d <strong>Elastic Stiffness</strong> matrix</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrixVec.</tt><tt class="descname">ElemStiffElasMatBa3DP1Vec</tt><big>(</big><em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em>, <em>la</em>, <em>mu</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrixVec.html#ElemStiffElasMatBa3DP1Vec"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Computes all the element elastic stiffness  matrices <img class="math" src="_images/math/05b5b58654cbedf6c936e3c93a7e60b02d0140be.png" alt="\mathbb{K}^e(T_k)"/> for <img class="math" src="_images/math/0c1a5b812f7df75f27ae30d57d614b305c4c4203.png" alt="k\in\{0,\hdots,\nme-1\}"/> 
+in local <em>alternate</em> basis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nme</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of mesh elements,</li>
+<li><strong>q</strong> (<tt class="docutils literal"><span class="pre">(3,nq)</span></tt> <em>numpy</em> array of floats) &#8211; mesh vertices,</li>
+<li><strong>me</strong> (<tt class="docutils literal"><span class="pre">(4,nme)</span></tt> <em>numpy</em> array of integers) &#8211; mesh connectivity,</li>
+<li><strong>volumes</strong> (<tt class="docutils literal"><span class="pre">(nme,)</span></tt> <em>numpy</em> array of floats) &#8211; volumes of all the mesh elements.</li>
+<li><strong>la</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the  <img class="math" src="_images/math/bc2f669949a98b6b06d4d2e23c06f0a81d6df0bf.png" alt="\\lambda"/> Lame parameter,</li>
+<li><strong>mu</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the  <img class="math" src="_images/math/2ea6c91b54aae2758daf2eb0e7ff97dc394dbd39.png" alt="\\mu"/> Lame parameter.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <tt class="docutils literal"><span class="pre">(144*nme,)</span></tt> <em>numpy</em> array of floats.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</li>
+<li><p class="first">We define on <img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/> the local <em>block</em> basis <img class="math" src="_images/math/5aa57a93d78d68a92c864829cc1fd8bdce43fa4d.png" alt="\mathcal{B}_b^k"/>  by</p>
+<div class="math">
+<p><img src="_images/math/7c4bf83fbf2fdf41f5cb21583408a47f29c82237.png" alt="\begin{array}{c}
+  \mathcal{B}_b^k=\{\BasisFuncTwoDB_1^k,\hdots,\BasisFuncTwoDB_{12}^k\} \\ = \\
+  \left\{\tiny
+  \begin{pmatrix} \BasisFunc_1^k \\ 0 \\ 0 \end{pmatrix},
+  \begin{pmatrix} \BasisFunc_2^k \\ 0 \\ 0 \end{pmatrix},
+  \begin{pmatrix} \BasisFunc_3^k \\ 0 \\ 0 \end{pmatrix},
+  \begin{pmatrix} \BasisFunc_4^k \\ 0 \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_1^k \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_2^k \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_3^k \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ \BasisFunc_4^k \\ 0 \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_1^k  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_2^k  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_3^k  \end{pmatrix},
+  \begin{pmatrix}  0  \\ 0  \\ \BasisFunc_4^k  \end{pmatrix}
+  \right\}
+\end{array}"/></p>
+</div><p>where <img class="math" src="_images/math/84859d3a0a3f19f132eb85cf3228e6e7a11983d0.png" alt="\BasisFunc_\il^k=\BasisFunc_{\me(\il,k)}."/></p>
+<p>For example, using formula <a href="#equation-eq_StiffElasHop">(?)</a>, we can  explicitly compute the first two terms in the first column of <img class="math" src="_images/math/0b4446e4b61aedda7d45af09681a69a6817d570d.png" alt="\StiffElasElem(T_k)"/> which are given by</p>
+<div class="math">
+<p><img src="_images/math/c4aef18f1397200b418955ce636071bc976bd58e.png" alt="\begin{array}{lcl}
+\StiffElasElem_{1,1}(T_k)&amp;=&amp;\int_{T_k} \mathcal{H}(\BasisFuncTwoDB^k_{1},\BasisFuncTwoDB^k_{1})(\q)d\q\\
+&amp;=&amp;\int_{T_k} \mathcal{H}\left(
+\tiny\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\0
+\end{pmatrix},
+\begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\0
+\end{pmatrix}
+\right)(\q)d\q\\
+&amp;=&amp;|T_k|
+\DOT{\tiny\begin{pmatrix} \gamma &amp; 0 &amp;0\\ 0 &amp; \mu &amp;0\\ 0 &amp; 0 &amp;\mu\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{1}}
+=|T_k|\left(\gamma\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{1}}{x}+\mu(\DP{\BasisFunc^k_{1}}{y}\DP{\BasisFunc^k_{1}}{y} +\DP{\BasisFunc^k_{1}}{z}\DP{\BasisFunc^k_{1}}{z})\right).
+\end{array}"/></p>
+</div><p>and</p>
+<div class="math">
+<p><img src="_images/math/c7bc5b702294ebee564e5c3c2e19643d6cea022a.png" alt="\begin{array}{lcl}
+\StiffElasElem_{2,1}(T_k)&amp;=&amp;\int_{T_k} \mathcal{H}(\BasisFuncTwoDB^k_{1},\BasisFuncTwoDB^k_{2})(\q)d\q\\
+&amp;=&amp;\int_{T_k} \mathcal{H}\left(
+\tiny \begin{pmatrix}
+\BasisFunc^k_{1}\\
+0\\ 0
+\end{pmatrix},
+\begin{pmatrix}
+\BasisFunc^k_{2}\\
+0\\ 0
+\end{pmatrix}
+\right)(\q)d\q\\
+&amp;=&amp;|T_k|
+\DOT{\tiny\begin{pmatrix} \gamma &amp; 0 &amp;0\\ 0 &amp; \mu &amp;0\\ 0 &amp; 0 &amp;\mu\end{pmatrix}\GRAD \BasisFunc^k_{1} }{\GRAD \BasisFunc^k_{2}}
+=|T_k|\left(\gamma\DP{\BasisFunc^k_{1}}{x}\DP{\BasisFunc^k_{2}}{x}+\mu(\DP{\BasisFunc^k_{1}}{y}\DP{\BasisFunc^k_{2}}{y}+\DP{\BasisFunc^k_{1}}{z}\DP{\BasisFunc^k_{2}}{z}) \right).
+\end{array}"/></p>
+</div><p>Using vectorized algorithm function <img class="math" src="_images/math/81070b3b885b402e04faae49543d43a7c5b18cec.png" alt="\FNametxt{GradientVec3D}"/>  given in Algorithm <a href="FEM3D.ToolsVec.html#gradientvec3dalgo">26</a>, we obtain
+the vectorized algorithm <a href="#elemstiffelasmatbb3dp1vectoralgo">30</a> for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> computation for the <strong>Elastic Stiffness</strong> matrix in 3d.</p>
+<div class="admonition-algorithm-num-elemstiffelasmatbb3dp1vectoralgo admonition">
+<p class="first admonition-title">Algorithm <a href="#elemstiffelasmatbb3dp1vectoralgo">30</a></p>
+<div class="last figure align-center" id="elemstiffelasmatbb3dp1vectoralgo">
+<a class="reference internal image-reference" href="_images/ElemStiffElasMatBb3DP1_algo.png"><img alt="_images/ElemStiffElasMatBb3DP1_algo.png" src="_images/ElemStiffElasMatBb3DP1_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 30: Vectorized algorithm for <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> associated to 3d <strong>Elastic Stiffness</strong> matrix</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM3D.elemMatrixVec.</tt><tt class="descname">ElemStiffElasMatBb3DP1Vec</tt><big>(</big><em>nme</em>, <em>q</em>, <em>me</em>, <em>volumes</em>, <em>L</em>, <em>M</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/FEM3D/elemMatrixVec.html#ElemStiffElasMatBb3DP1Vec"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Compute all the element elastic stiffness matrices, <img class="math" src="_images/math/05b5b58654cbedf6c936e3c93a7e60b02d0140be.png" alt="\mathbb{K}^e(T_k)"/> for <img class="math" src="_images/math/0c1a5b812f7df75f27ae30d57d614b305c4c4203.png" alt="k\in\{0,\hdots,\nme-1\}"/> 
+in local <em>block</em> basis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nme</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of mesh elements,</li>
+<li><strong>q</strong> (<tt class="docutils literal"><span class="pre">(3,nq)</span></tt> <em>numpy</em> array of floats) &#8211; mesh vertices,</li>
+<li><strong>me</strong> (<tt class="docutils literal"><span class="pre">(4,nme)</span></tt> <em>numpy</em> array of integers) &#8211; mesh connectivity,</li>
+<li><strong>volumes</strong> (<tt class="docutils literal"><span class="pre">(nme,)</span></tt> <em>numpy</em> array of floats) &#8211; volumes of all the mesh elements.</li>
+<li><strong>la</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the  <img class="math" src="_images/math/bc2f669949a98b6b06d4d2e23c06f0a81d6df0bf.png" alt="\\lambda"/> Lame parameter,</li>
+<li><strong>mu</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the  <img class="math" src="_images/math/2ea6c91b54aae2758daf2eb0e7ff97dc394dbd39.png" alt="\\mu"/> Lame parameter.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a <tt class="docutils literal"><span class="pre">(144*nme,)</span></tt> <em>numpy</em> array of floats.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Element Mass Matrix</a></li>
+<li><a class="reference internal" href="#element-stiffness-matrix">Element Stiffness Matrix</a></li>
+<li><a class="reference internal" href="#element-elastic-stiffness-matrix">Element Elastic Stiffness Matrix</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/FEM3D.elemMatrixVec.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

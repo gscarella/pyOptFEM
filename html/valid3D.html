@@ -1,0 +1,424 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>valid3D module &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="index.html" />
+    <link rel="prev" title="valid2D module" href="valid2D.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="valid2D.html" title="valid2D module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="valid3d-module">
+<span id="valid3d-label"></span><h1>valid3D module<a class="headerlink" href="#valid3d-module" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#mass-matrix" id="id1">Mass Matrix</a></li>
+<li><a class="reference internal" href="#stiffness-matrix" id="id2">Stiffness matrix</a></li>
+<li><a class="reference internal" href="#elastic-stiffness-matrix" id="id3">Elastic Stiffness Matrix</a></li>
+</ul>
+</div>
+<div class="section" id="mass-matrix">
+<h2><a class="toc-backref" href="#id1">Mass Matrix</a><a class="headerlink" href="#mass-matrix" title="Permalink to this headline">¶</a></h2>
+<p>Validation program for the assembly of the <strong>Mass</strong> matrix for <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite element method in 3d
+(see <a class="reference internal" href="FEM3D.html#fem3d-massassembling-label"><em>Mass Matrix</em></a>). Meshes of the unit cube are used.</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Test 1: Computation of the <strong>Mass</strong> Matrix using the <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions : it gives errors and computation times</p>
+</li>
+<li><p class="first">Test 2: Computation of the integral</p>
+<div class="math">
+<p><img src="_images/math/4d27e42fa1e141ff9b6ede292f5165d0e4c50c73.png" alt="\int_{\Omega_h} u(\q) v(\q) d\q \approx \pmb{V}^t\mathbb{M} \pmb{U}"/></p>
+</div><p>where <img class="math" src="_images/math/ad6855c3d65fbbe3a70d1593e76826ff7b82bc71.png" alt="\pmb{U}_i=u(q^i)"/> and <img class="math" src="_images/math/46f3266aa7f024e58f3c89020c5e8c7afefb6fa8.png" alt="\pmb{V}_i=v(q^i)"/>. Functions <img class="math" src="_images/math/9ad99798ec4c38e165cf517cb9e02b1c9e824103.png" alt="u"/> and <img class="math" src="_images/math/a9f23bf124b6b2b2a993eb313c72e678664ac74a.png" alt="v"/> are
+those defined in ...</p>
+</li>
+<li><p class="first">Test 3: Ones retrieves the order 2 of <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange integration</p>
+<div class="math">
+<p><img src="_images/math/ed663a1f5df7dc879ea91308c500e9231453cdbb.png" alt="|\int_{\Omega_h} u\,v -\Pi_h(u)\,\Pi_h(v)d\Omega| \leq C h^2"/></p>
+</div></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>source code</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.valid3D.validMass3DP1.</tt><tt class="descname">validMass3DP1</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/valid3D/validMass3DP1.html#validMass3DP1"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Validation of Mass Matrix for P1-Lagrange finite elements in 3D</p>
+</dd></dl>
+
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.valid3D</span> <span class="kn">import</span> <span class="n">validMass3DP1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validMass3DP1</span><span class="p">()</span>
+<span class="go">*********************************************</span>
+<span class="go">*     3D Mass Assembling P1 validations     *</span>
+<span class="go">*********************************************</span>
+<span class="go">-----------------------------------------</span>
+<span class="go">  Test 1: Matrices errors and CPU times</span>
+<span class="go">-----------------------------------------</span>
+<span class="go">    Matrix size           : (216,216)</span>
+<span class="go">    Error P1base vs OptV1 : 1.734723e-18</span>
+<span class="go">    Error P1base vs OptV2 : 1.734723e-18</span>
+<span class="go">    CPU times base (ref)  : 0.9355 (s)</span>
+<span class="go">    CPU times OptV1       : 0.0481 (s) - Speed Up X19.438</span>
+<span class="go">    CPU times OptV2       : 0.0016 (s) - Speed Up X592.083</span>
+<span class="go">----------------------------</span>
+<span class="go">  Test 1 (results): OK</span>
+<span class="go">----------------------------</span>
+<span class="go">-----------------------------------------------------</span>
+<span class="go">  Test 2: Validations by integration on [0,1]x[0,1]</span>
+<span class="go">-----------------------------------------------------</span>
+<span class="go">    function 0 :</span>
+<span class="go">      u(x,y,z)=x + y + z,</span>
+<span class="go">      v(x,y,z)=x - y - z,</span>
+<span class="go">           -&gt; Stiff error=3.330669e-16</span>
+<span class="go">    function 1 :</span>
+<span class="go">      u(x,y,z)=3*x + 2*y - z - 1,</span>
+<span class="go">      v(x,y,z)=2*x - 2*y + 2*z + 1,</span>
+<span class="go">           -&gt; Stiff error=8.881784e-16</span>
+<span class="go">    function 2 :</span>
+<span class="go">      u(x,y,z)=3*x**2 - x*y + 2*y**2 + y*z - z**2 - 3,</span>
+<span class="go">      v(x,y,z)=2*x**2 + x*y - 3*y**2 - x*z - y,</span>
+<span class="go">           -&gt; Stiff error=1.173244e-02</span>
+<span class="go">----------------------------</span>
+<span class="go">  Test 2 (results): OK</span>
+<span class="go">----------------------------</span>
+<span class="go">--------------------------------</span>
+<span class="go">  Test 3: Validations by order</span>
+<span class="go">--------------------------------</span>
+<span class="go">    function 2 :</span>
+<span class="go">      u(x,y,z)=3*x**2 - x*y + 2*y**2 + y*z - z**2 - 3,</span>
+<span class="go">      v(x,y,z)=2*x**2 + x*y - 3*y**2 - x*z - y</span>
+<span class="go">        Matrix size                     : (216,216)</span>
+<span class="go">        MassAssemblingP1OptV2 CPU times : 0.002(s)</span>
+<span class="go">        -&gt; Error                         : 1.173244e-02</span>
+<span class="go">        Matrix size                     : (1331,1331)</span>
+<span class="go">        MassAssemblingP1OptV2 CPU times : 0.009(s)</span>
+<span class="go">        -&gt; Error                         : 2.800865e-03</span>
+<span class="go">        ...</span>
+<span class="go">        Matrix size                     : (132651,132651)</span>
+<span class="go">        MassAssemblingP1OptV2 CPU times : 1.418(s)</span>
+<span class="go">        -&gt; Error                         : 1.110034e-04</span>
+</pre></div>
+</div>
+<p>At last, this program plots the figure :</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/validMass3DP1.png"><img alt="_images/validMass3DP1.png" src="_images/validMass3DP1.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 59: Graphical results of validMass3DP1-Test 3</p>
+</div>
+</div>
+<div class="section" id="stiffness-matrix">
+<h2><a class="toc-backref" href="#id2">Stiffness matrix</a><a class="headerlink" href="#stiffness-matrix" title="Permalink to this headline">¶</a></h2>
+<p>Validation function for the assembly of the <strong>Stiffness</strong> matrix for <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange
+finite element method in 3d (see <a class="reference internal" href="FEM2D.html#fem2d-stiffassembling-label"><em>Stiffness Matrix</em></a>). Meshes of the unit cube are used.</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Test 1: Computation of the <strong>Stiffness</strong> Matrix using the <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions : it gives errors and computation times</p>
+</li>
+<li><p class="first">Test 2: Computation of the integral</p>
+<div class="math">
+<p><img src="_images/math/cac8558793813028119521d6337150f35f5c9690.png" alt="\int_{\Omega_h} \nabla u(q).\nabla v(q)dq \approx \pmb{V}^t\mathbb{M} \pmb{U}"/></p>
+</div><p>where <img class="math" src="_images/math/ad6855c3d65fbbe3a70d1593e76826ff7b82bc71.png" alt="\pmb{U}_i=u(q^i)"/> and <img class="math" src="_images/math/46f3266aa7f024e58f3c89020c5e8c7afefb6fa8.png" alt="\pmb{V}_i=v(q^i)"/>. Functions <img class="math" src="_images/math/9ad99798ec4c38e165cf517cb9e02b1c9e824103.png" alt="u"/> and <img class="math" src="_images/math/a9f23bf124b6b2b2a993eb313c72e678664ac74a.png" alt="v"/> are
+those defined in ...</p>
+</li>
+<li><p class="first">Test 3: Ones retrieves the order 2 of <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange integration</p>
+<div class="math">
+<p><img src="_images/math/777943a33a281c378d433be10c3db024945e4e8f.png" alt="|\int_{\Omega_h} \nabla u . \nabla v -\nabla\Pi_h(u) . \nabla\Pi_h(v)d\Omega| \leq C h^2"/></p>
+</div></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>source code</p>
+<dl class="last function">
+<dt>
+<tt class="descclassname">pyOptFEM.valid3D.validStiff3DP1.</tt><tt class="descname">validStiff3DP1</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyOptFEM/valid3D/validStiff3DP1.html#validStiff3DP1"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Validation of Stiffness Matrix for P1-Lagrange finite elements in 3D</p>
+</dd></dl>
+
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.valid3D</span> <span class="kn">import</span> <span class="n">validStiff3DP1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validStiff3DP1</span><span class="p">()</span>
+<span class="go">**********************************************</span>
+<span class="go">*     3D Stiff Assembling P1 validations     *</span>
+<span class="go">**********************************************</span>
+<span class="go">-----------------------------------------</span>
+<span class="go">  Test 1: Matrices errors and CPU times</span>
+<span class="go">-----------------------------------------</span>
+<span class="go">    Matrix size           : (216,216)</span>
+<span class="go">    Error P1base vs OptV1 : 2.220446e-15</span>
+<span class="go">    Error P1base vs OptV2 : 2.220446e-15</span>
+<span class="go">    CPU times base (ref)  : 0.9563 (s)</span>
+<span class="go">    CPU times OptV1       : 0.0566 (s) - Speed Up X16.901</span>
+<span class="go">    CPU times OptV2       : 0.0032 (s) - Speed Up X299.656</span>
+<span class="go">----------------------------</span>
+<span class="go">  Test 1 (results): OK</span>
+<span class="go">----------------------------</span>
+<span class="go">-----------------------------------------------------</span>
+<span class="go">  Test 2: Validations by integration on [0,1]x[0,1]</span>
+<span class="go">-----------------------------------------------------</span>
+<span class="go">    function 0 :</span>
+<span class="go">      u(x,y,z)=x + y + z,</span>
+<span class="go">      v(x,y,z)=x - y - z,</span>
+<span class="go">           -&gt; Stiff error=6.217249e-15</span>
+<span class="go">    function 1 :</span>
+<span class="go">      u(x,y,z)=3*x + 2*y - z - 1,</span>
+<span class="go">      v(x,y,z)=2*x - 2*y + 2*z + 1,</span>
+<span class="go">           -&gt; Stiff error=7.771561e-15</span>
+<span class="go">    function 2 :</span>
+<span class="go">      u(x,y,z)=3*x**2 - x*y + 2*y**2 + y*z - z**2 - 3,</span>
+<span class="go">      v(x,y,z)=2*x**2 + x*y - 3*y**2 - x*z - y,</span>
+<span class="go">           -&gt; Stiff error=2.077333e-02</span>
+<span class="go">----------------------------</span>
+<span class="go">  Test 2 (results): OK</span>
+<span class="go">----------------------------</span>
+<span class="go">--------------------------------</span>
+<span class="go">  Test 3: Validations by order</span>
+<span class="go">--------------------------------</span>
+<span class="go">    function 2 :</span>
+<span class="go">      u(x,y,z)=3*x**2 - x*y + 2*y**2 + y*z - z**2 - 3,</span>
+<span class="go">      v(x,y,z)=2*x**2 + x*y - 3*y**2 - x*z - y</span>
+<span class="go">        Matrix size                        : (216,216)</span>
+<span class="go">        StiffAssembling3DP1OptV2 CPU times : 0.003(s)</span>
+<span class="go">        Error                              : 2.077333e-02</span>
+<span class="go">        Matrix size                        : (1331,1331)</span>
+<span class="go">        StiffAssembling3DP1OptV2 CPU times : 0.019(s)</span>
+<span class="go">        Error                              : 3.330000e-03</span>
+<span class="go">        ...</span>
+<span class="go">        Matrix size                        : (132651,132651)</span>
+<span class="go">        StiffAssembling3DP1OptV2 CPU times : 2.784(s)</span>
+<span class="go">        Error                              : 1.828928e-04</span>
+</pre></div>
+</div>
+<p>At last, this program plots the figure :</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/validStiff3DP1.png"><img alt="_images/validStiff3DP1.png" src="_images/validStiff3DP1.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 60: Graphical results of validStiff3DP1-Test 3</p>
+</div>
+</div>
+<div class="section" id="elastic-stiffness-matrix">
+<h2><a class="toc-backref" href="#id3">Elastic Stiffness Matrix</a><a class="headerlink" href="#elastic-stiffness-matrix" title="Permalink to this headline">¶</a></h2>
+<p>Validation function for the assembly of the <strong>Elastic Stiffness</strong> matrix for <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange
+finite element method in 3d (see <a class="reference internal" href="FEM2D.html#fem2d-stiffelasassembling-label"><em>Elastic Stiffness Matrix</em></a>). Meshes of the unit cube are used.</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Test 1: Computation of the <strong>Elastic Stiffness</strong> Matrix using the <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions : it gives errors and computation times</p>
+</li>
+<li><p class="first">Test 2: Computation of the integral</p>
+<div class="math">
+<p><img src="_images/math/bdc62753440678f6894f903d94f620d5132bdcb0.png" alt="\int_{\Omega_h} \underline{\pmb{\epsilon}}^t(u) \underline{\pmb{\sigma}}(v)dq \approx \pmb{V}^t\mathbb{M} \pmb{U}"/></p>
+</div><p>where <img class="math" src="_images/math/ad6855c3d65fbbe3a70d1593e76826ff7b82bc71.png" alt="\pmb{U}_i=u(q^i)"/> and <img class="math" src="_images/math/46f3266aa7f024e58f3c89020c5e8c7afefb6fa8.png" alt="\pmb{V}_i=v(q^i)"/>. Functions <img class="math" src="_images/math/9ad99798ec4c38e165cf517cb9e02b1c9e824103.png" alt="u"/> and <img class="math" src="_images/math/a9f23bf124b6b2b2a993eb313c72e678664ac74a.png" alt="v"/> are
+those defined in ...</p>
+</li>
+<li><p class="first">Test 3: Ones retrieves the order 2 of <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange integration</p>
+<div class="math">
+<p><img src="_images/math/c3d6b9b5e154bfeb54d275e3e95f665fc9825ec0.png" alt="|\int_{\Omega_h} \underline{\pmb{\epsilon}}^t(u) \underline{\pmb{\sigma}}(v) - \underline{\pmb{\epsilon}}^t(\Pi_h(u))
+\underline{\pmb{\sigma}}(\Pi_h(v)) d\Omega| \leq C h^2"/></p>
+</div></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last function">
+<dt id="pyOptFEM.valid3D.validStiff3DP1.validStiffElas3DP1">
+<tt class="descclassname">pyOptFEM.valid3D.validStiff3DP1.</tt><tt class="descname">validStiffElas3DP1</tt><big>(</big><span class="optional">[</span><em>Num=0</em>, <em>la=1.5</em>, <em>mu=0.5</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pyOptFEM.valid3D.validStiff3DP1.validStiffElas3DP1" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Num</strong> &#8211; <em>(optional)</em> Numbering choice.</li>
+<li><strong>la</strong> &#8211; <em>(optional)</em> the first Lame coefficient in Hooke&#8217;s law, denoted by <img class="math" src="_images/math/ce4588fd900d02afcbd260bc07f54cce49a7dc4a.png" alt="\lambda"/>.</li>
+<li><strong>mu</strong> &#8211; <em>(optional)</em> the second Lame coefficient in Hooke&#8217;s law, denoted by <img class="math" src="_images/math/2d8c833ed800824727cd7bd2fb9de1a12ad7e674.png" alt="\mu"/>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.valid3D</span> <span class="kn">import</span> <span class="n">validStiffElas3DP1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validStiffElas3DP1</span><span class="p">()</span>
+<span class="go">**************************************************</span>
+<span class="go">*     3D StiffElas Assembling P1 validations     *</span>
+<span class="go">**************************************************</span>
+<span class="go">-----------------------------------------</span>
+<span class="go">  Test 1: Matrices errors and CPU times</span>
+<span class="go">-----------------------------------------</span>
+<span class="go">    Matrix size           : (648,648)</span>
+<span class="go">    Error P1base vs OptV1 : 1.554312e-15</span>
+<span class="go">    Error P1base vs OptV2 : 1.776357e-15</span>
+<span class="go">    CPU times base (ref)  : 2.8850 (s)</span>
+<span class="go">    CPU times OptV1       : 0.2925 (s) - Speed Up X9.862</span>
+<span class="go">    CPU times OptV2       : 0.0152 (s) - Speed Up X189.919</span>
+<span class="go">----------------------------</span>
+<span class="go">  Test 1 (results): OK</span>
+<span class="go">----------------------------</span>
+<span class="go">-----------------------------------------------------</span>
+<span class="go">  Test 2: Validations by integration on [0,1]x[0,1]</span>
+<span class="go">-----------------------------------------------------</span>
+<span class="go">    functions 0 :</span>
+<span class="go">        u(x,y,z)=[&#39;x - 2*y&#39;, &#39;x + y - z&#39;, &#39;3*x + 2*z&#39;],</span>
+<span class="go">        v(x,y,z)=[&#39;x + 2*y + 4*z&#39;, &#39;2*x - y + 4*z&#39;, &#39;3*x - 2*y&#39;],</span>
+<span class="go">           -&gt; StiffElas error=5.329071e-14</span>
+<span class="go">    functions 1 :</span>
+<span class="go">        u(x,y,z)=[&#39;5*x - 2*y+z&#39;, &#39;x + y - 3*z&#39;, &#39;3*x + -2*y+ 2*z&#39;],</span>
+<span class="go">        v(x,y,z)=[&#39;2*x - 2*y + 4*z +1&#39;, &#39;5*x - y + 4*z&#39;, &#39;4*x - 2*y+4&#39;],</span>
+<span class="go">           -&gt; StiffElas error=2.131628e-14</span>
+<span class="go">    functions 2 :</span>
+<span class="go">        u(x,y,z)=[&#39;x**2 - 2*x*y + x*z&#39;, &#39;y**2 - y*z + z**2 + x&#39;, &#39;x**2 - x*z - y*z - z**2&#39;],</span>
+<span class="go">        v(x,y,z)=[&#39;x**2 + 2*y**2 - x*z&#39;, &#39;2*x**2 - x*y + y*z&#39;, &#39;x*y - y*z + z**2&#39;],</span>
+<span class="go">           -&gt; StiffElas error=5.712000e-02</span>
+<span class="go">    functions 3 :</span>
+<span class="go">        u(x,y,z)=[&#39;x**2 - 2*x*y + x*z&#39;, &#39;x**3 + y**2 - y*z + z**2&#39;, &#39;-x**2*z - x*y*z + x**2 - z**2&#39;],</span>
+<span class="go">        v(x,y,z)=[&#39;-x*z**2 + x**2 + 2*y**2&#39;, &#39;2*x**2 - x*y + y*z&#39;, &#39;x*y - y*z + z**2&#39;],</span>
+<span class="go">           -&gt; StiffElas error=1.221381e-01</span>
+<span class="go">----------------------------</span>
+<span class="go">  Test 2 (results): OK</span>
+<span class="go">----------------------------</span>
+<span class="go">--------------------------------</span>
+<span class="go">  Test 3: Validations by order</span>
+<span class="go">--------------------------------</span>
+<span class="go">    functions 3 :</span>
+<span class="go">        u(x,y,z)=[x**2 - 2*x*y + x*z,x**3 + y**2 - y*z + z**2,-x**2*z - x*y*z + x**2 - z**2],</span>
+<span class="go">        v(x,y)=[-x*z**2 + x**2 + 2*y**2,2*x**2 - x*y + y*z,x*y - y*z + z**2]</span>
+<span class="go">      Matrix size                            : (3993,3993)</span>
+<span class="go">      StiffElasAssembling3DP1OptV2 CPU times : 0.121(s)</span>
+<span class="go">      -&gt; Error                               : 3.036230e-02</span>
+<span class="go">      Matrix size                            : (12288,12288)</span>
+<span class="go">      StiffElasAssembling3DP1OptV2 CPU times : 0.422(s)</span>
+<span class="go">      -&gt; Error                               : 1.515389e-02</span>
+<span class="go">      Matrix size                            : (27783,27783)</span>
+<span class="go">      StiffElasAssembling3DP1OptV2 CPU times : 0.999(s)</span>
+<span class="go">      -&gt; Error                               : 8.314471e-03</span>
+<span class="go">      Matrix size                            : (52728,52728)</span>
+<span class="go">      StiffElasAssembling3DP1OptV2 CPU times : 2.019(s)</span>
+<span class="go">      -&gt; Error                               : 5.618296e-03</span>
+<span class="go">      Matrix size                            : (89373,89373)</span>
+<span class="go">      StiffElasAssembling3DP1OptV2 CPU times : 3.528(s)</span>
+<span class="go">      -&gt; Error                               : 3.666314e-03</span>
+<span class="go">      Matrix size                            : (139968,139968)</span>
+<span class="go">      StiffElasAssembling3DP1OptV2 CPU times : 5.668(s)</span>
+<span class="go">      -&gt; Error                               : 2.932322e-03</span>
+</pre></div>
+</div>
+<p>At last, this program plots the figure :</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/validStiffElas3DP1.png"><img alt="_images/validStiffElas3DP1.png" src="_images/validStiffElas3DP1.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 61: Graphical results of validStiffElas3DP1-Test 3</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">valid3D module</a><ul>
+<li><a class="reference internal" href="#mass-matrix">Mass Matrix</a></li>
+<li><a class="reference internal" href="#stiffness-matrix">Stiffness matrix</a></li>
+<li><a class="reference internal" href="#elastic-stiffness-matrix">Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="valid2D.html"
+                        title="previous chapter">valid2D module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/valid3D.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="valid2D.html" title="valid2D module"
+             >previous</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

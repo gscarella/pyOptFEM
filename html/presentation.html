@@ -1,0 +1,473 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Presentation &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="index.html" />
+    <link rel="next" title="2D benchmarks" href="benchmarks2D.html" />
+    <link rel="prev" title="Welcome to pyOptFEM’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="benchmarks2D.html" title="2D benchmarks"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyOptFEM’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="presentation">
+<span id="presentation-label"></span><h1>Presentation<a class="headerlink" href="#presentation" title="Permalink to this headline">¶</a></h1>
+<p>Let <img class="math" src="_images/math/a6f6a1ca959a10c8ccd5149338d04ebe08987dd1.png" alt="\Omega_h"/> be a triangular (2d) or tetrahedral (3d) mesh of <img class="math" src="_images/math/20e3e28e7025f11cd86d004e37707f1bee2f84e8.png" alt="\Omega\subset\R^d"/> corresponding
+to the following data structure:</p>
+<div class="math">
+<p><img src="_images/math/3b9d77cd2d39a25075a99c7e6376dce26018b9ed.png" alt="\mbox{\begin{tabular}{lccll}
+\hline
+\textbf{name} &amp; \textbf{type} &amp; \textbf{dimension} &amp; \textbf{description}\\
+\hline
+$\nq$ &amp; integer &amp; 1 &amp; number of vertices\\
+$\nme$ &amp; integer &amp; 1 &amp; number of elements\\
+$\q$   &amp; double  &amp; $d \times \nq$ &amp;
+\begin{minipage}[t]{7.9cm}
+array of vertices coordinates. $\q(\nu,j)$ is the $\nu$-th coordinate of the $j$-th vertex,
+$\nu\in\{1,\hdots,d\}$, $j\in\{1,\hdots,\rm{n_q}\}.$
+The $j$-th vertex will be also denoted by $\rm{q}^j$
+\end{minipage}\\
+$\me$  &amp; integer &amp; $(d+1) \times \nme$ &amp;
+\begin{minipage}[t]{7.9cm}
+connectivity array. $\me(\beta,k)$ is the storage index of the $\beta$-th vertex
+of the $k$-th element, in the array~$q$, for $\beta\in\{1,\hdots,(d+1)\}$ and $k\in\{1,\hdots,{\nme}\}$
+\end{minipage}\\
+$\rm volumes$  &amp; double &amp; $1\times {\nme}$ &amp;
+\begin{minipage}[t]{7.9cm}
+array of volumes in 3d or areas in 2d. ${\rm volumes}(k)$ is the $k$-th element volume (3d)
+or element area (2d),
+$k\in\{1,\hdots,{\nme}\}$
+\end{minipage}\\
+\hline
+\end{tabular}}"/></p>
+</div><ul>
+<li><p class="first"><strong>Scalar finite elements :</strong></p>
+<p>Let <img class="math" src="_images/math/e5eeab37e5ef03dd2db5cdde2d629028fc80522d.png" alt="\HUnHD{\DOMH}=\{v \in {\cal C}^0(\overline \DOMH),\ \  {v}_{|T} \in {\cal P}_1(T), \ \forall T \in {\cal T}_h \},"/>
+be the finite dimensional space spanned by
+the <img class="math" src="_images/math/a1f282017ba3eedd24975a774d23cbd991e9e590.png" alt="{\cal P}_1"/>-Lagrange (scalar) basis functions <img class="math" src="_images/math/181118435d6ff3975cb73f7b03b171f7014344c5.png" alt="\{\varphi_i\}_{i\in\ENS{1}{\nq}}"/>
+where <img class="math" src="_images/math/d5d07b31adb1ed2c3a3ed652dfc467387e85f7b4.png" alt="{\cal P}_1(T)"/> denotes the space of all polynomials defined over <cite>T</cite> of total
+degree less than or equal to <img class="math" src="_images/math/6cdd1b53e5faf7a118222e4b7571d1e9afa0cf56.png" alt="1."/>
+The functions <img class="math" src="_images/math/87686aa0f5136421c8415c7169adcb308e36c7a8.png" alt="\varphi_i"/> satisfy</p>
+<div class="math">
+<p><img src="_images/math/192a2c08013fd81a36a82c3f17fd67dc50a184e1.png" alt="\varphi_i(\rm{q}^j)=\delta_{i,j},\ \ \forall (i,j)\in\{1,\hdots,\rm{n_q}\}^2"/></p>
+</div><p>Then we have  <img class="math" src="_images/math/45f9c3986dc4623a5b4148b0e8e6912937c36853.png" alt="\varphi_i\equiv 0"/> on <img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/>, <img class="math" src="_images/math/967403a72f84face7c457659bad17444aa67ea4e.png" alt="\forall k\in\{1,\hdots,{\nme}\}"/>
+such that <img class="math" src="_images/math/7c6d822cb18a8e36badb8b15fcfa6331aaed0863.png" alt="\q^i\notin T_k"/>.</p>
+<p>A <img class="math" src="_images/math/a1f282017ba3eedd24975a774d23cbd991e9e590.png" alt="{\cal P}_1"/>-Lagrange (scalar) finite element matrix is of the generic form</p>
+<div class="math">
+<p><img src="_images/math/64a9604700f553a90ec7f3018805818894ddaca2.png" alt="\MAT{D}_{i,j}=\int_\DOMH \mathcal{D}(\varphi_j,\varphi_i) d\DOMH,\ \
+\forall (i,j)\in\ENS{1}{\nq}^2"/></p>
+</div><p>where <img class="math" src="_images/math/36eee9eaded3a8c323d85046041a94a032ded392.png" alt="\mathcal{D}"/> is the  bilinear differential operator (order <img class="math" src="_images/math/dce34f4dfb2406144304ad0d6106c5382ddd1446.png" alt="1"/>)
+defined for all <img class="math" src="_images/math/b115b3c373a377140b88fa5d0ec9d67884a5cb4e.png" alt="u,v\in \HUnHD{\DOMH}"/> by</p>
+<div class="math">
+<p><img src="_images/math/b6a50f429143a001a58c06182224b040abece258.png" alt="\mathcal{D}(u,v)=\DOT{\MAT{A}\GRAD u}{\GRAD v}
+  -\left(u\DOT{\vecb{b}}{\GRAD v} - v \DOT{\GRAD u}{\vecb{c}}\right)
+  +d uv"/></p>
+</div><p>and <img class="math" src="_images/math/df32a8891f5ca899da84349009a13f9502689dd7.png" alt="\MAT{A}\in (\LInfD{\DOMH})^{d\times d},"/> <img class="math" src="_images/math/f75c4caed2052e723389eea55a40a63056fa6524.png" alt="\vecb{b}\in(\LInfD{\DOMH})^{d},"/> <img class="math" src="_images/math/06dab09d51d138eb3c19e08ebffe52f3138f2962.png" alt="\vecb{c}\in(\LInfD{\DOMH})^{d}"/> and <img class="math" src="_images/math/69e2edd16bc8f69f184e714b5483253f6b54c98f.png" alt="d\in\LInfD{\DOMH}"/> are given functions on <img class="math" src="_images/math/4a097f60362c315a734cacc5fae4b34c5a92906d.png" alt="\DOMH."/></p>
+<p>We can notice that <img class="math" src="_images/math/dc2c18d66af8bd13ab5a66b54b28d4647ea7b885.png" alt="\MAT{D}"/> is a <strong>sparse</strong> matrix due to
+support properties of <img class="math" src="_images/math/87686aa0f5136421c8415c7169adcb308e36c7a8.png" alt="\varphi_i"/> functions.</p>
+<p>Let <img class="math" src="_images/math/3325435ca43e1ad5cb0af15e2b3e81cfd503c995.png" alt="\ndfe=d+1."/>
+The element matrix <img class="math" src="_images/math/7dcef7138d0235d949f2e9f98dc4c9a9c3e6448e.png" alt="\MAT{D}_{\il,\jl}(T_k)"/>, associated to <img class="math" src="_images/math/dc2c18d66af8bd13ab5a66b54b28d4647ea7b885.png" alt="\MAT{D}"/>, is the <img class="math" src="_images/math/a3ae6249a21c549aea5b6aa75ae51530980a5a5b.png" alt="\ndfe\times\ndfe"/> matrix defined by</p>
+<div class="math">
+<p><img src="_images/math/8e5f2760287683b70bc9f8c478776135bc59ffbc.png" alt="\MAT{D}_{\il,\jl}(T_k)=\int_{T_k} \mathcal{D}(\varphi_{\jl}^k,\varphi_{\il}^k)(\q) d\q,\ \
+\forall (\il,\jl)\in\{1,\hdots,\ndfe\}^2"/></p>
+</div><p>where <img class="math" src="_images/math/8d39443e9ee624423e2c94b0b6a5eb8443ed7ee2.png" alt="\varphi_{\il}^k=\varphi_{\me(\il,k)}"/> is the <img class="math" src="_images/math/5ee15782abefadaa0cab770c2e50452f8af97f5d.png" alt="\il"/>-th local basis function associated
+to the <img class="math" src="_images/math/8c325612684d41304b9751c175df7bcc0f61f64f.png" alt="k"/>-th element.</p>
+<p>For examples,</p>
+<ul>
+<li><p class="first">the <strong>Mass</strong> matrix is defined by</p>
+<div class="math">
+<p><img src="_images/math/7c7ca77160655ceb2a3ff9b53f51e3578ba809b4.png" alt="\MAT{M}_{i,j}=\int_\DOMH \BasisFunc_j \BasisFunc_i d\DOMH"/></p>
+</div><p>The corresponding bilinear differential operator <img class="math" src="_images/math/36eee9eaded3a8c323d85046041a94a032ded392.png" alt="\mathcal{D}"/> is completely defined with
+<img class="math" src="_images/math/2d3c36bb701bc42419d0923d9b1f1b0d539aa3de.png" alt="\MAT{A}=0"/>, <img class="math" src="_images/math/123db85f9b42917d326903cf6cbf7b898359b998.png" alt="\vecb{b}=\vecb{c}=0"/> and <img class="math" src="_images/math/97ff667490bc9e2a86ecd5b27f21a929d45c0950.png" alt="d=1."/></p>
+</li>
+<li><p class="first">the <strong>Stiffness</strong> matrix is defined by</p>
+<div class="math">
+<p><img src="_images/math/a2d58cc76691a0b5442a1ce2f256444442e8507b.png" alt="\MAT{S}_{i,j}=\int_\DOMH \DOT{\GRAD\BasisFunc_j}{\GRAD \BasisFunc_i} d\DOMH"/></p>
+</div><p>The corresponding bilinear differential operator <img class="math" src="_images/math/36eee9eaded3a8c323d85046041a94a032ded392.png" alt="\mathcal{D}"/> is completely defined with
+<img class="math" src="_images/math/64e56648a4c8b0d306e5108a2e124aad3df95b86.png" alt="\MAT{A}=\MAT{I}"/>, <img class="math" src="_images/math/123db85f9b42917d326903cf6cbf7b898359b998.png" alt="\vecb{b}=\vecb{c}=0"/> and <img class="math" src="_images/math/8da29477726b661bb95fa1cd50045fc26509bf86.png" alt="d=0."/></p>
+</li>
+</ul>
+</li>
+<li><p class="first"><strong>Vector finite elements :</strong></p>
+<p>The dimension of the space <img class="math" src="_images/math/5680c621074642bac7f5b179f64b5b4aef478724.png" alt="(\HUnHD{\DOMH})^d"/> is <img class="math" src="_images/math/61d37f51d153d8392075d7162ae20da07bb08b10.png" alt="\ndf=d\,\nq."/></p>
+<ul>
+<li><p class="first">in dimension <img class="math" src="_images/math/82355f3d291c3e2949d6980e14d11bf9f4beb2a1.png" alt="d=2,"/> we have two natural basis :</p>
+<blockquote>
+<div><p>the global <em>alternate</em> basis <img class="math" src="_images/math/d6ec75eaa4b0a8b5675477e7c0d4723eceacebba.png" alt="\mathcal{B}_a"/> defined by</p>
+<div class="math">
+<p><img src="_images/math/2e67cdb3020f596ba064ded388b28f42c119da13.png" alt="\mathcal{B}_a=\{\FoncBaseDeuxD_1,\hdots,\FoncBaseDeuxD_{2\rm{n_q}}\}=\left\{
+\begin{pmatrix}  \varphi_1 \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_1 \end{pmatrix},
+\begin{pmatrix}  \varphi_2 \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_2\end{pmatrix}, \hdots,
+\begin{pmatrix} \varphi_{\rm n_q} \\ 0 \end{pmatrix},
+\begin{pmatrix} 0  \\ \varphi_{\rm n_q} \end{pmatrix}
+\right\}"/></p>
+</div><p>and the global <em>block</em> basis <img class="math" src="_images/math/6b5488ebd4c806ed88554d44f2589ea787771b60.png" alt="\mathcal{B}_b"/> defined by</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/74a7a3ba743938274c545b4dc21844ddd95b8a6f.png" alt="\mathcal{B}_b=\{\FoncBaseDeuxDB_1,\hdots,\FoncBaseDeuxDB_{2\rm{n_q}}\}=\left\{
+\begin{pmatrix}  \varphi_1 \\ 0 \end{pmatrix},
+\begin{pmatrix}  \varphi_2 \\ 0 \end{pmatrix},\hdots,
+\begin{pmatrix}  \varphi_{\rm n_q} \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_1 \end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_2\end{pmatrix},\hdots,
+\begin{pmatrix} 0  \\ \varphi_{\rm n_q} \end{pmatrix}
+\right\}."/></p>
+</div></div></blockquote>
+</div></blockquote>
+</li>
+<li><p class="first">in dimension <img class="math" src="_images/math/a504ba7bdf8c31952659ac3c7ed0c9402ef48bee.png" alt="d=3,"/> we have two natural basis :</p>
+<p>the global <em>alternate</em> basis <img class="math" src="_images/math/d6ec75eaa4b0a8b5675477e7c0d4723eceacebba.png" alt="\mathcal{B}_a"/> defined by</p>
+<div class="math">
+<p><img src="_images/math/32b4f81159ffee67ed369b1a522e2f7689bf671a.png" alt="\mathcal{B}_a=\{\FoncBaseDeuxD_1,\hdots,\FoncBaseDeuxD_{3\nq}\}=\left\{
+\begin{pmatrix}  \varphi_1 \\ 0 \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_1 \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ 0 \\ \varphi_1 \end{pmatrix}, \hdots,
+\begin{pmatrix}  \varphi_\nq \\ 0 \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_\nq \\ 0 \end{pmatrix},
+\begin{pmatrix}  0  \\ 0 \\ \varphi_\nq \end{pmatrix}
+\right\}"/></p>
+</div><p>and the global <em>block</em> basis <img class="math" src="_images/math/6b5488ebd4c806ed88554d44f2589ea787771b60.png" alt="\mathcal{B}_b"/> defined by</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/9c2b39f0be748e0b44d1d78babba7bf7a0d3212c.png" alt="\mathcal{B}_b=\{\FoncBaseDeuxDB_1,\hdots,\FoncBaseDeuxDB_{3\nq}\}=\left\{
+\begin{pmatrix}  \varphi_1 \\ 0 \\ 0\end{pmatrix},\hdots,
+\begin{pmatrix}  \varphi_\nq \\ 0 \\0\end{pmatrix},
+\begin{pmatrix}  0  \\ \varphi_1 \\ 0\end{pmatrix},\hdots,
+\begin{pmatrix} 0  \\ \varphi_\nq \\0 \end{pmatrix},
+\begin{pmatrix}  0  \\ 0\\ \varphi_1 \end{pmatrix},\hdots,
+\begin{pmatrix} 0  \\ 0\\ \varphi_\nq \end{pmatrix}
+\right\}."/></p>
+</div></div></blockquote>
+</li>
+</ul>
+<p>A <img class="math" src="_images/math/a1f282017ba3eedd24975a774d23cbd991e9e590.png" alt="{\cal P}_1"/>-Lagrange (vector) finite element matrix in <img class="math" src="_images/math/d6ec75eaa4b0a8b5675477e7c0d4723eceacebba.png" alt="\mathcal{B}_a"/> basis
+is of the generic form</p>
+<div class="math">
+<p><img src="_images/math/f63a3484aa9fe3f9a53c60f3797371ea3020d84b.png" alt="\MAT{H}_{l,m}=\int_\DOMH \mathcal{H}(\BasisFuncTwoD_m,\BasisFuncTwoD_l) d\DOMH,\ \
+\forall (l,m)\in\ENS{1}{d\nq}^2"/></p>
+</div><p>where <img class="math" src="_images/math/094215a028a80a31054721ded9ee0f700ec5f31a.png" alt="\mathcal{H}"/> is the bilinear differential operator (order <img class="math" src="_images/math/dce34f4dfb2406144304ad0d6106c5382ddd1446.png" alt="1"/>)
+defined by</p>
+<div class="math">
+<p><img src="_images/math/3c5b992081502eb51986cf4458c9ed21cff2eca6.png" alt="\mathcal{H}(\vecb{u},\vecb{v})=\sum_{\il,\jl=1}^d \mathcal{D}^{\il,\jl}(u_\il,v_\jl)"/></p>
+</div><p>and <img class="math" src="_images/math/d5e0137778d2e368a1f8c5b1899e52fc814839c4.png" alt="\mathcal{D}^{\il,\jl}"/> is a bilinear differential operator of scalar type.</p>
+<p>For example, in dimension <img class="math" src="_images/math/82355f3d291c3e2949d6980e14d11bf9f4beb2a1.png" alt="d=2,"/> the <strong>Elastic Stiffness</strong> matrix is defined by</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/ff52b27e2ce3b56cd5511adff6817986d6c9c7ad.png" alt="\mathbb{K}_{m,l}=\int_{\Omega_h} \underline{\pmb{\epsilon}}^t(\psi_l(q))
+\MAT{C} \underline{\pmb{\epsilon}}(\psi_m(q))
+,
+\ \ \forall (m,l) \in \{1,...,2\rm{n_q}\}^2."/></p>
+</div></div></blockquote>
+<p>where <img class="math" src="_images/math/1d9e95dc4e32533f227f7a3494b1ac4d56a1970b.png" alt="\underline{\pmb{\epsilon}}=(\epsilon_{xx},\epsilon_{yy},\epsilon_{xy})^t"/>
+is the strain tensor respectively and <img class="math" src="_images/math/fd349248ebbc53f4c62f0e2f3f6729eca17cf57c.png" alt="\MAT{C}"/> is the Hooke matrix</p>
+<div class="math">
+<p><img src="_images/math/85bccf83927726b05d516f9f86fdda96652b70a1.png" alt="\MAT{C}=\begin{pmatrix}
+          \lambda+2\mu &amp; \lambda &amp; 0\\
+          \lambda &amp; \lambda+2\mu &amp; 0\\
+          0 &amp; 0 &amp; \mu
+        \end{pmatrix}"/></p>
+</div><p>Then the bilinear differential operator associated to this matrix is given by</p>
+<div class="math">
+<p><img src="_images/math/7232c1ee851eccc0cd39471deb570170c66dface.png" alt="\begin{array}{lcl}
+\mathcal{H}(\vecb{u},\vecb{v})&amp;=&amp;
+\DOT{\begin{pmatrix} \lambda+2\mu &amp; 0\\ 0 &amp; \mu \end{pmatrix}\GRAD u_1 }{\GRAD v_1}
++\DOT{\begin{pmatrix} 0 &amp; \mu\\ \lambda &amp; 0 \end{pmatrix}\GRAD u_2 }{\GRAD v_1}\\
+&amp;+&amp;\DOT{\begin{pmatrix} 0 &amp; \lambda\\ \mu &amp; 0 \end{pmatrix}\GRAD u_1 }{\GRAD v_2}+
+\DOT{\begin{pmatrix} \mu &amp; 0\\ 0 &amp;\lambda+2\mu\end{pmatrix}\GRAD u_2 }{\GRAD v_2}
+\end{array}"/></p>
+</div></li>
+</ul>
+<p>We present now three algorithms (<tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions) for assembling this kind of matrix.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>These algorithms can be successfully implemented in
+various interpreted languages under some assumptions.
+For all versions, it must have a sparse matrix implementation. For <tt class="docutils literal"><span class="pre">OptV1</span></tt> and <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions,
+we also need a particular sparse matrix constructor (see <a class="reference internal" href="#sparse-matrix-requirement"><em>Sparse matrix requirement</em></a>). And, finally, <tt class="docutils literal"><span class="pre">OptV2</span></tt> also required that
+the interpreted languages support classical <strong>vectorization</strong> operations.
+Here is the current list of interpreted languages for which we have successfully implemented these three algorithms :</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li>Python with <em>Numpy</em> and <em>Scipy</em> modules,</li>
+<li>Matlab,</li>
+<li>Octave,</li>
+<li>Scilab</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="classical-assembly-algorithm-base-version">
+<h2>Classical assembly algorithm (<tt class="docutils literal"><span class="pre">base</span></tt> version)<a class="headerlink" href="#classical-assembly-algorithm-base-version" title="Permalink to this headline">¶</a></h2>
+<p>Due to support properties of <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange basis functions, we have the classical algorithm :</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>We recall the classical matrix assembly in dimension <img class="math" src="_images/math/96ab646de7704969b91c76a214126b45f2b07b25.png" alt="d"/> with <img class="math" src="_images/math/3325435ca43e1ad5cb0af15e2b3e81cfd503c995.png" alt="\ndfe=d+1."/></p>
+<div class="last figure align-center">
+<a class="reference internal image-reference" href="_images/AssemblyMat_base_algo.png"><img alt="_images/AssemblyMat_base_algo.png" src="_images/AssemblyMat_base_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 43: Classical matrix assembly in 2d or 3d</p>
+</div>
+</div>
+<p>In fact, for each element we add its element matrix to the global sparse matrix
+(lines 4 to 10 of the previous algorithm). This operation is illustrated in the following figure in 2d scalar fields case :</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/AssemblyMat_base.png"><img alt="_images/AssemblyMat_base.png" src="_images/AssemblyMat_base.png" style="width: 540.0px;" /></a>
+<p class="caption">Figure 44: Adding of an element matrix to global matrix in 2d scalar fields case</p>
+</div>
+<p>The repetition of elements insertion in <strong>sparse</strong> matrix is very expensive.</p>
+</div>
+<div class="section" id="sparse-matrix-requirement">
+<span id="id1"></span><h2>Sparse matrix requirement<a class="headerlink" href="#sparse-matrix-requirement" title="Permalink to this headline">¶</a></h2>
+<p>The interpreted language must contain a function to generate a sparse matrix <tt class="docutils literal"><span class="pre">M</span></tt> from three 1d
+arrays of same length  <tt class="docutils literal"><span class="pre">Ig</span></tt>,  <tt class="docutils literal"><span class="pre">Jg</span></tt> and  <tt class="docutils literal"><span class="pre">Kg</span></tt> such that  <tt class="docutils literal"><span class="pre">M(Ig(k),Jg(k))=Kg(k)</span></tt> .
+Furthermore, the elements of <tt class="docutils literal"><span class="pre">Kg</span></tt> having the same indices in
+<tt class="docutils literal"><span class="pre">Ig</span></tt> and  <tt class="docutils literal"><span class="pre">Jg</span></tt>  must be summed.</p>
+<dl class="docutils">
+<dt>We give for several interpreted languages the corresponding function :</dt>
+<dd><ul class="first last simple">
+<li>Python (<em>scipy.sparse</em> module) : <tt class="docutils literal"><span class="pre">M=sparse.&lt;format&gt;_matrix(Kg,(Ig,Jg),shape=(m,n)</span></tt>
+where <tt class="docutils literal"><span class="pre">&lt;format&gt;</span></tt> is the sparse matrix format chosen in <tt class="docutils literal"><span class="pre">csc</span></tt> , <tt class="docutils literal"><span class="pre">csr</span></tt> , <tt class="docutils literal"><span class="pre">lil</span></tt> ,...</li>
+<li>Matlab : <tt class="docutils literal"><span class="pre">M=sparse(Ig,Jg,Kg,m,n)</span></tt>, only <tt class="docutils literal"><span class="pre">csc</span></tt> format.</li>
+<li>Octave : <tt class="docutils literal"><span class="pre">M=sparse(Ig,Jg,Kg,m,n)</span></tt>, only <tt class="docutils literal"><span class="pre">csc</span></tt> format.</li>
+<li>Scilab : <tt class="docutils literal"><span class="pre">M=sparse([Ig,Jg],Kg,[m,n])</span></tt>, only <tt class="docutils literal"><span class="pre">row-by-row</span></tt> format.</li>
+</ul>
+</dd>
+</dl>
+<p>Obviously, this kind of function exists in compiled languages. For example, in C language, one can use
+the <em>SuiteSparse</em> from T. Davis and with Nvidia GPU, one can use <em>Thrust</em> library.</p>
+</div>
+<div class="section" id="optimized-classical-assembly-algorithm-optv1-version">
+<h2>Optimized classical assembly algorithm (<tt class="docutils literal"><span class="pre">OptV1</span></tt> version)<a class="headerlink" href="#optimized-classical-assembly-algorithm-optv1-version" title="Permalink to this headline">¶</a></h2>
+<p>The idea is to create three global 1d-arrays <img class="math" src="_images/math/53814ca45e18c7450bc3a8ad417c87731eabdc13.png" alt="\vecb{I}_g,"/>  <img class="math" src="_images/math/d2aba838772b867c8737a00c5e72551c564ff0c5.png" alt="\vecb{J}_g"/> and <img class="math" src="_images/math/8a05f09d12b2831d069755a6e9953b880c84c4f0.png" alt="\vecb{K}_g"/>
+allowing the storage of the element matrices as well as the position of their elements in the global matrix.
+The length of each array is <img class="math" src="_images/math/de0ac52e229d78714d6f918a7b0e8e72ce6be50c.png" alt="\ndfes \nme."/>  (i.e. <img class="math" src="_images/math/b091aced11cff2cca8a1057d148eaf6174158fbf.png" alt="9 \nme"/> for <img class="math" src="_images/math/588e07a0cfc1e617ac5d6552a759b3011aa96d6c.png" alt="d=2"/> and <img class="math" src="_images/math/c1bccae0437745ece7b45872924f5be5a9147dd0.png" alt="16 \nme"/> for <img class="math" src="_images/math/856c1da6b59af6b801109a15f37e6348c778b614.png" alt="d=3"/> ).
+Once these arrays are created, the matrix assembly is obtained with one of the previous commands.</p>
+<p>To create these three arrays, we first define three local 1d-arrays <img class="math" src="_images/math/fb878a4a9c7c6e56f3c44c7643a6ceaa174e034d.png" alt="\vecb{K}^e_k,"/> <img class="math" src="_images/math/cae7650394a19a8192891400048b587d83f1ae0a.png" alt="\vecb{I}^e_k"/>
+and <img class="math" src="_images/math/f2891724651e5e5b46bfd65fbffa1c8f8218477e.png" alt="\vecb{J}^e_k"/> of <img class="math" src="_images/math/3607ac30182c0e04fc13112cf47f2af3e97281d1.png" alt="\ndfes"/> elements obtained from a generic element matrix <img class="math" src="_images/math/a4d405f989af4143e4a83df403f680d7775eeeb5.png" alt="\MAT{E}(T_k)"/> of
+dimension <img class="math" src="_images/math/df02552231dfc73879438ccfe504f849713c756d.png" alt="\ndfe"/> :</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/OptV1_IgeJgeKge.png"><img alt="_images/OptV1_IgeJgeKge.png" src="_images/OptV1_IgeJgeKge.png" style="width: 700.0px;" /></a>
+</div>
+<p>From these arrays, it is then possible to build the three global arrays
+<img class="math" src="_images/math/53814ca45e18c7450bc3a8ad417c87731eabdc13.png" alt="\vecb{I}_g,"/> <img class="math" src="_images/math/d2aba838772b867c8737a00c5e72551c564ff0c5.png" alt="\vecb{J}_g"/> and <img class="math" src="_images/math/18a886718b847f0ea1b00a90c3e4ceaaea59b245.png" alt="\vecb{K}_g,"/> of size
+<img class="math" src="_images/math/eea4ce2428a61d6e4a141db8ef15df091dbd3a55.png" alt="\ndfes\nme \times 1"/> defined,
+<img class="math" src="_images/math/9b7dd29b42e8638d94aca5fadbde6b0ef8280d6c.png" alt="\forall k \in \ENS{1}{\nme},"/> <img class="math" src="_images/math/3f183628c6c72570e6633a1781ec89a5fd49a943.png" alt="\forall l \in\ENS{1}{\ndfes},"/> by</p>
+<div class="math">
+<p><img src="_images/math/10907bf3b0530818c537a4bc94b1cb33a8c64471.png" alt="\begin{array}{lcl}
+  \vecb{K}(\ndfes(k-1)+l)&amp;=&amp;\vecb{K}^e_k(l),\\
+  \vecb{I}(\ndfes(k-1)+l)&amp;=&amp;\vecb{I}^e_k(l)=\mathcal{I}^k((l-1) \bmod m +1),\\
+  \vecb{J}(\ndfes(k-1)+l)&amp;=&amp;\vecb{J}^e_k(l)=\mathcal{I}^k(E((l-1)/ m)+1).
+\end{array}"/></p>
+</div><p>So, for each triangle <img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/>, we have</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/AssemblyMat_OptV1_generic.png"><img alt="_images/AssemblyMat_OptV1_generic.png" src="_images/AssemblyMat_OptV1_generic.png" style="width: 700.0px;" /></a>
+</div>
+<p>Then, a simple algorithm can build these three arrays using a loop over each triangle.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>We give the complete <tt class="docutils literal"><span class="pre">OptV1</span></tt> algorithm</p>
+<div class="last figure align-center">
+<a class="reference internal image-reference" href="_images/AssemblyMat_OptV1_algo.png"><img alt="_images/AssemblyMat_OptV1_algo.png" src="_images/AssemblyMat_OptV1_algo.png" style="width: 600.0px;" /></a>
+</div>
+</div>
+</div>
+<div class="section" id="new-optimized-assembly-algorithm-optv2-version">
+<span id="presentationoptv2-label"></span><h2>New Optimized assembly algorithm (<tt class="docutils literal"><span class="pre">OptV2</span></tt> version)<a class="headerlink" href="#new-optimized-assembly-algorithm-optv2-version" title="Permalink to this headline">¶</a></h2>
+<p>We present the optimized version 2 algorithm where no loop is used.
+We define three 2d-arrays that allow to store all the element matrices
+as well as their positions in the global matrix. We denote by <img class="math" src="_images/math/d29887756f4adefbfd88ae87dd0fcd503b050f39.png" alt="\MAT{K}_g,"/> <img class="math" src="_images/math/f992a68494b52361cd3cdefabdb845aa0b4b18d2.png" alt="\MAT{I}_g"/>
+and <img class="math" src="_images/math/0370130d30c8f4c1fb06a84f3c754058d3715f8b.png" alt="\MAT{J}_g"/> these <img class="math" src="_images/math/212b7711c6ebc09263c51aea42f6fde150f6deca.png" alt="\ndfes-by-\nme"/> arrays, defined <img class="math" src="_images/math/d96af3bf4d204c0ded5779ce75f6687856c48403.png" alt="\forall k \in \{1,\hdots,\nme\},"/>
+<img class="math" src="_images/math/d390f7dbe4b3c3fbe032f6b0a97a4790216fe3ee.png" alt="\forall il \in\{1,\hdots,\ndfes\}"/> by</p>
+<div class="math" id="equation-eq_IgJgKgdef">
+<p><span class="eqno">(1)</span><img src="_images/math/e40c0444bf8fd814a462494fad615497c87ea3b1.png" alt="\MAT{K}_g(il,k)=\vecb{K}^e_k(il),\quad\quad \MAT{I}_g(il,k)=\vecb{I}^e_k(il),\quad\quad \MAT{J}_g(il,k)=\vecb{J}^e_k(il)."/></p>
+</div><p>The three local arrays <img class="math" src="_images/math/fb878a4a9c7c6e56f3c44c7643a6ceaa174e034d.png" alt="\vecb{K}^e_k,"/>  <img class="math" src="_images/math/cae7650394a19a8192891400048b587d83f1ae0a.png" alt="\vecb{I}^e_k"/> and <img class="math" src="_images/math/f2891724651e5e5b46bfd65fbffa1c8f8218477e.png" alt="\vecb{J}^e_k"/> are thus stored
+in the <img class="math" src="_images/math/9f95e9fc37dc276d9cfc43aba335cde356371cac.png" alt="k^{th}"/> column of the global arrays <img class="math" src="_images/math/d29887756f4adefbfd88ae87dd0fcd503b050f39.png" alt="\MAT{K}_g,"/> <img class="math" src="_images/math/f992a68494b52361cd3cdefabdb845aa0b4b18d2.png" alt="\MAT{I}_g"/> and <img class="math" src="_images/math/0370130d30c8f4c1fb06a84f3c754058d3715f8b.png" alt="\MAT{J}_g"/> respectively.</p>
+<p>A natural way to build these three arrays consists in using a loop through the triangles
+<img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/> in which we insert the local arrays column-wise</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/AssembleMatV2d.png"><img alt="_images/AssembleMatV2d.png" src="_images/AssembleMatV2d.png" style="width: 800.0px;" /></a>
+<p class="caption">Figure 48: Construction of <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/>, <img class="math" src="_images/math/22dad34087855e67791c14e5f6d3fc7d0c90e600.png" alt="\mathbb{I}_g"/> and <img class="math" src="_images/math/262bd2ae79e5b5704fc4b8411e3d2750e1eebab0.png" alt="\mathbb{J}_g"/> with loop</p>
+</div>
+<p>The natural construction of these three arrays is done column-wise. So, for each array there are
+<img class="math" src="_images/math/1b2ddc9345548a0e09b20ac6851e89cc2d81df8e.png" alt="\nme"/> columns to compute, which depends on the mesh size.
+To vectorize, we must fill these arrays by row-wise operations and then for each array there are
+<img class="math" src="_images/math/3607ac30182c0e04fc13112cf47f2af3e97281d1.png" alt="\ndfes"/> rows to compute. We recall that <img class="math" src="_images/math/df02552231dfc73879438ccfe504f849713c756d.png" alt="\ndfe"/> does not depend on the mesh size.
+These  rows insertions are represented in Figure <a href="#figureigjgkgoptv2"> 49</a> . We can also remark that,
+<img class="math" src="_images/math/77cad995c2f0e35274116fa0320c5389d6761bcb.png" alt="\forall (\il,\jl)\in\ENS{1}{\ndfe}"/>, with <img class="math" src="_images/math/1c29b0cdddc018caac5e14f6666784d76b9ae826.png" alt="m=\ndfe,"/></p>
+<div class="math">
+<p><img src="_images/math/ea43d0c053412935076f52719846991b0df8069a.png" alt="\MAT{K}_g(m(\jl-1)+\il,k)=e^k_{\il,\jl},\ \
+\MAT{I}_g(m(\jl-1)+\il,k)=\mathcal{I}^k_\il,\ \
+\MAT{J}_g(m(\jl-1)+\il,k)=\mathcal{I}^k_\jl."/></p>
+</div><p>where, in scalar fields case, <img class="math" src="_images/math/a97eeba3a4bfcd773f400bc0be9a5d4fc323c9f4.png" alt="\mathcal{I}^k_\il=\me(\il,k),"/> <img class="math" src="_images/math/ceb756c2579f4fddd165be36eaf2ce8b61d34598.png" alt="\forall \il\in\ENS{1}{d+1}"/>
+and in vector fields case, <img class="math" src="_images/math/c577413f09ec5773c32b6088a7173a28015475d9.png" alt="\mathcal{I}^k_{d a - b}=d \me(a,k)-b,"/>
+<img class="math" src="_images/math/598925f753f4b723370c40f81f645485f063fde2.png" alt="\forall a \in \ENS{1}{d+1},"/> <img class="math" src="_images/math/249dbe7323e265e3530681ba7e809b74380e042a.png" alt="\forall b \in \ENS{0}{d-1}."/></p>
+<div class="figure align-center" id="figureigjgkgoptv2">
+<a class="reference internal image-reference" href="_images/IgJgKg_OptV2.png"><img alt="_images/IgJgKg_OptV2.png" src="_images/IgJgKg_OptV2.png" style="width: 800.0px;" /></a>
+<p class="caption">Figure 49: Row-wise operations on global arrays <img class="math" src="_images/math/f559eba4bae1323f3478d54264462706a7ba4790.png" alt="\mathbb{I}_g,"/> <img class="math" src="_images/math/262bd2ae79e5b5704fc4b8411e3d2750e1eebab0.png" alt="\mathbb{J}_g"/> and <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/></p>
+</div>
+<p>As we can see in Figures <a href="#figurebuild2digjgoptv2scalar"> 50</a> and <a href="#figurebuild3digjgoptv2scalar"> 51</a>,
+it is quite easy to vectorize <img class="math" src="_images/math/f992a68494b52361cd3cdefabdb845aa0b4b18d2.png" alt="\MAT{I}_g"/> and <img class="math" src="_images/math/0370130d30c8f4c1fb06a84f3c754058d3715f8b.png" alt="\MAT{J}_g"/> computations in scalar fields case
+by filling these arrays lines by lines :</p>
+<div class="figure align-center" id="figurebuild2digjgoptv2scalar">
+<a class="reference internal image-reference" href="_images/Build2D_IgJg_OptV2.png"><img alt="_images/Build2D_IgJg_OptV2.png" src="_images/Build2D_IgJg_OptV2.png" style="width: 800.0px;" /></a>
+<p class="caption">Figure 50: Construction of <img class="math" src="_images/math/22dad34087855e67791c14e5f6d3fc7d0c90e600.png" alt="\mathbb{I}_g"/> and <img class="math" src="_images/math/262bd2ae79e5b5704fc4b8411e3d2750e1eebab0.png" alt="\mathbb{J}_g"/> : <tt class="docutils literal"><span class="pre">OptV2</span></tt> version for 2d <em>scalar</em> matrix</p>
+</div>
+<div class="figure align-center" id="figurebuild3digjgoptv2scalar">
+<a class="reference internal image-reference" href="_images/Build3D_IgJg_OptV2.png"><img alt="_images/Build3D_IgJg_OptV2.png" src="_images/Build3D_IgJg_OptV2.png" style="width: 800.0px;" /></a>
+<p class="caption">Figure 51: Construction of  <img class="math" src="_images/math/22dad34087855e67791c14e5f6d3fc7d0c90e600.png" alt="\mathbb{I}_g"/> and <img class="math" src="_images/math/262bd2ae79e5b5704fc4b8411e3d2750e1eebab0.png" alt="\mathbb{J}_g"/> : <tt class="docutils literal"><span class="pre">OptV2</span></tt> version for 3d <em>scalar</em> matrix</p>
+</div>
+<p>Using vectorization tools, we can compute <img class="math" src="_images/math/f992a68494b52361cd3cdefabdb845aa0b4b18d2.png" alt="\MAT{I}_g"/> and <img class="math" src="_images/math/0370130d30c8f4c1fb06a84f3c754058d3715f8b.png" alt="\MAT{J}_g"/> in one line. The vectorized algorithms in 2d and 3d scalar fields are represented by Figure <a href="#figurebuildigjgoptv2scalaralgo">52</a>.</p>
+<div class="figure align-center" id="figurebuildigjgoptv2scalaralgo">
+<a class="reference internal image-reference" href="_images/BuildIgJg_scalar_algo.png"><img alt="_images/BuildIgJg_scalar_algo.png" src="_images/BuildIgJg_scalar_algo.png" style="width: 600.0px;" /></a>
+<p class="caption">Figure 52: Vectorized algorithms for <img class="math" src="_images/math/22dad34087855e67791c14e5f6d3fc7d0c90e600.png" alt="\mathbb{I}_g"/> and <img class="math" src="_images/math/262bd2ae79e5b5704fc4b8411e3d2750e1eebab0.png" alt="\mathbb{J}_g"/> computations</p>
+</div>
+<p>In vector fields case, we construct the tabular <img class="math" src="_images/math/b5b722f92f7afd2dd2cb6e6ac9db70521fe81ff0.png" alt="\MAT{T}"/> such that
+<img class="math" src="_images/math/bcd4e2954ae65ccbc8f68db2e043fb3a55939d77.png" alt="\MAT{T}(\alpha,k)=\mathcal{I}^k_\il,"/> <img class="math" src="_images/math/6422e78b0579eb5e7e942dfbb13415d142301e66.png" alt="\forall \il\in\ENS{1}{\ndfe}."/>
+Then we can vectorize <img class="math" src="_images/math/f992a68494b52361cd3cdefabdb845aa0b4b18d2.png" alt="\MAT{I}_g"/> and <img class="math" src="_images/math/0370130d30c8f4c1fb06a84f3c754058d3715f8b.png" alt="\MAT{J}_g"/> computations in vector fields case.
+We represent in Figure <a href="#figurebuild2digjgoptv2vector">53</a> these operations in 2d.</p>
+<div class="figure align-center" id="figurebuild2digjgoptv2vector">
+<a class="reference internal image-reference" href="_images/IgJgTabularMECA.png"><img alt="_images/IgJgTabularMECA.png" src="_images/IgJgTabularMECA.png" style="width: 800.0px;" /></a>
+<p class="caption">Figure 53: Construction of <img class="math" src="_images/math/22dad34087855e67791c14e5f6d3fc7d0c90e600.png" alt="\mathbb{I}_g"/> and <img class="math" src="_images/math/262bd2ae79e5b5704fc4b8411e3d2750e1eebab0.png" alt="\mathbb{J}_g"/> : <tt class="docutils literal"><span class="pre">OptV2</span></tt> version in 2d vector fields case</p>
+</div>
+<p>Now, it remains to vectorize the computation of <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> array
+which contains all the element matrices associated to <img class="math" src="_images/math/dc2c18d66af8bd13ab5a66b54b28d4647ea7b885.png" alt="\MAT{D}"/> or <img class="math" src="_images/math/c59e97e7224d4485aa7350978b5675bc4f459960.png" alt="\MAT{H}"/> :
+it should be done by <strong>row-wise</strong> vector operations.</p>
+<p>We now describe a vectorized construction of <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> array associated to a generic
+bilinear form <img class="math" src="_images/math/c7d457e388298246adb06c587bccd419ea67f7e8.png" alt="a"/>. For the mesh element <img class="math" src="_images/math/7da81cb3cee239abc137061d65f85d90d269ca50.png" alt="T_k"/>, the element matrix is then given by</p>
+<div class="math">
+<p><img src="_images/math/b3567a3c73225ce22ebc9a51960d8044fb21cf07.png" alt="\MAT{E}(T_k)=\begin{pmatrix}
+   a(\varphi_{i_1^k},\varphi_{i_1^k}) &amp; a(\varphi_{i_1^k},\varphi_{i_2^k}) &amp; a(\varphi_{i_1^k},\varphi_{i_3^k})\\
+   a(\varphi_{i_2^k},\varphi_{i_1^k}) &amp; a(\varphi_{i_2^k},\varphi_{i_2^k}) &amp; a(\varphi_{i_2^k},\varphi_{i_3^k})\\
+   a(\varphi_{i_3^k},\varphi_{i_1^k}) &amp; a(\varphi_{i_3^k},\varphi_{i_2^k}) &amp; a(\varphi_{i_3^k},\varphi_{i_3^k})
+\end{pmatrix}"/></p>
+</div><div class="figure align-center">
+<a class="reference internal image-reference" href="_images/Build2D_Kg_generic_OptV2.png"><img alt="_images/Build2D_Kg_generic_OptV2.png" src="_images/Build2D_Kg_generic_OptV2.png" style="width: 800.0px;" /></a>
+<p class="caption">Figure 54: Construction of <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> for <strong>Mass</strong> matrix</p>
+</div>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/Build2D_Kg_Mass_OptV2.png"><img alt="_images/Build2D_Kg_Mass_OptV2.png" src="_images/Build2D_Kg_Mass_OptV2.png" style="width: 800.0px;" /></a>
+<p class="caption">Figure 55: Construction of <img class="math" src="_images/math/3da60f575eb81e432c84887bd1388ca61a0bc858.png" alt="\mathbb{K}_g"/> for <strong>Mass</strong> matrix</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Presentation</a><ul>
+<li><a class="reference internal" href="#classical-assembly-algorithm-base-version">Classical assembly algorithm (<tt class="docutils literal"><span class="pre">base</span></tt> version)</a></li>
+<li><a class="reference internal" href="#sparse-matrix-requirement">Sparse matrix requirement</a></li>
+<li><a class="reference internal" href="#optimized-classical-assembly-algorithm-optv1-version">Optimized classical assembly algorithm (<tt class="docutils literal"><span class="pre">OptV1</span></tt> version)</a></li>
+<li><a class="reference internal" href="#new-optimized-assembly-algorithm-optv2-version">New Optimized assembly algorithm (<tt class="docutils literal"><span class="pre">OptV2</span></tt> version)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to pyOptFEM&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="benchmarks2D.html"
+                        title="next chapter">2D benchmarks</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/presentation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="benchmarks2D.html" title="2D benchmarks"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyOptFEM’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

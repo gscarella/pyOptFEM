@@ -1,0 +1,241 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyOptFEM.FEM2D.mesh &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyOptFEM.FEM2D.mesh</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">Delaunay</span>
+<span class="kn">from</span> <span class="nn">.toolsVec</span> <span class="kn">import</span> <span class="n">ComputeAreaOpt</span>
+<span class="kn">from</span> <span class="nn">.toolsVec</span> <span class="kn">import</span> <span class="n">ComputeAreaOpt2</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+
+<div class="viewcode-block" id="getMesh"><a class="viewcode-back" href="../../../FEM2D.html#pyOptFEM.FEM2D.mesh.getMesh">[docs]</a><span class="k">class</span> <span class="nc">getMesh</span><span class="p">:</span>
+   <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Reads a *FreeFEM++* mesh from file ``meshfile``. Class attributes are :</span>
+<span class="sd">   </span>
+<span class="sd">     - **nq**, total number of mesh vertices (points), also denoted :math:`\\nq`.</span>
+<span class="sd">     - **nme**, total number of mesh elements (triangles in 2d),</span>
+<span class="sd">     - **version**, mesh structure version,</span>
+<span class="sd">     - **q**, *Numpy* array of vertices coordinates, dimension ``(nq,2)`` *(version 0)* or ``(2,nq)`` *(version 1)*. </span>
+<span class="sd">     </span>
+<span class="sd">       ``q[j]``  *(version 0)* or ``q[:,j]`` *(version 1)* are the two coordinates of the :math:`j`-th vertex, :math:`j\in\{0,..,nq-1\}`</span>
+<span class="sd">       </span>
+<span class="sd">     - **me**, *Numpy* connectivity array,  dimension ``(nme,3)`` *(version 0)* or ``(3,nme)`` *(version 1)*. </span>
+<span class="sd">       </span>
+<span class="sd">       ``me[k]``  *(version 0)* or ``me[:,k]`` *(version 1)* are the storage index of the three vertices of the :math:`k`-th triangle in the array ``q`` of vertices coordinates, :math:`k\in\{0,...,nme-1\}`.</span>
+<span class="sd"> </span>
+<span class="sd">     - **areas**, Array of mesh elements areas, ``(nme,)`` *Numpy* array.</span>
+<span class="sd">     </span>
+<span class="sd">       ``areas[k]`` is the area of :math:`k`-th triangle, ``k in range(0,nme)``</span>
+<span class="sd">       </span>
+<span class="sd">   :param    N: number of points on each side of the square</span>
+<span class="sd">   </span>
+<span class="sd">   **optional parameter** : ``version=0`` or ``version=1``</span>
+<span class="sd">       </span>
+<span class="sd">   &gt;&gt;&gt; from pyOptFEM.FEM2D import *</span>
+<span class="sd">   &gt;&gt;&gt; Th=getMesh(&#39;mesh/disk4-1-5.msh&#39;)</span>
+<span class="sd">   &gt;&gt;&gt; PlotMesh(Th)</span>
+<span class="sd">   </span>
+<span class="sd">   .. figure::  images/PlotMesh_disk4.png</span>
+<span class="sd">     :width: 400px</span>
+<span class="sd">     :scale: 100%</span>
+<span class="sd">     :align:   center</span>
+<span class="sd">     </span>
+<span class="sd">     Visualisation of a *FreeFEM++* mesh (disk unit)</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meshfile</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="n">version</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;version&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">meshfile</span><span class="p">,</span> <span class="s">&#39;rt&#39;</span><span class="p">)</span> 
+      <span class="bp">self</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nq</span><span class="p">)</span>
+      <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">=</span><span class="n">data</span><span class="p">[:,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">ql</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nme</span><span class="p">)</span>
+      <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">=</span><span class="n">data</span><span class="p">[:,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span><span class="o">-</span><span class="mi">1</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">mel</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nbe</span><span class="p">)</span>
+      <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbe</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">be</span><span class="o">=</span><span class="n">data</span><span class="p">[:,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span><span class="o">-</span><span class="mi">1</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">bel</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">areas</span><span class="o">=</span><span class="n">ComputeAreaOpt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="o">=</span><span class="n">version</span>
+      <span class="k">if</span> <span class="n">version</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">T</span>
+      </div>
+<div class="viewcode-block" id="SquareMesh"><a class="viewcode-back" href="../../../FEM2D.html#pyOptFEM.FEM2D.mesh.SquareMesh">[docs]</a><span class="k">class</span> <span class="nc">SquareMesh</span><span class="p">:</span>
+   <span class="sd">&quot;&quot;&quot;  Creates meshes of the unit square :math:`[0,1]\\times [0,1]`. Class attributes are :</span>
+<span class="sd">   </span>
+<span class="sd">     - **nq**, total number of mesh vertices (points), also denoted :math:`\\nq`.</span>
+<span class="sd">     - **nme**, total number of mesh elements (triangles in 2d),</span>
+<span class="sd">     - **version**, mesh structure version,</span>
+<span class="sd">     - **q**, *Numpy* array of vertices coordinates, dimension ``(nq,2)`` *(version 0)* or ``(2,nq)`` *(version 1)*. </span>
+<span class="sd">     </span>
+<span class="sd">       ``q[j]``  *(version 0)* or ``q[:,j]`` *(version 1)* are the two coordinates of the :math:`j`-th vertex, :math:`j\in\{0,..,nq-1\}`</span>
+<span class="sd">       </span>
+<span class="sd">     - **me**, *Numpy* connectivity array,  dimension ``(nme,3)`` *(version 0)* or ``(3,nme)`` *(version 1)*. </span>
+<span class="sd">       </span>
+<span class="sd">       ``me[k]``  *(version 0)* or ``me[:,k]`` *(version 1)* are the storage index of the three vertices of the :math:`k`-th triangle in the array ``q`` of vertices coordinates, :math:`k\in\{0,...,nme-1\}`.</span>
+<span class="sd"> </span>
+<span class="sd">     - **areas**, Array of mesh elements areas, ``(nme,)`` *Numpy* array.</span>
+<span class="sd">     </span>
+<span class="sd">       ``areas[k]`` is the area of :math:`k`-th triangle, ``k in range(0,nme)``</span>
+<span class="sd">       </span>
+<span class="sd">   :param    N: number of points on each side of the square</span>
+<span class="sd">   </span>
+<span class="sd">   **optional parameter** : ``version=0`` or ``version=1``</span>
+<span class="sd">   </span>
+<span class="sd">   &gt;&gt;&gt; from pyOptFEM.FEM2D import *</span>
+<span class="sd">   &gt;&gt;&gt; Th=SquareMesh(3)</span>
+<span class="sd">   &gt;&gt;&gt; Th.nme,Th.nq</span>
+<span class="sd">   (18, 16)</span>
+<span class="sd">   &gt;&gt;&gt; Th.q</span>
+<span class="sd">   array([[ 0.        ,  0.        ],</span>
+<span class="sd">          [ 0.33333333,  0.        ],</span>
+<span class="sd">          [ 0.66666667,  0.        ],</span>
+<span class="sd">          [ 1.        ,  0.        ],</span>
+<span class="sd">          [ 0.        ,  0.33333333],</span>
+<span class="sd">          [ 0.33333333,  0.33333333],</span>
+<span class="sd">          [ 0.66666667,  0.33333333],</span>
+<span class="sd">          [ 1.        ,  0.33333333],</span>
+<span class="sd">          [ 0.        ,  0.66666667],</span>
+<span class="sd">          [ 0.33333333,  0.66666667],   </span>
+<span class="sd">          [ 0.66666667,  0.66666667],</span>
+<span class="sd">          [ 1.        ,  0.66666667],</span>
+<span class="sd">          [ 0.        ,  1.        ],</span>
+<span class="sd">          [ 0.33333333,  1.        ],</span>
+<span class="sd">          [ 0.66666667,  1.        ],</span>
+<span class="sd">          [ 1.        ,  1.        ]])</span>
+<span class="sd">   &gt;&gt;&gt; PlotMesh(Th)</span>
+
+<span class="sd">   .. figure::  images/PlotMesh_SquareMesh.png</span>
+<span class="sd">     :width: 400px</span>
+<span class="sd">     :scale: 100%</span>
+<span class="sd">     :align:   center</span>
+<span class="sd">     </span>
+<span class="sd">     SquareMesh(3) visualisation</span>
+<span class="sd">   &quot;&quot;&quot;</span>    
+   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="n">version</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;version&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">t</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+      <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">((</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+      <span class="n">y</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">((</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[:],</span><span class="n">y</span><span class="p">[:]])</span><span class="o">.</span><span class="n">T</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">nq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">tri</span><span class="o">=</span><span class="n">Delaunay</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">=</span><span class="n">tri</span><span class="o">.</span><span class="n">vertices</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">nme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">areas</span><span class="o">=</span><span class="n">ComputeAreaOpt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="o">=</span><span class="n">version</span>
+      <span class="k">if</span> <span class="n">version</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">me</span><span class="o">.</span><span class="n">T</span>
+      </div>
+<span class="k">def</span> <span class="nf">PlotMesh</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+  <span class="k">if</span> <span class="n">M</span><span class="o">.</span><span class="n">version</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">triplot</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">M</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">M</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="s">&#39;bo-&#39;</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">M</span><span class="o">.</span><span class="n">version</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">triplot</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">M</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">M</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="s">&#39;bo-&#39;</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;equal&#39;</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">&#39;off&#39;</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

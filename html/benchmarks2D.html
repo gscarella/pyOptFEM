@@ -1,0 +1,1156 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>2D benchmarks &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="index.html" />
+    <link rel="next" title="3D benchmarks" href="benchmarks3D.html" />
+    <link rel="prev" title="Presentation" href="presentation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="benchmarks3D.html" title="3D benchmarks"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="presentation.html" title="Presentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="d-benchmarks">
+<span id="bench2d-label"></span><h1>2D benchmarks<a class="headerlink" href="#d-benchmarks" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#module-pyOptFEM.FEM2D.assemblyBench" id="id1">Benchmark usage</a></li>
+<li><a class="reference internal" href="#mass-matrix" id="id2">Mass Matrix</a></li>
+<li><a class="reference internal" href="#stiffness-matrix" id="id3">Stiffness Matrix</a></li>
+<li><a class="reference internal" href="#elastic-stiffness-matrix" id="id4">Elastic Stiffness Matrix</a></li>
+</ul>
+</div>
+<div class="section" id="module-pyOptFEM.FEM2D.assemblyBench">
+<span id="benchmark-usage"></span><h2><a class="toc-backref" href="#id1">Benchmark usage</a><a class="headerlink" href="#module-pyOptFEM.FEM2D.assemblyBench" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<tt class="descclassname">pyOptFEM.FEM2D.assemblyBench.</tt><tt class="descname">assemblyBench</tt><big>(</big><span class="optional">[</span><em>assembly=&lt;string&gt;</em>, <em>version=&lt;string&gt;</em>, <em>LN=&lt;array&gt;</em>, <em>meshname=&lt;string&gt;</em>, <em>meshdir=&lt;string&gt;</em>, <em>nbruns=&lt;int&gt;</em>, <em>la=&lt;float&gt;</em>, <em>mu=&lt;float&gt;</em>, <em>Num=&lt;int&gt;</em>, <em>tag=&lt;string&gt;</em>, <em>...</em><span class="optional">]</span><big>)</big></dt>
+<dd><p>Benchmark code for <img class="math" src="_images/math/a5b0256a78d58b6d5f7a53400b19e7747d2983fa.png" alt="P_1"/>-Lagrange finite element matrices defined in <tt class="xref py py-mod docutils literal"><span class="pre">FEM2D</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>assembly</strong> &#8211; <p>Name of an assembly routine. The string should be :</p>
+<ul>
+<li><em>&#8216;MassAssembling2DP1&#8217;</em>,</li>
+<li><em>&#8216;StiffAssembling2DP1&#8217;</em> (default)</li>
+<li><em>&#8216;StiffElasAssembling2DP1&#8217;</em></li>
+</ul>
+</li>
+<li><strong>versions</strong> &#8211; List of versions. Must be a list of any size whose elements may be <em>{&#8216;base&#8217;,&#8217;OptV1&#8217;,&#8217;OptV2&#8217;}</em> (default : <tt class="docutils literal"><span class="pre">['OptV2','OptV1','base']</span></tt>)</li>
+<li><strong>meshname</strong> &#8211; Name of the mesh files. By default it is an empty string <em>&#8216;&#8217;</em>. It means it uses SquareMesh function to generate meshes.</li>
+<li><strong>meshdir</strong> &#8211; Directory location of FreeFEM++ mesh files. Used if meshname is not empty.</li>
+<li><strong>LN</strong> &#8211; <p>array of integer values. &lt;LN&gt; contains the values of N. Used to generate meshes data via Th=SquareMesh(N) function if
+meshname is empty or via <em>getMesh</em> class to read FreeFEM++ meshes Th=getMesh(meshdir+&#8217;/&#8217;+meshname+str(N)+&#8217;.msh&#8217;)</p>
+<p>LN default value is <tt class="docutils literal"><span class="pre">range(50,</span> <span class="pre">90,</span> <span class="pre">10)</span></tt></p>
+</li>
+<li><strong>nbruns</strong> &#8211; Number of runs on each mesh (default : <em>1</em>)</li>
+<li><strong>save</strong> &#8211; For saving benchmark results in a file (see parameters &lt;output&gt;, &lt;outdir&gt; and &lt;tag&gt;)</li>
+<li><strong>plot</strong> &#8211; For plotting computation times (default : <em>True</em>)</li>
+<li><strong>output</strong> &#8211; Name used to set results file name (default : <em>&#8216;bench2D&#8217;</em>)</li>
+<li><strong>outdir</strong> &#8211; Directory location of saved results file name (default : <em>&#8216;./results&#8217;</em>).</li>
+<li><strong>tag</strong> &#8211; Specify a tag string added to filename</li>
+<li><strong>la</strong> &#8211; the first Lame coefficient in Hooke&#8217;s law, denoted by <img class="math" src="_images/math/ce4588fd900d02afcbd260bc07f54cce49a7dc4a.png" alt="\lambda"/>. Used by functions for assembling the elastic stiffness matrix.
+(default : <em>2</em>)</li>
+<li><strong>mu</strong> &#8211; the second Lame coefficient in Hooke&#8217;s law, denoted by <img class="math" src="_images/math/2d8c833ed800824727cd7bd2fb9de1a12ad7e674.png" alt="\mu"/>. Used by functions for assembling the elastic stiffness matrix.
+(default : <em>0.3</em>)</li>
+<li><strong>Num</strong> &#8211; Numbering choice. Used by functions for assembling the elastic stiffness matrix. (default : <em>0</em>)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="mass-matrix">
+<span id="bench2d-mass-label"></span><h2><a class="toc-backref" href="#id2">Mass Matrix</a><a class="headerlink" href="#mass-matrix" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Benchmark of <strong>MassAssembling2DP1</strong> with <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions (see <a class="reference internal" href="FEM2D.html#fem2d-massassembling-label"><em>Mass Matrix</em></a>)</p>
+<table border="1" class="docutils">
+<caption>MassAssembling2DP1 benchmark summary</caption>
+<colgroup>
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="21%" />
+<col width="21%" />
+<col width="21%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">N</th>
+<th class="head">nq</th>
+<th class="head">ndof</th>
+<th class="head">OptV2</th>
+<th class="head">OptV1</th>
+<th class="head">base</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>50</td>
+<td>2601</td>
+<td>2601</td>
+<td>0.0042(s)</td>
+<td>0.0816(s)</td>
+<td>3.2783(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x19.50</td>
+<td>x783.85</td>
+</tr>
+<tr class="row-even"><td>60</td>
+<td>3721</td>
+<td>3721</td>
+<td>0.0058(s)</td>
+<td>0.1162(s)</td>
+<td>4.7136(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x20.02</td>
+<td>x812.43</td>
+</tr>
+<tr class="row-even"><td>70</td>
+<td>5041</td>
+<td>5041</td>
+<td>0.0078(s)</td>
+<td>0.1584(s)</td>
+<td>6.3931(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x20.32</td>
+<td>x819.97</td>
+</tr>
+<tr class="row-even"><td>80</td>
+<td>6561</td>
+<td>6561</td>
+<td>0.0102(s)</td>
+<td>0.2075(s)</td>
+<td>8.4154(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x20.33</td>
+<td>x824.26</td>
+</tr>
+<tr class="row-even"><td>90</td>
+<td>8281</td>
+<td>8281</td>
+<td>0.0133(s)</td>
+<td>0.2622(s)</td>
+<td>10.6460(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x19.66</td>
+<td>x798.28</td>
+</tr>
+<tr class="row-even"><td>100</td>
+<td>10201</td>
+<td>10201</td>
+<td>0.0162(s)</td>
+<td>0.3228(s)</td>
+<td>13.1028(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x19.89</td>
+<td>x807.38</td>
+</tr>
+<tr class="row-even"><td>110</td>
+<td>12321</td>
+<td>12321</td>
+<td>0.0197(s)</td>
+<td>0.3912(s)</td>
+<td>15.9244(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x19.88</td>
+<td>x809.23</td>
+</tr>
+<tr class="row-even"><td>120</td>
+<td>14641</td>
+<td>14641</td>
+<td>0.0232(s)</td>
+<td>0.4685(s)</td>
+<td>18.9165(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x20.21</td>
+<td>x816.09</td>
+</tr>
+</tbody>
+</table>
+<p>This tabular was built with the following code :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM2D</span> <span class="kn">import</span> <span class="n">assemblyBench</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assemblyBench</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="s">&#39;MassAssembling2DP1&#39;</span><span class="p">,</span><span class="n">LN</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">130</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">SquareMesh(50):</span>
+<span class="go"> -&gt; MassAssembling2DP1OptV2(nq=2601, nme=5000)</span>
+<span class="go">  run ( 1/ 1) : cputime=0.004182(s) - matrix 2601-by-2601</span>
+<span class="gp">...</span>
+<span class="go">SquareMesh(120):</span>
+<span class="go"> -&gt; MassAssembling2DP1base(nq=14641, nme=28800)</span>
+<span class="go">  run ( 1/ 1) : cputime=18.916504(s) - matrix 14641-by-14641</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>We also obtain</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/bench_Mass2DP1_01.png"><img alt="_images/bench_Mass2DP1_01.png" src="_images/bench_Mass2DP1_01.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 31: MassAssembling2DP1 benchmark</p>
+</div>
+</li>
+<li><p class="first">Benchmark of <strong>MassAssembling2DP1</strong> with <tt class="docutils literal"><span class="pre">OptV2</span></tt> and  <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions</p>
+<table border="1" class="docutils">
+<caption>MassAssembling2DP1 benchmark summary</caption>
+<colgroup>
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="27%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">N</th>
+<th class="head">nq</th>
+<th class="head">ndof</th>
+<th class="head">OptV2</th>
+<th class="head">OptV1</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>100</td>
+<td>10201</td>
+<td>10201</td>
+<td>0.0163(s)</td>
+<td>0.3196(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x19.61</td>
+</tr>
+<tr class="row-even"><td>200</td>
+<td>40401</td>
+<td>40401</td>
+<td>0.0648(s)</td>
+<td>1.3025(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x20.09</td>
+</tr>
+<tr class="row-even"><td>300</td>
+<td>90601</td>
+<td>90601</td>
+<td>0.1583(s)</td>
+<td>2.9198(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x18.45</td>
+</tr>
+<tr class="row-even"><td>400</td>
+<td>160801</td>
+<td>160801</td>
+<td>0.2859(s)</td>
+<td>5.1809(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x18.12</td>
+</tr>
+<tr class="row-even"><td>500</td>
+<td>251001</td>
+<td>251001</td>
+<td>0.4591(s)</td>
+<td>8.1059(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x17.65</td>
+</tr>
+<tr class="row-even"><td>600</td>
+<td>361201</td>
+<td>361201</td>
+<td>0.6595(s)</td>
+<td>11.6834(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x17.72</td>
+</tr>
+<tr class="row-even"><td>700</td>
+<td>491401</td>
+<td>491401</td>
+<td>0.9056(s)</td>
+<td>15.8209(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x17.47</td>
+</tr>
+<tr class="row-even"><td>800</td>
+<td>641601</td>
+<td>641601</td>
+<td>1.1796(s)</td>
+<td>20.8883(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x17.71</td>
+</tr>
+<tr class="row-even"><td>900</td>
+<td>811801</td>
+<td>811801</td>
+<td>1.4933(s)</td>
+<td>26.0264(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x17.43</td>
+</tr>
+<tr class="row-even"><td>1000</td>
+<td>1002001</td>
+<td>1002001</td>
+<td>1.8503(s)</td>
+<td>32.5076(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x17.57</td>
+</tr>
+<tr class="row-even"><td>1100</td>
+<td>1212201</td>
+<td>1212201</td>
+<td>2.2262(s)</td>
+<td>39.3237(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x17.66</td>
+</tr>
+<tr class="row-even"><td>1200</td>
+<td>1442401</td>
+<td>1442401</td>
+<td>2.6616(s)</td>
+<td>46.6362(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x17.52</td>
+</tr>
+</tbody>
+</table>
+<p>This tabular was built with the following code :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM2D</span> <span class="kn">import</span> <span class="n">assemblyBench</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assemblyBench</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="s">&#39;MassAssembling2DP1&#39;</span><span class="p">,</span><span class="n">versions</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;OptV2&#39;</span><span class="p">,</span><span class="s">&#39;OptV1&#39;</span><span class="p">],</span><span class="n">LN</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">1300</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+<span class="go">SquareMesh(100):</span>
+<span class="go"> -&gt; MassAssembling2DP1OptV2(nq=10201, nme=20000)</span>
+<span class="go">  run ( 1/ 1) : cputime=0.016294(s) - matrix 10201-by-10201</span>
+<span class="gp">...</span>
+<span class="go">SquareMesh(1200):</span>
+<span class="go"> -&gt; MassAssembling2DP1OptV1(nq=1442401, nme=2880000)</span>
+<span class="go">  run ( 1/ 1) : cputime=46.636235(s) - matrix 1442401-by-1442401</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>We also obtain</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/bench_Mass2DP1_02.png"><img alt="_images/bench_Mass2DP1_02.png" src="_images/bench_Mass2DP1_02.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 32: MassAssembling2DP1 benchmark</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="stiffness-matrix">
+<span id="bench2d-stiff-label"></span><h2><a class="toc-backref" href="#id3">Stiffness Matrix</a><a class="headerlink" href="#stiffness-matrix" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Benchmark of <strong>StiffAssembling2DP1</strong> with <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions</p>
+<table border="1" class="docutils">
+<caption>StiffAssembling2DP1 benchmark summary</caption>
+<colgroup>
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="21%" />
+<col width="21%" />
+<col width="21%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">N</th>
+<th class="head">nq</th>
+<th class="head">ndof</th>
+<th class="head">OptV2</th>
+<th class="head">OptV1</th>
+<th class="head">base</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>50</td>
+<td>2601</td>
+<td>2601</td>
+<td>0.0055(s)</td>
+<td>0.2501(s)</td>
+<td>3.5504(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x45.35</td>
+<td>x643.82</td>
+</tr>
+<tr class="row-even"><td>60</td>
+<td>3721</td>
+<td>3721</td>
+<td>0.0076(s)</td>
+<td>0.3593(s)</td>
+<td>5.1301(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x47.38</td>
+<td>x676.64</td>
+</tr>
+<tr class="row-even"><td>70</td>
+<td>5041</td>
+<td>5041</td>
+<td>0.0101(s)</td>
+<td>0.4897(s)</td>
+<td>6.9854(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x48.33</td>
+<td>x689.37</td>
+</tr>
+<tr class="row-even"><td>80</td>
+<td>6561</td>
+<td>6561</td>
+<td>0.0138(s)</td>
+<td>0.6362(s)</td>
+<td>9.0807(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x46.11</td>
+<td>x658.09</td>
+</tr>
+<tr class="row-even"><td>90</td>
+<td>8281</td>
+<td>8281</td>
+<td>0.0178(s)</td>
+<td>0.8119(s)</td>
+<td>11.5354(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x45.57</td>
+<td>x647.46</td>
+</tr>
+<tr class="row-even"><td>100</td>
+<td>10201</td>
+<td>10201</td>
+<td>0.0223(s)</td>
+<td>1.0005(s)</td>
+<td>14.2190(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x44.77</td>
+<td>x636.22</td>
+</tr>
+<tr class="row-even"><td>110</td>
+<td>12321</td>
+<td>12321</td>
+<td>0.0266(s)</td>
+<td>1.2124(s)</td>
+<td>17.2704(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x45.61</td>
+<td>x649.74</td>
+</tr>
+<tr class="row-even"><td>120</td>
+<td>14641</td>
+<td>14641</td>
+<td>0.0325(s)</td>
+<td>1.4503(s)</td>
+<td>20.4368(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x44.69</td>
+<td>x629.75</td>
+</tr>
+</tbody>
+</table>
+<p>This tabular was built with the following code :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM2D</span> <span class="kn">import</span> <span class="n">assemblyBench</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assemblyBench</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="s">&#39;StiffAssembling2DP1&#39;</span><span class="p">,</span><span class="n">LN</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">130</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">SquareMesh(50):</span>
+<span class="go"> -&gt; StiffAssembling2DP1OptV2(nq=2601, nme=5000)</span>
+<span class="go">  run ( 1/ 1) : cputime=0.005515(s) - matrix 2601-by-2601</span>
+<span class="gp">...</span>
+<span class="go">SquareMesh(120):</span>
+<span class="go"> -&gt; StiffAssembling2DP1base(nq=14641, nme=28800)</span>
+<span class="go">  run ( 1/ 1) : cputime=20.436779(s) - matrix 14641-by-14641</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>We also obtain</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/bench_Stiff2DP1_01.png"><img alt="_images/bench_Stiff2DP1_01.png" src="_images/bench_Stiff2DP1_01.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 33: StiffAssembling2DP1 benchmark</p>
+</div>
+</li>
+<li><p class="first">Benchmark of <strong>StiffAssembling2DP1</strong> with <tt class="docutils literal"><span class="pre">OptV2</span></tt> and  <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions</p>
+<table border="1" class="docutils">
+<caption>StiffAssembling2DP1 benchmark summary</caption>
+<colgroup>
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="27%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">N</th>
+<th class="head">nq</th>
+<th class="head">ndof</th>
+<th class="head">OptV2</th>
+<th class="head">OptV1</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>100</td>
+<td>10201</td>
+<td>10201</td>
+<td>0.0225(s)</td>
+<td>1.0104(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x44.93</td>
+</tr>
+<tr class="row-even"><td>200</td>
+<td>40401</td>
+<td>40401</td>
+<td>0.0945(s)</td>
+<td>4.0847(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x43.22</td>
+</tr>
+<tr class="row-even"><td>300</td>
+<td>90601</td>
+<td>90601</td>
+<td>0.2379(s)</td>
+<td>9.1818(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x38.59</td>
+</tr>
+<tr class="row-even"><td>400</td>
+<td>160801</td>
+<td>160801</td>
+<td>0.4459(s)</td>
+<td>16.3333(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x36.63</td>
+</tr>
+<tr class="row-even"><td>500</td>
+<td>251001</td>
+<td>251001</td>
+<td>0.7169(s)</td>
+<td>25.6513(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x35.78</td>
+</tr>
+<tr class="row-even"><td>600</td>
+<td>361201</td>
+<td>361201</td>
+<td>1.0316(s)</td>
+<td>36.8382(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x35.71</td>
+</tr>
+<tr class="row-even"><td>700</td>
+<td>491401</td>
+<td>491401</td>
+<td>1.4316(s)</td>
+<td>49.9507(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x34.89</td>
+</tr>
+<tr class="row-even"><td>800</td>
+<td>641601</td>
+<td>641601</td>
+<td>1.8965(s)</td>
+<td>65.8354(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x34.71</td>
+</tr>
+<tr class="row-even"><td>900</td>
+<td>811801</td>
+<td>811801</td>
+<td>2.4164(s)</td>
+<td>82.7545(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x34.25</td>
+</tr>
+<tr class="row-even"><td>1000</td>
+<td>1002001</td>
+<td>1002001</td>
+<td>2.9450(s)</td>
+<td>102.3931(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x34.77</td>
+</tr>
+<tr class="row-even"><td>1100</td>
+<td>1212201</td>
+<td>1212201</td>
+<td>3.4908(s)</td>
+<td>123.9802(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x35.52</td>
+</tr>
+<tr class="row-even"><td>1200</td>
+<td>1442401</td>
+<td>1442401</td>
+<td>4.3144(s)</td>
+<td>147.2963(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x34.14</td>
+</tr>
+</tbody>
+</table>
+<p>This tabular was built with the following code :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM2D</span> <span class="kn">import</span> <span class="n">assemblyBench</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assemblyBench</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="s">&#39;StiffAssembling2DP1&#39;</span><span class="p">,</span><span class="n">versions</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;OptV2&#39;</span><span class="p">,</span><span class="s">&#39;OptV1&#39;</span><span class="p">],</span><span class="n">LN</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">1300</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+<span class="go">SquareMesh(100):</span>
+<span class="go"> -&gt; StiffAssembling2DP1OptV2(nq=10201, nme=20000)</span>
+<span class="go">  run ( 1/ 1) : cputime=0.022488(s) - matrix 10201-by-10201</span>
+<span class="gp">...</span>
+<span class="go">SquareMesh(1200):</span>
+<span class="go"> -&gt; StiffAssembling2DP1OptV1(nq=1442401, nme=2880000)</span>
+<span class="go">  run ( 1/ 1) : cputime=147.296321(s) - matrix 1442401-by-1442401</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>We also obtain</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/bench_Stiff2DP1_02.png"><img alt="_images/bench_Stiff2DP1_02.png" src="_images/bench_Stiff2DP1_02.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 34: StiffAssembling2DP1 benchmark</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="elastic-stiffness-matrix">
+<span id="bench2d-stiffelas-label"></span><h2><a class="toc-backref" href="#id4">Elastic Stiffness Matrix</a><a class="headerlink" href="#elastic-stiffness-matrix" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Benchmark of <strong>StiffElasAssembling2DP1</strong> with <tt class="docutils literal"><span class="pre">base</span></tt>, <tt class="docutils literal"><span class="pre">OptV1</span></tt> and  <tt class="docutils literal"><span class="pre">OptV2</span></tt> versions</p>
+<table border="1" class="docutils">
+<caption>StiffElasAssembling2DP1 benchmark summary</caption>
+<colgroup>
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="21%" />
+<col width="21%" />
+<col width="21%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">N</th>
+<th class="head">nq</th>
+<th class="head">ndof</th>
+<th class="head">OptV2</th>
+<th class="head">OptV1</th>
+<th class="head">base</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>30</td>
+<td>961</td>
+<td>1922</td>
+<td>0.0107(s)</td>
+<td>0.2809(s)</td>
+<td>1.8485(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x26.29</td>
+<td>x173.04</td>
+</tr>
+<tr class="row-even"><td>35</td>
+<td>1296</td>
+<td>2592</td>
+<td>0.0134(s)</td>
+<td>0.3807(s)</td>
+<td>2.5109(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x28.37</td>
+<td>x187.11</td>
+</tr>
+<tr class="row-even"><td>40</td>
+<td>1681</td>
+<td>3362</td>
+<td>0.0172(s)</td>
+<td>0.4986(s)</td>
+<td>3.2952(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x28.92</td>
+<td>x191.13</td>
+</tr>
+<tr class="row-even"><td>45</td>
+<td>2116</td>
+<td>4232</td>
+<td>0.0216(s)</td>
+<td>0.6306(s)</td>
+<td>4.1589(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x29.26</td>
+<td>x192.97</td>
+</tr>
+<tr class="row-even"><td>50</td>
+<td>2601</td>
+<td>5202</td>
+<td>0.0269(s)</td>
+<td>0.7800(s)</td>
+<td>5.1323(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x29.04</td>
+<td>x191.07</td>
+</tr>
+<tr class="row-even"><td>55</td>
+<td>3136</td>
+<td>6272</td>
+<td>0.0322(s)</td>
+<td>0.9453(s)</td>
+<td>6.2180(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x29.39</td>
+<td>x193.35</td>
+</tr>
+<tr class="row-even"><td>60</td>
+<td>3721</td>
+<td>7442</td>
+<td>0.0386(s)</td>
+<td>1.1282(s)</td>
+<td>7.4995(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x29.21</td>
+<td>x194.14</td>
+</tr>
+</tbody>
+</table>
+<p>This tabular was built with the following code :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM2D</span> <span class="kn">import</span> <span class="n">assemblyBench</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assemblyBench</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="s">&#39;StiffElasAssembling2DP1&#39;</span><span class="p">,</span><span class="n">LN</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="mi">65</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">SquareMesh(30):</span>
+<span class="go"> -&gt; StiffElasAssembling2DP1OptV2(nq=961, nme=1800)</span>
+<span class="go">  run ( 1/ 1) : cputime=0.010683(s) - matrix 1922-by-1922</span>
+<span class="gp">...</span>
+<span class="go">SquareMesh(30):</span>
+<span class="go"> -&gt; StiffElasAssembling2DP1OptV2(nq=961, nme=1800)</span>
+<span class="go">  run ( 1/ 1) : cputime=0.010683(s) - matrix 1922-by-1922</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>We also obtain</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/bench_StiffElas2DP1_01.png"><img alt="_images/bench_StiffElas2DP1_01.png" src="_images/bench_StiffElas2DP1_01.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 35: StiffElasAssembling2DP1 benchmark</p>
+</div>
+</li>
+<li><p class="first">Benchmark of <strong>StiffElasAssembling2DP1</strong> with <tt class="docutils literal"><span class="pre">OptV2</span></tt> and  <tt class="docutils literal"><span class="pre">OptV1</span></tt> versions</p>
+<table border="1" class="docutils">
+<caption>StiffElasAssembling2DP1 benchmark summary</caption>
+<colgroup>
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="27%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">N</th>
+<th class="head">nq</th>
+<th class="head">ndof</th>
+<th class="head">OptV2</th>
+<th class="head">OptV1</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>100</td>
+<td>10201</td>
+<td>20402</td>
+<td>0.1110(s)</td>
+<td>3.1286(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x28.18</td>
+</tr>
+<tr class="row-even"><td>200</td>
+<td>40401</td>
+<td>80802</td>
+<td>0.5036(s)</td>
+<td>12.5861(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x24.99</td>
+</tr>
+<tr class="row-even"><td>300</td>
+<td>90601</td>
+<td>181202</td>
+<td>1.2058(s)</td>
+<td>28.2232(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x23.41</td>
+</tr>
+<tr class="row-even"><td>400</td>
+<td>160801</td>
+<td>321602</td>
+<td>2.1346(s)</td>
+<td>50.2407(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x23.54</td>
+</tr>
+<tr class="row-even"><td>500</td>
+<td>251001</td>
+<td>502002</td>
+<td>3.5360(s)</td>
+<td>78.4291(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x22.18</td>
+</tr>
+<tr class="row-even"><td>600</td>
+<td>361201</td>
+<td>722402</td>
+<td>5.3290(s)</td>
+<td>113.4194(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x21.28</td>
+</tr>
+<tr class="row-even"><td>700</td>
+<td>491401</td>
+<td>982802</td>
+<td>7.4691(s)</td>
+<td>153.6793(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x20.58</td>
+</tr>
+<tr class="row-even"><td>800</td>
+<td>641601</td>
+<td>1283202</td>
+<td>9.8943(s)</td>
+<td>201.4319(s)</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>x1.00</td>
+<td>x20.36</td>
+</tr>
+</tbody>
+</table>
+<p>This tabular was built with the following code :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyOptFEM.FEM2D</span> <span class="kn">import</span> <span class="n">assemblyBench</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assemblyBench</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="s">&#39;StiffElasAssembling2DP1&#39;</span><span class="p">,</span><span class="n">versions</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;OptV2&#39;</span><span class="p">,</span><span class="s">&#39;OptV1&#39;</span><span class="p">],</span><span class="n">LN</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">900</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+<span class="go">SquareMesh(100):</span>
+<span class="go"> -&gt; StiffElasAssembling2DP1OptV2(nq=10201, nme=20000)</span>
+<span class="go">  run ( 1/ 1) : cputime=0.111037(s) - matrix 20402-by-20402</span>
+<span class="gp">...</span>
+<span class="go">SquareMesh(800):</span>
+<span class="go"> -&gt; StiffElasAssembling2DP1OptV1(nq=641601, nme=1280000)</span>
+<span class="go">  run ( 1/ 1) : cputime=201.431866(s) - matrix 1283202-by-1283202</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>We also obtain</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/bench_StiffElas2DP1_02.png"><img alt="_images/bench_StiffElas2DP1_02.png" src="_images/bench_StiffElas2DP1_02.png" style="width: 400.0px;" /></a>
+<p class="caption">Figure 36: StiffElasAssembling2DP1 benchmark</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2D benchmarks</a><ul>
+<li><a class="reference internal" href="#module-pyOptFEM.FEM2D.assemblyBench">Benchmark usage</a></li>
+<li><a class="reference internal" href="#mass-matrix">Mass Matrix</a></li>
+<li><a class="reference internal" href="#stiffness-matrix">Stiffness Matrix</a></li>
+<li><a class="reference internal" href="#elastic-stiffness-matrix">Elastic Stiffness Matrix</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="presentation.html"
+                        title="previous chapter">Presentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="benchmarks3D.html"
+                        title="next chapter">3D benchmarks</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/benchmarks2D.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="benchmarks3D.html" title="3D benchmarks"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="presentation.html" title="Presentation"
+             >previous</a> |</li>
+        <li><a href="index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

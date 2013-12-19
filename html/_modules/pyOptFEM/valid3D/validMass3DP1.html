@@ -1,0 +1,217 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyOptFEM.valid3D.validMass3DP1 &mdash; pyOptFEM 0.0.7
+ documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/FC.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.7
+',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pyOptFEM 0.0.7
+ documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyOptFEM.valid3D.validMass3DP1</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span><span class="o">,</span><span class="nn">sympy</span><span class="o">,</span><span class="nn">time</span><span class="o">,</span><span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">..FEM3D</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="k">class</span> <span class="nc">TestMass3D</span><span class="p">:</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cu</span><span class="p">,</span><span class="n">cv</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">sympy</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s">&#39;x y z&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cu</span><span class="o">=</span><span class="n">cu</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">=</span><span class="n">cv</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">=</span><span class="n">sympy</span><span class="o">.</span><span class="n">Lambda</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">),</span><span class="n">cu</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">=</span><span class="n">sympy</span><span class="o">.</span><span class="n">Lambda</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">),</span><span class="n">cv</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fu</span><span class="o">=</span><span class="nb">eval</span><span class="p">(</span><span class="s">&quot;lambda x,y,z: &quot;</span><span class="o">+</span><span class="n">cu</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fv</span><span class="o">=</span><span class="nb">eval</span><span class="p">(</span><span class="s">&quot;lambda x,y,z: &quot;</span><span class="o">+</span><span class="n">cv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">is_polynomial</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+      <span class="n">D</span><span class="o">=</span><span class="n">sympy</span><span class="o">.</span><span class="n">polys</span><span class="o">.</span><span class="n">Poly</span><span class="p">(</span><span class="n">cu</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">du</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">du</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">is_polynomial</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">):</span>
+      <span class="n">D</span><span class="o">=</span><span class="n">sympy</span><span class="o">.</span><span class="n">polys</span><span class="o">.</span><span class="n">Poly</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">dv</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">dv</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="o">=</span><span class="n">sympy</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">sympy</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">sympy</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">),(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),(</span><span class="n">y</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),(</span><span class="n">z</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    
+    
+<div class="viewcode-block" id="validMass3DP1"><a class="viewcode-back" href="../../../valid3D.html#pyOptFEM.valid3D.validMass3DP1.validMass3DP1">[docs]</a><span class="k">def</span> <span class="nf">validMass3DP1</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot; Validation of Mass Matrix for P1-Lagrange finite elements in 3D</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">Plot</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;plot&#39;</span><span class="p">,</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">Verbose</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;verbose&#39;</span><span class="p">,</span><span class="bp">True</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">&#39;*********************************************&#39;</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">&#39;*     3D Mass Assembling P1 validations     *&#39;</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">&#39;*********************************************&#39;</span><span class="p">)</span>    
+
+  <span class="n">Th</span><span class="o">=</span><span class="n">CubeMesh</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+  <span class="n">LF</span><span class="o">=</span><span class="p">[[</span><span class="s">&#39;x + y + z&#39;</span><span class="p">,</span><span class="s">&#39;x - y - z&#39;</span><span class="p">],</span>
+      <span class="p">[</span><span class="s">&#39;3*x + 2*y - z - 1&#39;</span><span class="p">,</span><span class="s">&#39;2*x - 2*y + 2*z + 1&#39;</span><span class="p">],</span>
+      <span class="p">[</span><span class="s">&#39;3*x**2 - x*y + 2*y**2 + y*z - z**2 - 3&#39;</span><span class="p">,</span><span class="s">&#39;2*x**2 + x*y - 3*y**2 - x*z - y&#39;</span><span class="p">]]</span>
+  <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span>     
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;-----------------------------------------&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;  Test 1: Matrices errors and CPU times  &#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;-----------------------------------------&#39;</span><span class="p">)</span>
+
+  <span class="n">T</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+  <span class="n">E</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="n">tstart</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="n">Mbase</span><span class="o">=</span><span class="n">MassAssembling3DP1base</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+  <span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">tstart</span>
+  <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;    Matrix size           : (</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">Mbase</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+  <span class="n">tstart</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="n">MOptV1</span><span class="o">=</span><span class="n">MassAssembling3DP1OptV1</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+  <span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">tstart</span>
+  <span class="n">E</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">NormInf</span><span class="p">(</span><span class="n">Mbase</span><span class="o">-</span><span class="n">MOptV1</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;    Error P1base vs OptV1 : </span><span class="si">%e</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">E</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+  <span class="n">tstart</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="n">MOptV2</span><span class="o">=</span><span class="n">MassAssembling3DP1OptV2</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+  <span class="n">T</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">tstart</span>
+  <span class="n">E</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">NormInf</span><span class="p">(</span><span class="n">Mbase</span><span class="o">-</span><span class="n">MOptV2</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> 
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;    Error P1base vs OptV2 : </span><span class="si">%e</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">E</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;    CPU times base (ref)  : </span><span class="si">%3.4f</span><span class="s"> (s)&quot;</span> <span class="o">%</span> <span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;    CPU times OptV1       : </span><span class="si">%3.4f</span><span class="s"> (s) - Speed Up X</span><span class="si">%3.3f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;    CPU times OptV2       : </span><span class="si">%3.4f</span><span class="s"> (s) - Speed Up X</span><span class="si">%3.3f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">T</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+  <span class="k">if</span> <span class="n">checkTest1</span><span class="p">(</span><span class="n">E</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+  <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;-----------------------------------------------------&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;  Test 2: Validations by integration on [0,1]x[0,1]  &#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;-----------------------------------------------------&#39;</span><span class="p">)</span>
+  <span class="n">deg</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">LF</span><span class="p">))</span>
+  <span class="n">E</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">LF</span><span class="p">))</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">LF</span><span class="p">)):</span>
+    <span class="n">test</span><span class="o">=</span><span class="n">TestMass3D</span><span class="p">(</span><span class="n">LF</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">LF</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">deg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">test</span><span class="o">.</span><span class="n">du</span><span class="o">+</span><span class="n">test</span><span class="o">.</span><span class="n">dv</span>
+    <span class="n">U</span><span class="o">=</span><span class="n">test</span><span class="o">.</span><span class="n">fu</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">V</span><span class="o">=</span><span class="n">test</span><span class="o">.</span><span class="n">fv</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">Ifem</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Mbase</span><span class="o">*</span><span class="n">U</span><span class="p">,</span><span class="n">V</span><span class="p">)</span>
+    <span class="n">E</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ifem</span><span class="o">-</span><span class="n">test</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;    function </span><span class="si">%d</span><span class="s"> :</span><span class="se">\n</span><span class="s">      u(x,y,z)=</span><span class="si">%s</span><span class="s">,&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">test</span><span class="o">.</span><span class="n">cu</span><span class="p">)</span> <span class="p">)</span>      
+    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;      v(x,y,z)=</span><span class="si">%s</span><span class="s">,</span><span class="se">\n</span><span class="s">           -&gt; Stiff error=</span><span class="si">%e</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">test</span><span class="o">.</span><span class="n">cv</span><span class="p">,</span><span class="n">E</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">)</span>
+  <span class="k">if</span> <span class="n">checkTest2</span><span class="p">(</span><span class="n">deg</span><span class="p">,</span><span class="n">E</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+  <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;--------------------------------&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;  Test 3: Validations by order  &#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;--------------------------------&#39;</span><span class="p">)</span>
+  <span class="n">tstart</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+  <span class="c">#LN=range(5,55,5)</span>
+  <span class="n">LN</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span>
+  <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">LN</span><span class="p">)</span>
+  <span class="n">h</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+  <span class="n">Error</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+  <span class="n">k</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">LF</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+  <span class="n">test</span><span class="o">=</span><span class="n">TestMass3D</span><span class="p">(</span><span class="n">LF</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">LF</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+  <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;    function </span><span class="si">%d</span><span class="s"> :</span><span class="se">\n</span><span class="s">      u(x,y,z)=</span><span class="si">%s</span><span class="s">,</span><span class="se">\n</span><span class="s">      v(x,y,z)=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">test</span><span class="o">.</span><span class="n">cu</span><span class="p">,</span><span class="n">test</span><span class="o">.</span><span class="n">cv</span><span class="p">))</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">Th</span><span class="o">=</span><span class="n">CubeMesh</span><span class="p">(</span><span class="n">LN</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">tstart</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">M</span><span class="o">=</span><span class="n">MassAssembling3DP1OptV2</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">nq</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">nme</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">volumes</span><span class="p">)</span>
+    <span class="n">TT</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">tstart</span>
+    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> 
+      <span class="k">print</span><span class="p">(</span><span class="s">&quot;        Matrix size                       : (</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="s">&quot;        MassAssembling3DP1OptV2 CPU times : </span><span class="si">%3.3f</span><span class="s">(s)&quot;</span> <span class="o">%</span> <span class="n">TT</span><span class="p">)</span>
+    <span class="n">U</span><span class="o">=</span><span class="n">test</span><span class="o">.</span><span class="n">fu</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">V</span><span class="o">=</span><span class="n">test</span><span class="o">.</span><span class="n">fv</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">Ifem</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">U</span><span class="p">,</span><span class="n">V</span><span class="p">)</span>
+    <span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">GetMaxLengthEdges</span><span class="p">(</span><span class="n">Th</span><span class="o">.</span><span class="n">q</span><span class="p">,</span><span class="n">Th</span><span class="o">.</span><span class="n">me</span><span class="p">)</span>
+    <span class="n">Error</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ifem</span><span class="o">-</span><span class="n">test</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;        -&gt; Error                         : </span><span class="si">%e</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">Error</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+  <span class="k">if</span> <span class="n">checkTest3</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">Error</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span> 
+  <span class="k">if</span> <span class="n">Plot</span><span class="p">:</span>    
+    <span class="n">PlotTest3</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">Error</span><span class="p">,</span><span class="s">&#39;Test 3 : Mass Matrix (3D/P1)&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/pyOptFEMsmall.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyOptFEM 0.0.7
+ documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, F. Cuvelier.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
