@@ -5,8 +5,8 @@ For each of the matrices studied, three assembly versions are available: ``base`
 Three matrices are currently implemented : **Mass matrix**, **Stiffness matrix** and **Elastic stiffness matrix**.
 
 More details are given in html or pdf documentations : 
-  - http://www.math.univ-paris13.fr/~cuvelier/software/docs/Software/FEM/pyOptFEM/<VERSION>/pyOptFEM_<VERSION>.pdf
-  - http://www.math.univ-paris13.fr/~cuvelier/software/docs/Software/FEM/pyOptFEM/<VERSION>/html/index.html
+  - http://www.math.univ-paris13.fr/~cuvelier/software/docs/Software/FEM/pyOptFEM/VERSION/pyOptFEM_VERSION.pdf
+  - http://www.math.univ-paris13.fr/~cuvelier/software/docs/Software/FEM/pyOptFEM/VERSION/html/index.html
   
 1) Requirements
   **pyOptFEM** works on Python3 or Python2 and needs ``numpy``, ``scipy``, ``sympy`` and ``matplotlib`` modules.
